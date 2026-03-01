@@ -206,6 +206,11 @@ class SerialManager:
         self.tx_count += len(data)
 
     def _run(self):
+        _REMOVE_SIGNS = (
+            "ClearCommError", "PermissionError(13", "PermissionError(5",
+            "handle is invalid", "access is denied",
+            "\u8bbe\u5907\u4e0d\u8bc6\u522b", "\u6ca1\u6709\u8fde\u63a5", "\u62d2\u7edd\u8bbf\u95ee",
+        )
         while self._alive:
             try:
                 chunk = self._port.read(256)
@@ -214,7 +219,9 @@ class SerialManager:
                     self._parser.feed(chunk)
             except Exception as e:
                 self._alive = False
-                self._on_error(str(e))
+                msg = str(e)
+                is_removal = any(k.lower() in msg.lower() for k in _REMOVE_SIGNS)
+                self._on_error("__REMOVED__" if is_removal else msg)
                 break
 
 # ─── 颜色 & 字体常量 ──────────────────────────────────────────────────────────
@@ -242,8 +249,9 @@ class EHUBApp(ctk.CTk):
         self._build_ui()
         self._refresh_ports()
         self._poll_log()
-        # 启动时自动检测
+        # 启动时自动检测，之后每秒热插拔监测
         self.after(600, self._auto_detect)
+        self.after(1000, self._hotplug_watch)
 
     # ── UI 构建 ───────────────────────────────────────────────────────────────
     def _build_ui(self):
@@ -645,8 +653,11 @@ class EHUBApp(ctk.CTk):
             while not self._log_q.empty():
                 ch, data = self._log_q.get_nowait()
                 if ch == -1:
-                    # 串口错误（来自 _on_serial_error）
-                    self._log_append(f"⚠ 串口错误：{data.decode(errors='replace')}", "err")
+                    text = data.decode(errors='replace')
+                    if text == "__REMOVED__":
+                        self._log_append("\u26a1 \u8bbe\u5907\u5df2\u79fb\u9664", "config")
+                    else:
+                        self._log_append(f"\u26a0 \u4e32\u53e3\u9519\u8bef\uff1a{text}", "err")
                     self._update_stats()
                 else:
                     self._handle_frame(ch, data)
@@ -735,16 +746,16 @@ class EHUBApp(ctk.CTk):
             self._log_append(f"⚠ 连接失败：{e}", "err")
 
     def _on_serial_error(self, msg: str):
-        """串口读取线程出错 → 推送到日志队列"""
+        """串口读取线程出错 → 推送到日志队列（区分拔出与其他错误）"""
         self._log_q.put((-1, msg.encode()))
-        # 同时在 Tk 线程里更新连接状态
         self.after(0, self._on_disconnect_event)
 
     def _on_disconnect_event(self):
-        self._conn_btn.configure(text="  连接",
+        self._conn_btn.configure(text="  \u8fde\u63a5",
                                   fg_color=("#16a34a","#15803d"),
                                   hover_color=("#15803d","#166534"))
-        self._stat_conn.configure(text="○  未连接", text_color=COLOR_ERR)
+        self._stat_conn.configure(text="\u25cb  \u672a\u8fde\u63a5", text_color=COLOR_ERR)
+        self._stat_tip.configure(text="\u8bbe\u5907\u5df2\u79fb\u9664  |  \u91cd\u65b0\u63d2\u5165\u540e\u5c06\u81ea\u52a8\u8fde\u63a5")
 
     def _refresh_ports(self):
         ports = [p.device for p in serial.tools.list_ports.comports()]
@@ -808,6 +819,15 @@ class EHUBApp(ctk.CTk):
         self._stat_tx.configure(text=f"发送:  {self._serial.tx_count} B")
         self._stat_rx.configure(text=f"接收:  {self._serial.rx_count} B")
         self._stat_err.configure(text=f"错误: {self._errors}")
+
+    def _hotplug_watch(self):
+        """每秒静默检测 EHUB 设备插入，断开状态下自动重连。"""
+        if not self._serial.connected:
+            port = find_ehub_port()
+            if port:
+                self._log_append(f"\u26a1 EHUB \u8bbe\u5907\u91cd\u65b0\u63d2\u5165\uff1a{port}\uff0c\u6b63\u5728\u8fde\u63a5\u2026", "config")
+                self._do_connect(port, PROBE_BAUD)
+        self.after(1000, self._hotplug_watch)
 
     def _toggle_theme(self):
         mode = ctk.get_appearance_mode()
