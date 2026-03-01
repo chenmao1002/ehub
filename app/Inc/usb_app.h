@@ -55,6 +55,9 @@ extern "C" {
 #define BRIDGE_CFG_SPI_MODE 0x03U   /* SPI CPOL/CPHA mode 0-3 */
 #define BRIDGE_CFG_I2C_SPD  0x04U   /* I2C speed: 100000 or 400000 (uint32 BE) */
 #define BRIDGE_CFG_CAN_BAUD 0x05U   /* CAN baud: 125000/250000/500000/1000000 (uint32 BE) */
+#define BRIDGE_CFG_SPI_ROLE 0x06U   /* SPI role: 0=master, 1=slave */
+#define BRIDGE_CFG_I2C_ROLE 0x07U   /* I2C role: 0=master, 1=slave */
+#define BRIDGE_CFG_I2C_OWN  0x08U   /* I2C own 7-bit address (0x08~0x77) */
 
 /* ---- Payload limits ------------------------------------------------------ */
 #define BRIDGE_MAX_DATA     128U    /* max bytes in one bridge frame payload */

@@ -20,7 +20,7 @@ ctk.set_default_color_theme("blue")
 # ─── 协议常量 ─────────────────────────────────────────────────────────────────
 SOF0_CMD, SOF1, SOF0_RPY = 0xAA, 0x55, 0xBB
 CH = {
-    "USART1":  0x01,
+    "USART":   0x01,
     "RS485":   0x02,
     "RS422":   0x03,
     "SPI":     0x04,
@@ -37,6 +37,9 @@ CFG_SPI_SPD  = 0x02
 CFG_SPI_MODE = 0x03
 CFG_I2C_SPD  = 0x04
 CFG_CAN_BAUD = 0x05
+CFG_SPI_ROLE = 0x06
+CFG_I2C_ROLE = 0x07
+CFG_I2C_OWN  = 0x08
 
 PROBE_BAUD   = 115200
 PROBE_MAGIC  = b'EHUB'  # 设备 PING 回复中必须包含的标识
@@ -72,6 +75,14 @@ CAN_BAUD_MAP = {
 I2C_SPEED_MAP = {
     "100 kHz（标准模式）": 100000,
     "400 kHz（快速模式）": 400000,
+}
+SPI_ROLE_MAP = {
+    "主机模式（Master）": 0,
+    "从机模式（Slave）": 1,
+}
+I2C_ROLE_MAP = {
+    "主机模式（Master）": 0,
+    "从机模式（Slave）": 1,
 }
 
 # ─── 设备探测（自动连接用） ────────────────────────────────────────────────────
@@ -233,17 +244,17 @@ COLOR_TS      = "#888888"
 MONO_FONT     = ("Consolas", 11)
 LABEL_FONT    = ("微软雅黑", 11)
 TITLE_FONT    = ("微软雅黑", 12, "bold")
-PROTO_LABELS  = ["USART1", "RS485", "RS422", "SPI", "I2C", "CAN"]
+PROTO_LABELS  = ["USART", "RS485", "RS422", "SPI", "I2C", "CAN"]
 
 # ─── 主应用 ───────────────────────────────────────────────────────────────────
 class EHUBApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("EHUB 调试工具  v1.1")
+        self.title("EHUB 调试工具  v1.1 — 软件作者（陈茂）")
         self.geometry("1100x740")
         self.minsize(920, 620)
         self._serial      = SerialManager(self._on_frame, self._on_serial_error)
-        self._cur_proto   = "USART1"
+        self._cur_proto   = "USART"
         self._log_q: queue.Queue = queue.Queue()
         self._auto_thread: threading.Thread | None = None
         self._auto_connect = True   # False = 手动断开后禁止自动重连，点击自动检测后恢复
@@ -263,7 +274,7 @@ class EHUBApp(ctk.CTk):
         self._build_sidebar()
         self._build_main()
         self._build_statusbar()
-        self._select_proto("USART1")
+        self._select_proto("USART")
 
     def _build_topbar(self):
         bar = ctk.CTkFrame(self, height=54, corner_radius=0, fg_color=("#e8eaf0", "#1e2233"))
@@ -362,30 +373,41 @@ class EHUBApp(ctk.CTk):
     def _build_send_panel(self, parent):
         card = ctk.CTkFrame(parent, corner_radius=10, fg_color=("#e2e8f4","#1a2236"))
         card.grid(row=0, column=0, sticky="ew", pady=(0,6))
+        # col0: 左侧内容, col1: 弹性间距, col2: 右侧对齐列
         card.columnconfigure(1, weight=1)
 
         ctk.CTkLabel(card, text="↑  发送数据", font=TITLE_FONT,
-                     text_color=COLOR_SEND).grid(row=0, column=0, columnspan=4,
+                     text_color=COLOR_SEND).grid(row=0, column=0, columnspan=3,
                                                   sticky="w", padx=10, pady=(8,4))
 
-        ctk.CTkLabel(card, text="格式：", font=LABEL_FONT).grid(row=1, column=0, padx=10)
+        # --- 格式行：左侧 "格式：文本"  右侧 "HEX" ---
+        fmt_left = ctk.CTkFrame(card, fg_color="transparent")
+        fmt_left.grid(row=1, column=0, columnspan=2, sticky="w", padx=10)
+        ctk.CTkLabel(fmt_left, text="格式：", font=LABEL_FONT).pack(side="left")
         self._send_mode = ctk.StringVar(value="text")
-        ctk.CTkRadioButton(card, text="文本", variable=self._send_mode,
-                           value="text", font=LABEL_FONT).grid(row=1, column=1, padx=4, sticky="w")
+        ctk.CTkRadioButton(fmt_left, text="文本", variable=self._send_mode,
+                           value="text", font=LABEL_FONT).pack(side="left", padx=(2, 4))
         ctk.CTkRadioButton(card, text="HEX", variable=self._send_mode,
-                           value="hex",  font=LABEL_FONT).grid(row=1, column=2, padx=4, sticky="w")
+                           value="hex",  font=LABEL_FONT
+                           ).grid(row=1, column=2, sticky="e", padx=10)
 
+        # --- 输入框 ---
         self._send_entry = ctk.CTkEntry(card, height=34, font=MONO_FONT,
                                          placeholder_text="输入文本或 HEX 字节（空格分隔），回车发送…")
         self._send_entry.grid(row=2, column=0, columnspan=3, sticky="ew", padx=10, pady=6)
         self._send_entry.bind("<Return>", lambda _: self._do_send())
 
-        btn_row = ctk.CTkFrame(card, fg_color="transparent")
-        btn_row.grid(row=3, column=0, columnspan=4, sticky="ew", padx=10, pady=(0,8))
-        ctk.CTkButton(btn_row, text="  发送", width=90, command=self._do_send,
+        # --- 按钮行：左侧 "发送 清除"  右侧 "追加换行" ---
+        btn_left = ctk.CTkFrame(card, fg_color="transparent")
+        btn_left.grid(row=3, column=0, columnspan=2, sticky="w", padx=10, pady=(0,8))
+        ctk.CTkButton(btn_left, text="  发送", width=90, command=self._do_send,
                       fg_color=("#2563eb","#1d4ed8")).pack(side="left", padx=(0,6))
-        ctk.CTkButton(btn_row, text="清除", width=72, fg_color=("gray70","#374151"),
+        ctk.CTkButton(btn_left, text="清除", width=72, fg_color=("gray70","#374151"),
                       command=lambda: self._send_entry.delete(0, "end")).pack(side="left")
+        self._append_newline = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(card, text="追加换行", variable=self._append_newline,
+                        font=LABEL_FONT, width=40
+                        ).grid(row=3, column=2, sticky="e", padx=36, pady=(0,16))
 
     def _build_log_panel(self, parent):
         card = ctk.CTkFrame(parent, corner_radius=10, fg_color=("#e2e8f4","#1a2236"))
@@ -447,7 +469,7 @@ class EHUBApp(ctk.CTk):
                      font=TITLE_FONT, text_color=COLOR_CONFIG
                      ).grid(row=0, column=0, columnspan=6, sticky="w", padx=12, pady=(8,6))
 
-        if name in ("USART1", "RS485", "RS422"):
+        if name in ("USART", "RS485", "RS422"):
             self._cfg_baud(name)
         elif name == "SPI":
             self._cfg_spi()
@@ -479,6 +501,7 @@ class EHUBApp(ctk.CTk):
     def _cfg_spi(self):
         spd_var  = ctk.StringVar(value=SPI_SPEED_LABELS[2])
         mode_var = ctk.StringVar(value="模式 0 (CPOL=0 CPHA=0)")
+        role_var = ctk.StringVar(value="主机模式（Master）")
         ctk.CTkComboBox(self._cfg_frame, variable=spd_var, width=200,
                          values=SPI_SPEED_LABELS, font=MONO_FONT
                          ).grid(row=1, column=1, sticky="w", padx=(0,20), pady=3)
@@ -491,26 +514,37 @@ class EHUBApp(ctk.CTk):
                          ).grid(row=2, column=1, sticky="w", padx=(0,20), pady=3)
         ctk.CTkLabel(self._cfg_frame, text="时钟模式：", font=LABEL_FONT
                      ).grid(row=2, column=0, sticky="w", padx=12, pady=3)
+        ctk.CTkComboBox(self._cfg_frame, variable=role_var, width=200,
+                         values=list(SPI_ROLE_MAP.keys()), font=MONO_FONT
+                         ).grid(row=3, column=1, sticky="w", padx=(0,20), pady=3)
+        ctk.CTkLabel(self._cfg_frame, text="主从模式：", font=LABEL_FONT
+                     ).grid(row=3, column=0, sticky="w", padx=12, pady=3)
         self._cfg_widgets["spi_spd"]  = spd_var
         self._cfg_widgets["spi_mode"] = mode_var
+        self._cfg_widgets["spi_role"] = role_var
 
         ctk.CTkLabel(self._cfg_frame,
                      text="ℹ  片选（CS）由外部硬件控制，固件不操作 CS 引脚",
                      font=("微软雅黑", 10), text_color="gray"
-                     ).grid(row=3, column=0, columnspan=4, sticky="w", padx=12, pady=(0,2))
+                     ).grid(row=4, column=0, columnspan=4, sticky="w", padx=12, pady=(0,2))
 
     def _cfg_i2c(self):
         spd_var  = ctk.StringVar(value="100 kHz（标准模式）")
+        role_var = ctk.StringVar(value="主机模式（Master）")
         self._row("通信速率：", 1,
                   ctk.CTkComboBox(self._cfg_frame, variable=spd_var, width=200,
                                    values=list(I2C_SPEED_MAP.keys()), font=MONO_FONT))
+        self._row("主从模式：", 2,
+                  ctk.CTkComboBox(self._cfg_frame, variable=role_var, width=200,
+                                   values=list(I2C_ROLE_MAP.keys()), font=MONO_FONT))
         self._cfg_widgets["i2c_spd"] = spd_var
+        self._cfg_widgets["i2c_role"] = role_var
 
         for row, (lbl, ph, key) in enumerate([
-            ("从机地址（7位十六进制）：", "0x3C", "i2c_addr"),
+            ("设备地址（7位十六进制）：", "0x3C", "i2c_addr"),
             ("寄存器地址（可选）：",      "0x00", "i2c_reg"),
             ("读取字节数：",              "1",    "i2c_rlen"),
-        ], start=2):
+        ], start=3):
             var = ctk.StringVar(value="")
             e   = ctk.CTkEntry(self._cfg_frame, placeholder_text=ph,
                                 textvariable=var, width=130, font=MONO_FONT)
@@ -541,7 +575,7 @@ class EHUBApp(ctk.CTk):
         name = self._cur_proto
         frames = []
 
-        if name in ("USART1", "RS485", "RS422"):
+        if name in ("USART", "RS485", "RS422"):
             baud = int(self._cfg_widgets["baud"].get().replace(",",""))
             iface = CH[name]
             frames.append(build_config_frame(iface, CFG_BAUD, baud))
@@ -551,14 +585,20 @@ class EHUBApp(ctk.CTk):
             idx  = SPI_SPEED_LABELS.index(self._cfg_widgets["spi_spd"].get())
             raw_mode = self._cfg_widgets["spi_mode"].get()
             mode = int(raw_mode.split()[1])   # "模式 0 ..." → 0
+            role = SPI_ROLE_MAP[self._cfg_widgets["spi_role"].get()]
             frames.append(build_config_frame(CH["SPI"], CFG_SPI_SPD,  idx))
             frames.append(build_config_frame(CH["SPI"], CFG_SPI_MODE, mode))
-            self._log_append(f"[配置] SPI  速率索引={idx}  模式={mode}", "config")
+            frames.append(build_config_frame(CH["SPI"], CFG_SPI_ROLE, role))
+            self._log_append(f"[配置] SPI  速率索引={idx}  模式={mode}  角色={'主机' if role == 0 else '从机'}", "config")
 
         elif name == "I2C":
             spd = I2C_SPEED_MAP[self._cfg_widgets["i2c_spd"].get()]
+            role = I2C_ROLE_MAP[self._cfg_widgets["i2c_role"].get()]
+            addr = int(self._cfg_widgets.get("i2c_addr", ctk.StringVar(value="0x3C")).get(), 16) & 0x7F
             frames.append(build_config_frame(CH["I2C_W"], CFG_I2C_SPD, spd))
-            self._log_append(f"[配置] I2C  速率={spd//1000} kHz", "config")
+            frames.append(build_config_frame(CH["I2C_W"], CFG_I2C_ROLE, role))
+            frames.append(build_config_frame(CH["I2C_W"], CFG_I2C_OWN,  addr))
+            self._log_append(f"[配置] I2C  速率={spd//1000} kHz  角色={'主机' if role == 0 else '从机'}  本机地址=0x{addr:02X}", "config")
 
         elif name == "CAN":
             baud = CAN_BAUD_MAP[self._cfg_widgets["can_baud"].get()]
@@ -588,7 +628,9 @@ class EHUBApp(ctk.CTk):
                 payload = self._build_i2c_payload(raw, mode)
             else:
                 payload = self._parse_input(raw, mode)
-                ch_key  = name    # USART1 / RS485 / RS422 / SPI
+                if self._append_newline.get() and mode == "text":
+                    payload += b"\r\n"
+                ch_key  = name    # USART / RS485 / RS422 / SPI
         except Exception as e:
             self._log_append(f"⚠ Input error: {e}", "err"); return
 
@@ -628,9 +670,17 @@ class EHUBApp(ctk.CTk):
     def _build_i2c_payload(self, raw: str, mode: str):
         addr_s = self._cfg_widgets.get("i2c_addr", ctk.StringVar(value="0x3C")).get()
         addr   = int(addr_s, 16) & 0x7F
+        role_s = self._cfg_widgets.get("i2c_role", ctk.StringVar(value="主机模式（Master）")).get()
+        is_slave = I2C_ROLE_MAP.get(role_s, 0) == 1
         reg_s  = self._cfg_widgets.get("i2c_reg",  ctk.StringVar(value="")).get().strip()
         rlen_s = self._cfg_widgets.get("i2c_rlen", ctk.StringVar(value="1")).get().strip()
         data   = self._parse_input(raw, mode) if raw.strip() else b""
+
+        if is_slave:
+            if len(data) == 0:
+                raise ValueError("I2C 从机模式下请输入应答数据（HEX或文本）")
+            payload = data[:128]
+            return ("I2C_W", build_frame(CH["I2C_W"], payload))
 
         needs_read = (rlen_s not in ("", "0"))
 

@@ -1,0 +1,11 @@
+{
+    "python-envs.pythonProjects": [
+        {
+            "path": "tools/ehub_debug.py",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
+        }
+    ],
+    "cortex-debug.armToolchainPath": "F:\\vscode\\openstm32\\Arm GNU Toolchain arm-none-eabi\\14.3 rel1\\bin",
+    "cortex-debug.openocdPath": "F:\\vscode\\openstm32\\openocd-20250710\\OpenOCD-20250710-0.12.0\\bin\\openocd.exe"
+}

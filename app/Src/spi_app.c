@@ -66,6 +66,13 @@ static const uint32_t s_spi_prescalers[8] = {
     SPI_BAUDRATEPRESCALER_256,
 };
 
+typedef enum {
+    BRIDGE_SPI_MASTER = 0,
+    BRIDGE_SPI_SLAVE  = 1,
+} BridgeSpiRole_t;
+
+static BridgeSpiRole_t s_spi_role = BRIDGE_SPI_MASTER;
+
 void Bridge_SPI_Config(uint8_t param, uint32_t value)
 {
     HAL_SPI_DeInit(&hspi1);
@@ -86,6 +93,12 @@ void Bridge_SPI_Config(uint8_t param, uint32_t value)
             default: break;
         }
     }
+    else if (param == BRIDGE_CFG_SPI_ROLE)
+    {
+        s_spi_role = (value == 0U) ? BRIDGE_SPI_MASTER : BRIDGE_SPI_SLAVE;
+    }
+
+    hspi1.Init.Mode = (s_spi_role == BRIDGE_SPI_MASTER) ? SPI_MODE_MASTER : SPI_MODE_SLAVE;
 
     HAL_SPI_Init(&hspi1);
 }

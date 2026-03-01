@@ -1,0 +1,11 @@
+{
+  "configurations": [
+    {
+      "name": "STM32",
+      "includePath": [],
+      "defines": [],
+      "compilerPath": "F:\\vscode\\openstm32\\Arm GNU Toolchain arm-none-eabi\\14.3 rel1\\bin\\arm-none-eabi-gcc.EXE"
+    }
+  ],
+  "version": 4
+}
