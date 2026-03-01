@@ -187,7 +187,7 @@ class SerialManager:
 
     @property
     def connected(self):
-        return self._port is not None and self._port.is_open
+        return self._alive and self._port is not None and self._port.is_open
 
     def connect(self, portname: str, baud: int):
         self._port  = serial.Serial(portname, baud, timeout=0.05)
@@ -751,11 +751,16 @@ class EHUBApp(ctk.CTk):
         self.after(0, self._on_disconnect_event)
 
     def _on_disconnect_event(self):
-        self._conn_btn.configure(text="  \u8fde\u63a5",
+        # 确保端口对象被干净关闭，使 connected 返回 False，热插拔监测才能重连
+        try:
+            self._serial.disconnect()
+        except Exception:
+            pass
+        self._conn_btn.configure(text="  连接",
                                   fg_color=("#16a34a","#15803d"),
                                   hover_color=("#15803d","#166534"))
-        self._stat_conn.configure(text="\u25cb  \u672a\u8fde\u63a5", text_color=COLOR_ERR)
-        self._stat_tip.configure(text="\u8bbe\u5907\u5df2\u79fb\u9664  |  \u91cd\u65b0\u63d2\u5165\u540e\u5c06\u81ea\u52a8\u8fde\u63a5")
+        self._stat_conn.configure(text="○  未连接", text_color=COLOR_ERR)
+        self._stat_tip.configure(text="设备已移除  |  重新插入后将自动连接")
 
     def _refresh_ports(self):
         ports = [p.device for p in serial.tools.list_ports.comports()]
