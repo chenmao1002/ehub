@@ -1,6 +1,6 @@
 """
-EHUB Debug Tool  v1.0
-上位机调试工具 — CDC ↔ Bus Bridge
+EHUB 调试工具  v1.1
+上位机 — CDC ↔ 总线桥接调试器
 依赖: pip install customtkinter pyserial
 """
 
@@ -31,11 +31,15 @@ CH = {
 }
 CH_NAME = {v: k for k, v in CH.items()}
 
-CFG_BAUD      = 0x01
-CFG_SPI_SPD   = 0x02
-CFG_SPI_MODE  = 0x03
-CFG_I2C_SPD   = 0x04
-CFG_CAN_BAUD  = 0x05
+CFG_PING     = 0x00   # 设备识别 PING（iface=0xF0 param=0x00）
+CFG_BAUD     = 0x01
+CFG_SPI_SPD  = 0x02
+CFG_SPI_MODE = 0x03
+CFG_I2C_SPD  = 0x04
+CFG_CAN_BAUD = 0x05
+
+PROBE_BAUD   = 115200
+PROBE_MAGIC  = b'EHUB'  # 设备 PING 回复中必须包含的标识
 
 SPI_SPEED_LABELS = [
     "42 MHz  (÷2)",
@@ -48,15 +52,35 @@ SPI_SPEED_LABELS = [
     "328 kHz  (÷256)",
 ]
 CAN_BAUD_MAP = {
-    "1 Mbps":   1000000,
-    "500 kbps": 500000,
-    "250 kbps": 250000,
-    "125 kbps": 125000,
+    "1 Mbps (1000 kbps)":  1000000,
+    "500 kbps":            500000,
+    "250 kbps":            250000,
+    "125 kbps":            125000,
 }
 I2C_SPEED_MAP = {
-    "100 kHz (Standard)": 100000,
-    "400 kHz (Fast)":     400000,
+    "100 kHz（标准模式）": 100000,
+    "400 kHz（快速模式）": 400000,
 }
+
+# ─── 设备探测（自动连接用） ────────────────────────────────────────────────────
+def probe_port(portname: str, baud: int = PROBE_BAUD, timeout: float = 0.6) -> bool:
+    """向指定串口发送 PING 帧，收到含 'EHUB' 的回复则判定为目标设备。"""
+    try:
+        ping = build_frame(CH["CONFIG"], bytes([0xF0, CFG_PING, 0, 0, 0, 0]))
+        with serial.Serial(portname, baud, timeout=timeout) as s:
+            s.reset_input_buffer()
+            s.write(ping)
+            deadline = time.time() + timeout
+            buf = bytearray()
+            while time.time() < deadline:
+                chunk = s.read(64)
+                if chunk:
+                    buf.extend(chunk)
+                    if b'\xBB\x55\xF0' in buf and PROBE_MAGIC in buf:
+                        return True
+            return False
+    except Exception:
+        return False
 
 # ─── 协议编解码 ───────────────────────────────────────────────────────────────
 def _crc8(ch_byte, data: bytes) -> int:
@@ -79,6 +103,10 @@ def build_config_frame(iface: int, param: int, value: int) -> bytes:
     """构建 CONFIG 帧 (6字节 payload)"""
     payload = bytes([iface, param]) + struct.pack(">I", value)
     return build_frame(CH["CONFIG"], payload)
+
+def build_ping_frame() -> bytes:
+    """构建设备识别 PING 帧"""
+    return build_frame(CH["CONFIG"], bytes([0xF0, CFG_PING, 0, 0, 0, 0]))
 
 class FrameParser:
     """状态机解析设备→PC 回复帧"""
@@ -176,23 +204,26 @@ COLOR_CONFIG  = "#f2a93b"
 COLOR_ERR     = "#f25c5c"
 COLOR_TS      = "#888888"
 MONO_FONT     = ("Consolas", 11)
-LABEL_FONT    = ("Segoe UI", 11)
-TITLE_FONT    = ("Segoe UI Semibold", 12)
+LABEL_FONT    = ("微软雅黑", 11)
+TITLE_FONT    = ("微软雅黑", 12, "bold")
 PROTO_LABELS  = ["USART1", "RS485", "RS422", "SPI", "I2C", "CAN"]
 
 # ─── 主应用 ───────────────────────────────────────────────────────────────────
 class EHUBApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("EHUB Debug Tool  v1.0")
-        self.geometry("1050x720")
-        self.minsize(900, 600)
-        self._serial  = SerialManager(self._on_frame, self._on_serial_error)
-        self._cur_proto = "USART1"
+        self.title("EHUB 调试工具  v1.1")
+        self.geometry("1100x740")
+        self.minsize(920, 620)
+        self._serial      = SerialManager(self._on_frame, self._on_serial_error)
+        self._cur_proto   = "USART1"
         self._log_q: queue.Queue = queue.Queue()
+        self._auto_thread: threading.Thread | None = None
         self._build_ui()
         self._refresh_ports()
         self._poll_log()
+        # 启动时自动检测
+        self.after(600, self._auto_detect)
 
     # ── UI 构建 ───────────────────────────────────────────────────────────────
     def _build_ui(self):
@@ -203,52 +234,59 @@ class EHUBApp(ctk.CTk):
         self._build_sidebar()
         self._build_main()
         self._build_statusbar()
+        self._select_proto("USART1")
 
     def _build_topbar(self):
-        bar = ctk.CTkFrame(self, height=52, corner_radius=0, fg_color=("#e8eaf0", "#1e2233"))
+        bar = ctk.CTkFrame(self, height=54, corner_radius=0, fg_color=("#e8eaf0", "#1e2233"))
         bar.grid(row=0, column=0, columnspan=2, sticky="ew")
-        bar.columnconfigure(6, weight=1)
+        bar.columnconfigure(7, weight=1)
 
-        ctk.CTkLabel(bar, text="  EHUB Debug Tool", font=("Segoe UI Semibold", 16),
+        ctk.CTkLabel(bar, text="  EHUB 调试工具", font=("微软雅黑", 16, "bold"),
                      text_color=("#2563eb", "#63a3f5")).grid(row=0, column=0, padx=(10, 20))
 
-        ctk.CTkLabel(bar, text="Port:", font=LABEL_FONT).grid(row=0, column=1, padx=(0, 4))
+        ctk.CTkLabel(bar, text="串口：", font=LABEL_FONT).grid(row=0, column=1, padx=(0, 4))
         self._port_var = ctk.StringVar()
         self._port_cb  = ctk.CTkComboBox(bar, variable=self._port_var, width=120, font=MONO_FONT)
         self._port_cb.grid(row=0, column=2, padx=(0, 4))
 
         ctk.CTkButton(bar, text="↺", width=30, command=self._refresh_ports,
-                      font=("Segoe UI", 14)).grid(row=0, column=3, padx=(0, 10))
+                      font=("微软雅黑", 14)).grid(row=0, column=3, padx=(0, 6))
 
-        ctk.CTkLabel(bar, text="Baud:", font=LABEL_FONT).grid(row=0, column=4, padx=(0, 4))
+        # 自动检测按钮
+        self._detect_btn = ctk.CTkButton(bar, text="🔍 自动检测", width=100,
+                                          fg_color=("#7c3aed","#6d28d9"),
+                                          hover_color=("#6d28d9","#5b21b6"),
+                                          command=self._auto_detect, font=LABEL_FONT)
+        self._detect_btn.grid(row=0, column=4, padx=(0, 14))
+
+        ctk.CTkLabel(bar, text="波特率：", font=LABEL_FONT).grid(row=0, column=5, padx=(0, 4))
         self._baud_var = ctk.StringVar(value="115200")
         ctk.CTkComboBox(bar, variable=self._baud_var, width=100, font=MONO_FONT,
                         values=["9600","19200","38400","57600","115200","230400","460800","921600"]
-                        ).grid(row=0, column=5, padx=(0, 14))
+                        ).grid(row=0, column=6, padx=(0, 14))
 
-        self._conn_btn = ctk.CTkButton(bar, text="  Connect", width=110,
+        self._conn_btn = ctk.CTkButton(bar, text="  连接", width=100,
                                        fg_color=("#16a34a","#15803d"),
                                        hover_color=("#15803d","#166534"),
                                        command=self._toggle_connect, font=TITLE_FONT)
-        self._conn_btn.grid(row=0, column=6, padx=10, sticky="w")
+        self._conn_btn.grid(row=0, column=7, padx=10, sticky="w")
 
-        # theme toggle
         self._theme_var = ctk.StringVar(value="🌙")
         ctk.CTkButton(bar, textvariable=self._theme_var, width=36,
-                      command=self._toggle_theme, font=("Segoe UI", 14)
-                      ).grid(row=0, column=7, padx=(0, 10), sticky="e")
+                      command=self._toggle_theme, font=("微软雅黑", 14)
+                      ).grid(row=0, column=8, padx=(0, 10), sticky="e")
 
     def _build_sidebar(self):
-        sb = ctk.CTkFrame(self, width=150, corner_radius=0, fg_color=("#d1d5e8","#161b2e"))
+        sb = ctk.CTkFrame(self, width=158, corner_radius=0, fg_color=("#d1d5e8","#161b2e"))
         sb.grid(row=1, column=0, sticky="nsew", padx=0)
         sb.grid_propagate(False)
 
-        ctk.CTkLabel(sb, text="Protocol", font=("Segoe UI Semibold", 13),
+        ctk.CTkLabel(sb, text="通信协议", font=("微软雅黑", 13, "bold"),
                      text_color=("#475569","#94a3b8")).pack(pady=(18, 8))
 
         self._proto_btns: dict[str, ctk.CTkButton] = {}
         for name in PROTO_LABELS:
-            btn = ctk.CTkButton(sb, text=name, width=120, height=36,
+            btn = ctk.CTkButton(sb, text=name, width=130, height=36,
                                 anchor="w", font=TITLE_FONT,
                                 fg_color="transparent",
                                 text_color=("#1e293b","#e2e8f0"),
@@ -258,20 +296,17 @@ class EHUBApp(ctk.CTk):
             btn.pack(pady=3, padx=12)
             self._proto_btns[name] = btn
 
-        # stat labels
         sb_bot = ctk.CTkFrame(sb, fg_color="transparent")
         sb_bot.pack(side="bottom", pady=14, padx=10)
-        self._stat_tx  = ctk.CTkLabel(sb_bot, text="TX:  0 B", font=MONO_FONT,
+        self._stat_tx  = ctk.CTkLabel(sb_bot, text="发送:  0 B", font=MONO_FONT,
                                        text_color=COLOR_SEND, anchor="w")
-        self._stat_rx  = ctk.CTkLabel(sb_bot, text="RX:  0 B", font=MONO_FONT,
+        self._stat_rx  = ctk.CTkLabel(sb_bot, text="接收:  0 B", font=MONO_FONT,
                                        text_color=COLOR_RECV, anchor="w")
-        self._stat_err = ctk.CTkLabel(sb_bot, text="ERR: 0",   font=MONO_FONT,
+        self._stat_err = ctk.CTkLabel(sb_bot, text="错误: 0",    font=MONO_FONT,
                                        text_color=COLOR_ERR,  anchor="w")
         for lbl in (self._stat_tx, self._stat_rx, self._stat_err):
             lbl.pack(anchor="w")
         self._errors = 0
-
-        self._select_proto("USART1")
 
     def _build_main(self):
         self._main_frame = ctk.CTkFrame(self, corner_radius=0,
@@ -280,14 +315,12 @@ class EHUBApp(ctk.CTk):
         self._main_frame.columnconfigure(0, weight=1)
         self._main_frame.rowconfigure(1, weight=1)
 
-        # ── config card ──────────────────────────────────────────────────────
         self._cfg_frame = ctk.CTkFrame(self._main_frame, corner_radius=10,
                                         fg_color=("#e2e8f4","#1a2236"))
         self._cfg_frame.grid(row=0, column=0, sticky="ew", padx=14, pady=(12,6))
         self._cfg_frame.columnconfigure(0, weight=1)
         self._cfg_widgets: dict = {}
 
-        # ── bottom splitter (send + log) ──────────────────────────────────────
         split = ctk.CTkFrame(self._main_frame, corner_radius=0, fg_color="transparent")
         split.grid(row=1, column=0, sticky="nsew", padx=14, pady=(0,6))
         split.columnconfigure(0, weight=1)
@@ -302,27 +335,27 @@ class EHUBApp(ctk.CTk):
         card.grid(row=0, column=0, sticky="ew", pady=(0,6))
         card.columnconfigure(1, weight=1)
 
-        ctk.CTkLabel(card, text="↑  Send", font=TITLE_FONT,
+        ctk.CTkLabel(card, text="↑  发送数据", font=TITLE_FONT,
                      text_color=COLOR_SEND).grid(row=0, column=0, columnspan=4,
                                                   sticky="w", padx=10, pady=(8,4))
 
-        ctk.CTkLabel(card, text="Mode:", font=LABEL_FONT).grid(row=1, column=0, padx=10)
+        ctk.CTkLabel(card, text="格式：", font=LABEL_FONT).grid(row=1, column=0, padx=10)
         self._send_mode = ctk.StringVar(value="text")
-        ctk.CTkRadioButton(card, text="Text", variable=self._send_mode,
+        ctk.CTkRadioButton(card, text="文本", variable=self._send_mode,
                            value="text", font=LABEL_FONT).grid(row=1, column=1, padx=4, sticky="w")
-        ctk.CTkRadioButton(card, text="HEX",  variable=self._send_mode,
+        ctk.CTkRadioButton(card, text="HEX", variable=self._send_mode,
                            value="hex",  font=LABEL_FONT).grid(row=1, column=2, padx=4, sticky="w")
 
         self._send_entry = ctk.CTkEntry(card, height=34, font=MONO_FONT,
-                                         placeholder_text="Enter text or hex bytes …")
+                                         placeholder_text="输入文本或 HEX 字节（空格分隔），回车发送…")
         self._send_entry.grid(row=2, column=0, columnspan=3, sticky="ew", padx=10, pady=6)
         self._send_entry.bind("<Return>", lambda _: self._do_send())
 
         btn_row = ctk.CTkFrame(card, fg_color="transparent")
         btn_row.grid(row=3, column=0, columnspan=4, sticky="ew", padx=10, pady=(0,8))
-        ctk.CTkButton(btn_row, text="  Send", width=90, command=self._do_send,
+        ctk.CTkButton(btn_row, text="  发送", width=90, command=self._do_send,
                       fg_color=("#2563eb","#1d4ed8")).pack(side="left", padx=(0,6))
-        ctk.CTkButton(btn_row, text="Clear", width=72, fg_color=("gray70","#374151"),
+        ctk.CTkButton(btn_row, text="清除", width=72, fg_color=("gray70","#374151"),
                       command=lambda: self._send_entry.delete(0, "end")).pack(side="left")
 
     def _build_log_panel(self, parent):
@@ -333,11 +366,11 @@ class EHUBApp(ctk.CTk):
 
         hdr = ctk.CTkFrame(card, fg_color="transparent")
         hdr.grid(row=0, column=0, sticky="ew", padx=10, pady=(8,2))
-        ctk.CTkLabel(hdr, text="↓  Receive Log", font=TITLE_FONT,
+        ctk.CTkLabel(hdr, text="↓  接收日志", font=TITLE_FONT,
                      text_color=COLOR_RECV).pack(side="left")
-        ctk.CTkButton(hdr, text="Save", width=60, fg_color=("gray60","#374151"),
+        ctk.CTkButton(hdr, text="保存", width=60, fg_color=("gray60","#374151"),
                       command=self._save_log, height=26).pack(side="right", padx=(4,0))
-        ctk.CTkButton(hdr, text="Clear", width=60, fg_color=("gray60","#374151"),
+        ctk.CTkButton(hdr, text="清空", width=60, fg_color=("gray60","#374151"),
                       command=self._clear_log, height=26).pack(side="right")
 
         self._log = ctk.CTkTextbox(card, font=MONO_FONT, wrap="none",
@@ -355,15 +388,16 @@ class EHUBApp(ctk.CTk):
                             fg_color=("#d1d5e8","#161b2e"))
         bar.grid(row=2, column=0, columnspan=2, sticky="ew")
         bar.columnconfigure(2, weight=1)
-        self._stat_conn = ctk.CTkLabel(bar, text="○ Disconnected",
-                                        font=("Segoe UI", 11),
+        self._stat_conn = ctk.CTkLabel(bar, text="○  未连接",
+                                        font=("微软雅黑", 11),
                                         text_color=COLOR_ERR)
         self._stat_conn.grid(row=0, column=0, padx=12)
-        ctk.CTkLabel(bar, text="│", font=("Segoe UI", 11),
+        ctk.CTkLabel(bar, text="│", font=("微软雅黑", 11),
                      text_color=("gray50","gray40")).grid(row=0, column=1)
-        ctk.CTkLabel(bar, text="Bridge Protocol v1.0",
-                     font=("Segoe UI", 11),
-                     text_color=("gray50","gray50")).grid(row=0, column=2, sticky="w", padx=8)
+        self._stat_tip = ctk.CTkLabel(bar, text="桥接协议 v1.1  |  插入设备后点击 🔍 自动检测",
+                     font=("微软雅黑", 11),
+                     text_color=("gray50","gray50"))
+        self._stat_tip.grid(row=0, column=2, sticky="w", padx=8)
 
     # ── CONFIG 面板渲染 ────────────────────────────────────────────────────────
     def _select_proto(self, name: str):
@@ -380,7 +414,7 @@ class EHUBApp(ctk.CTk):
             w.destroy()
         self._cfg_widgets.clear()
 
-        ctk.CTkLabel(self._cfg_frame, text=f"⚙  {name} Configuration",
+        ctk.CTkLabel(self._cfg_frame, text=f"⚙  {name} 参数配置",
                      font=TITLE_FONT, text_color=COLOR_CONFIG
                      ).grid(row=0, column=0, columnspan=6, sticky="w", padx=12, pady=(8,6))
 
@@ -393,7 +427,7 @@ class EHUBApp(ctk.CTk):
         elif name == "CAN":
             self._cfg_can()
 
-        ctk.CTkButton(self._cfg_frame, text="Apply Config", width=120,
+        ctk.CTkButton(self._cfg_frame, text="应用配置", width=110,
                       fg_color=("#d97706","#b45309"),
                       hover_color=("#b45309","#92400e"),
                       command=self._apply_config, font=TITLE_FONT
@@ -410,49 +444,47 @@ class EHUBApp(ctk.CTk):
                                values=["9600","19200","38400","57600","115200",
                                        "230400","460800","921600"],
                                font=MONO_FONT)
-        self._row("Baud Rate:", 1, cb)
+        self._row("波特率：", 1, cb)
         self._cfg_widgets["baud"] = var
 
     def _cfg_spi(self):
         spd_var  = ctk.StringVar(value=SPI_SPEED_LABELS[2])
-        mode_var = ctk.StringVar(value="Mode 0 (CPOL=0 CPHA=0)")
+        mode_var = ctk.StringVar(value="模式 0 (CPOL=0 CPHA=0)")
         ctk.CTkComboBox(self._cfg_frame, variable=spd_var, width=200,
                          values=SPI_SPEED_LABELS, font=MONO_FONT
                          ).grid(row=1, column=1, sticky="w", padx=(0,20), pady=3)
-        ctk.CTkLabel(self._cfg_frame, text="Speed:", font=LABEL_FONT
+        ctk.CTkLabel(self._cfg_frame, text="通信速率：", font=LABEL_FONT
                      ).grid(row=1, column=0, sticky="w", padx=12, pady=3)
-        modes = ["Mode 0 (CPOL=0 CPHA=0)","Mode 1 (CPOL=0 CPHA=1)",
-                 "Mode 2 (CPOL=1 CPHA=0)","Mode 3 (CPOL=1 CPHA=1)"]
+        modes = ["模式 0 (CPOL=0 CPHA=0)","模式 1 (CPOL=0 CPHA=1)",
+                 "模式 2 (CPOL=1 CPHA=0)","模式 3 (CPOL=1 CPHA=1)"]
         ctk.CTkComboBox(self._cfg_frame, variable=mode_var, width=200,
                          values=modes, font=MONO_FONT
                          ).grid(row=2, column=1, sticky="w", padx=(0,20), pady=3)
-        ctk.CTkLabel(self._cfg_frame, text="Mode:", font=LABEL_FONT
+        ctk.CTkLabel(self._cfg_frame, text="时钟模式：", font=LABEL_FONT
                      ).grid(row=2, column=0, sticky="w", padx=12, pady=3)
         self._cfg_widgets["spi_spd"]  = spd_var
         self._cfg_widgets["spi_mode"] = mode_var
 
-        # extra SPI-specific I/O params shown for reference
         ctk.CTkLabel(self._cfg_frame,
-                     text="ℹ  CS pin is controlled externally (not by firmware)",
-                     font=("Segoe UI", 10), text_color="gray"
+                     text="ℹ  片选（CS）由外部硬件控制，固件不操作 CS 引脚",
+                     font=("微软雅黑", 10), text_color="gray"
                      ).grid(row=3, column=0, columnspan=4, sticky="w", padx=12, pady=(0,2))
 
     def _cfg_i2c(self):
-        spd_var  = ctk.StringVar(value="100 kHz (Standard)")
-        self._row("Speed:", 1,
+        spd_var  = ctk.StringVar(value="100 kHz（标准模式）")
+        self._row("通信速率：", 1,
                   ctk.CTkComboBox(self._cfg_frame, variable=spd_var, width=200,
                                    values=list(I2C_SPEED_MAP.keys()), font=MONO_FONT))
         self._cfg_widgets["i2c_spd"] = spd_var
 
-        # extra fields for I2C operation
         for row, (lbl, ph, key) in enumerate([
-            ("Slave Addr (7-bit hex):", "0x3C", "i2c_addr"),
-            ("Reg Addr (hex, opt):",    "0x00", "i2c_reg"),
-            ("Read Len (bytes):",       "1",    "i2c_rlen"),
+            ("从机地址（7位十六进制）：", "0x3C", "i2c_addr"),
+            ("寄存器地址（可选）：",      "0x00", "i2c_reg"),
+            ("读取字节数：",              "1",    "i2c_rlen"),
         ], start=2):
             var = ctk.StringVar(value="")
             e   = ctk.CTkEntry(self._cfg_frame, placeholder_text=ph,
-                                textvariable=var, width=120, font=MONO_FONT)
+                                textvariable=var, width=130, font=MONO_FONT)
             ctk.CTkLabel(self._cfg_frame, text=lbl, font=LABEL_FONT
                          ).grid(row=row, column=0, sticky="w", padx=12, pady=3)
             e.grid(row=row, column=1, sticky="w", padx=(0,20), pady=3)
@@ -460,22 +492,22 @@ class EHUBApp(ctk.CTk):
 
     def _cfg_can(self):
         baud_var = ctk.StringVar(value="500 kbps")
-        self._row("CAN Baud:", 1,
+        self._row("CAN 波特率：", 1,
                   ctk.CTkComboBox(self._cfg_frame, variable=baud_var,
-                                   width=160, values=list(CAN_BAUD_MAP.keys()), font=MONO_FONT))
-        ide_var = ctk.StringVar(value="Standard 11-bit")
-        self._row("Frame Type:", 2,
+                                   width=180, values=list(CAN_BAUD_MAP.keys()), font=MONO_FONT))
+        ide_var = ctk.StringVar(value="标准帧 11 位")
+        self._row("帧类型：", 2,
                   ctk.CTkComboBox(self._cfg_frame, variable=ide_var,
-                                   width=180, values=["Standard 11-bit","Extended 29-bit"], font=MONO_FONT))
+                                   width=180, values=["标准帧 11 位","扩展帧 29 位"], font=MONO_FONT))
         id_var = ctk.StringVar(value="0x123")
-        self._row("CAN ID (hex):", 3,
+        self._row("CAN ID（十六进制）：", 3,
                   ctk.CTkEntry(self._cfg_frame, textvariable=id_var, width=110, font=MONO_FONT))
         self._cfg_widgets.update(can_baud=baud_var, can_ide=ide_var, can_id=id_var)
 
     # ── Apply Config ──────────────────────────────────────────────────────────
     def _apply_config(self):
         if not self._serial.connected:
-            self._log_append("⚠ Not connected", "err"); return
+            self._log_append("⚠ 设备未连接", "err"); return
 
         name = self._cur_proto
         frames = []
@@ -484,24 +516,25 @@ class EHUBApp(ctk.CTk):
             baud = int(self._cfg_widgets["baud"].get().replace(",",""))
             iface = CH[name]
             frames.append(build_config_frame(iface, CFG_BAUD, baud))
-            self._log_append(f"[Config] {name}  baud→{baud}", "config")
+            self._log_append(f"[配置] {name}  波特率→{baud}", "config")
 
         elif name == "SPI":
             idx  = SPI_SPEED_LABELS.index(self._cfg_widgets["spi_spd"].get())
-            mode = int(self._cfg_widgets["spi_mode"].get().split()[1])
+            raw_mode = self._cfg_widgets["spi_mode"].get()
+            mode = int(raw_mode.split()[1])   # "模式 0 ..." → 0
             frames.append(build_config_frame(CH["SPI"], CFG_SPI_SPD,  idx))
             frames.append(build_config_frame(CH["SPI"], CFG_SPI_MODE, mode))
-            self._log_append(f"[Config] SPI  speed_idx={idx}  mode={mode}", "config")
+            self._log_append(f"[配置] SPI  速率索引={idx}  模式={mode}", "config")
 
         elif name == "I2C":
             spd = I2C_SPEED_MAP[self._cfg_widgets["i2c_spd"].get()]
             frames.append(build_config_frame(CH["I2C_W"], CFG_I2C_SPD, spd))
-            self._log_append(f"[Config] I2C  speed={spd//1000} kHz", "config")
+            self._log_append(f"[配置] I2C  速率={spd//1000} kHz", "config")
 
         elif name == "CAN":
             baud = CAN_BAUD_MAP[self._cfg_widgets["can_baud"].get()]
             frames.append(build_config_frame(CH["CAN"], CFG_CAN_BAUD, baud))
-            self._log_append(f"[Config] CAN  baud={baud}", "config")
+            self._log_append(f"[配置] CAN  波特率={baud}", "config")
 
         for f in frames:
             self._serial.send(f)
@@ -510,7 +543,7 @@ class EHUBApp(ctk.CTk):
     # ── Send ──────────────────────────────────────────────────────────────────
     def _do_send(self):
         if not self._serial.connected:
-            self._log_append("⚠ Not connected", "err"); return
+            self._log_append("⚠ 设备未连接", "err"); return
 
         raw = self._send_entry.get()
         if not raw.strip(): return
@@ -534,7 +567,7 @@ class EHUBApp(ctk.CTk):
             ch_key = name
             frame  = build_frame(CH[ch_key], payload)
         elif name == "I2C":
-            ch_str, frame = payload   # returns (ch_key, frame)
+            ch_str, frame = payload
             ch_key = ch_str
         else:
             frame  = payload
@@ -554,7 +587,7 @@ class EHUBApp(ctk.CTk):
 
     def _build_can_payload(self) -> bytes:
         can_id  = int(self._cfg_widgets["can_id"].get(), 16)
-        ide     = 1 if "29" in self._cfg_widgets["can_ide"].get() else 0
+        ide     = 1 if "29" in self._cfg_widgets["can_ide"].get() else 0  # 扩展帧 29 位
         raw     = self._send_entry.get().strip()
         mode    = self._send_mode.get()
         data    = self._parse_input(raw, mode)[:8]
@@ -591,8 +624,13 @@ class EHUBApp(ctk.CTk):
         try:
             while not self._log_q.empty():
                 ch, data = self._log_q.get_nowait()
-                self._handle_frame(ch, data)
-                self._update_stats()
+                if ch == -1:
+                    # 串口错误（来自 _on_serial_error）
+                    self._log_append(f"⚠ 串口错误：{data.decode(errors='replace')}", "err")
+                    self._update_stats()
+                else:
+                    self._handle_frame(ch, data)
+                    self._update_stats()
         except Exception:
             pass
         self.after(40, self._poll_log)
@@ -602,11 +640,15 @@ class EHUBApp(ctk.CTk):
         ch_name = CH_NAME.get(ch, f"0x{ch:02X}")
 
         if ch == CH["CONFIG"]:
-            status = "OK" if len(data) >= 2 and data[1] == 0 else "FAIL"
+            # 自动连接时的 PING 回复（data = [0xF0, 0x00, E, H, U, B]）
+            if (len(data) >= 6 and data[0] == 0xF0 and data[1] == 0x00
+                    and data[2:6] == b'EHUB'):
+                self._log_append("← [设备识别]  EHUB 设备已确认 ✓", "config")
+                return
+            status = "成功" if len(data) >= 2 and data[1] == 0x00 else "失败"
             target = CH_NAME.get(data[0], f"0x{data[0]:02X}") if data else "?"
-            self._log_append(f"← [CONFIG/{target}]  {status}", "config")
+            self._log_append(f"← [配置回复/{target}]  {status}", "config")
         else:
-            # try ASCII decode for display
             try:
                 text = data.decode("utf-8", errors="replace")
                 text = text[:80].replace("\r", "").replace("\n", "↵")
@@ -635,7 +677,7 @@ class EHUBApp(ctk.CTk):
         from tkinter import filedialog
         path = filedialog.asksaveasfilename(
             defaultextension=".txt",
-            filetypes=[("Text", "*.txt"), ("All", "*.*")])
+            filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")])
         if path:
             content = self._log.get("1.0", "end")
             with open(path, "w", encoding="utf-8") as f:
@@ -645,40 +687,95 @@ class EHUBApp(ctk.CTk):
     def _toggle_connect(self):
         if self._serial.connected:
             self._serial.disconnect()
-            self._conn_btn.configure(text="  Connect",
+            self._conn_btn.configure(text="  连接",
                                       fg_color=("#16a34a","#15803d"),
                                       hover_color=("#15803d","#166534"))
-            self._stat_conn.configure(text="○ Disconnected", text_color=COLOR_ERR)
-            self._log_append("Disconnected.", "err")
+            self._stat_conn.configure(text="○  未连接", text_color=COLOR_ERR)
+            self._stat_tip.configure(text="桥接协议 v1.1  |  插入设备后点击 🔍 自动检测")
+            self._log_append("已断开连接。", "err")
         else:
             port = self._port_var.get()
-            if not port:
-                self._log_append("⚠ No port selected", "err"); return
-            try:
-                baud = int(self._baud_var.get().replace(",",""))
-                self._serial.connect(port, baud)
-                self._conn_btn.configure(text="  Disconnect",
-                                          fg_color=("#dc2626","#b91c1c"),
-                                          hover_color=("#b91c1c","#991b1b"))
-                self._stat_conn.configure(
-                    text=f"● {port}  {baud}", text_color=COLOR_RECV)
-                self._log_append(f"Connected to {port} @ {baud}", "config")
-            except Exception as e:
-                self._log_append(f"⚠ {e}", "err")
+            if not port or port == "(无可用串口)":
+                self._log_append("⚠ 未选择串口", "err"); return
+            self._do_connect(port, int(self._baud_var.get()))
+
+    def _do_connect(self, port: str, baud: int):
+        """实际执行连接操作（可由自动检测或手动按钮调用）"""
+        try:
+            self._serial.connect(port, baud)
+            self._conn_btn.configure(text="  断开",
+                                      fg_color=("#dc2626","#b91c1c"),
+                                      hover_color=("#b91c1c","#991b1b"))
+            self._stat_conn.configure(
+                text=f"●  {port}  {baud} bps", text_color=COLOR_RECV)
+            self._stat_tip.configure(text=f"已连接  |  EHUB 桥接协议 v1.1")
+            self._port_var.set(port)
+            self._log_append(f"已连接到 {port} @ {baud} bps", "config")
+        except Exception as e:
+            self._log_append(f"⚠ 连接失败：{e}", "err")
 
     def _on_serial_error(self, msg: str):
+        """串口读取线程出错 → 推送到日志队列"""
         self._log_q.put((-1, msg.encode()))
+        # 同时在 Tk 线程里更新连接状态
+        self.after(0, self._on_disconnect_event)
+
+    def _on_disconnect_event(self):
+        self._conn_btn.configure(text="  连接",
+                                  fg_color=("#16a34a","#15803d"),
+                                  hover_color=("#15803d","#166534"))
+        self._stat_conn.configure(text="○  未连接", text_color=COLOR_ERR)
 
     def _refresh_ports(self):
         ports = [p.device for p in serial.tools.list_ports.comports()]
-        self._port_cb.configure(values=ports if ports else ["(none)"])
+        self._port_cb.configure(values=ports if ports else ["(无可用串口)"])
         if ports:
             self._port_var.set(ports[0])
 
+    # ── 自动检测 ──────────────────────────────────────────────────────────────
+    def _auto_detect(self):
+        if self._serial.connected:
+            self._log_append("ℹ 已连接，无需自动检测", "config"); return
+        if self._auto_thread and self._auto_thread.is_alive():
+            return   # 检测线程已在运行
+        ports = [p.device for p in serial.tools.list_ports.comports()]
+        if not ports:
+            self._log_append("⚠ 未检测到任何串口，请检查 USB 连接", "err"); return
+        self._detect_btn.configure(state="disabled", text="检测中…")
+        self._stat_tip.configure(text=f"正在检测 {len(ports)} 个串口…")
+        self._log_append(f"开始自动检测，共 {len(ports)} 个串口…", "config")
+        self._auto_thread = threading.Thread(
+            target=self._probe_worker, args=(ports,), daemon=True)
+        self._auto_thread.start()
+
+    def _probe_worker(self, ports: list):
+        found_port = None
+        baud = PROBE_BAUD
+        for port in ports:
+            self.after(0, lambda p=port: self._stat_tip.configure(
+                text=f"正在检测 {p}…"))
+            self.after(0, lambda p=port: self._log_append(
+                f"  检测 {p} …", "config"))
+            if probe_port(port, baud):
+                found_port = port
+                break
+
+        # 回到 Tk 主线程更新 UI
+        self.after(0, lambda: self._probe_done(found_port, baud))
+
+    def _probe_done(self, found_port, baud: int):
+        self._detect_btn.configure(state="normal", text="🔍 自动检测")
+        if found_port:
+            self._log_append(f"✓ 检测到 EHUB 设备：{found_port}，正在连接…", "config")
+            self._do_connect(found_port, baud)
+        else:
+            self._log_append("✗ 未检测到 EHUB 设备，请检查 USB 连接或手动选择串口", "err")
+            self._stat_tip.configure(text="未找到 EHUB 设备  |  可手动选择串口后点击连接")
+
     def _update_stats(self):
-        self._stat_tx.configure(text=f"TX:  {self._serial.tx_count} B")
-        self._stat_rx.configure(text=f"RX:  {self._serial.rx_count} B")
-        self._stat_err.configure(text=f"ERR: {self._errors}")
+        self._stat_tx.configure(text=f"发送:  {self._serial.tx_count} B")
+        self._stat_rx.configure(text=f"接收:  {self._serial.rx_count} B")
+        self._stat_err.configure(text=f"错误: {self._errors}")
 
     def _toggle_theme(self):
         mode = ctk.get_appearance_mode()

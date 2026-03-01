@@ -88,8 +88,18 @@ static void Bridge_Config_Reply(uint8_t iface, uint8_t ok)
 
 static void Bridge_HandleConfig(const BridgeMsg_t *m)
 {
-    if (m->len < 6U) { Bridge_Config_Reply(m->buf[0], 0); return; }
+    if (m->len < 1U) { Bridge_Config_Reply(m->buf[0], 0); return; }
     uint8_t  iface = m->buf[0];
+
+    /* PING: iface=0xF0 param=0x00 — respond with magic "EHUB" */
+    if (iface == BRIDGE_CH_CONFIG)
+    {
+        uint8_t rep[6] = { BRIDGE_CH_CONFIG, 0x00U, 'E', 'H', 'U', 'B' };
+        Bridge_SendToCDC(BRIDGE_CH_CONFIG, rep, 6U);
+        return;
+    }
+
+    if (m->len < 6U) { Bridge_Config_Reply(iface, 0); return; }
     uint8_t  param = m->buf[1];
     uint32_t value = ((uint32_t)m->buf[2] << 24U)
                    | ((uint32_t)m->buf[3] << 16U)
