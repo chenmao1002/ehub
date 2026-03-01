@@ -246,6 +246,7 @@ class EHUBApp(ctk.CTk):
         self._cur_proto   = "USART1"
         self._log_q: queue.Queue = queue.Queue()
         self._auto_thread: threading.Thread | None = None
+        self._auto_connect = True   # False = 手动断开后禁止自动重连，点击自动检测后恢复
         self._build_ui()
         self._refresh_ports()
         self._poll_log()
@@ -717,13 +718,14 @@ class EHUBApp(ctk.CTk):
     # ── Serial helpers ────────────────────────────────────────────────────────
     def _toggle_connect(self):
         if self._serial.connected:
+            self._auto_connect = False   # 手动断开 → 禁止自动重连
             self._serial.disconnect()
             self._conn_btn.configure(text="  连接",
                                       fg_color=("#16a34a","#15803d"),
                                       hover_color=("#15803d","#166534"))
             self._stat_conn.configure(text="○  未连接", text_color=COLOR_ERR)
-            self._stat_tip.configure(text="桥接协议 v1.1  |  插入设备后点击 🔍 自动检测")
-            self._log_append("已断开连接。", "err")
+            self._stat_tip.configure(text="已手动断开  |  点击 🔍 自动检测可重新启用自动连接")
+            self._log_append("已手动断开连接。自动重连已暂停，点击 🔍 自动检测可恢复。", "config")
         else:
             port = self._port_var.get()
             if not port or port == "(无可用串口)":
@@ -770,6 +772,7 @@ class EHUBApp(ctk.CTk):
 
     # ── 自动检测 ──────────────────────────────────────────────────────────────
     def _auto_detect(self):
+        self._auto_connect = True   # 点击自动检测 → 重新开启自动重连
         if self._serial.connected:
             self._log_append("ℹ 已连接，无需自动检测", "config"); return
         if self._auto_thread and self._auto_thread.is_alive():
@@ -826,11 +829,11 @@ class EHUBApp(ctk.CTk):
         self._stat_err.configure(text=f"错误: {self._errors}")
 
     def _hotplug_watch(self):
-        """每秒静默检测 EHUB 设备插入，断开状态下自动重连。"""
-        if not self._serial.connected:
+        """每秒静默检测 EHUB 设备插入，断开状态下自动重连（仅限 _auto_connect=True）。"""
+        if self._auto_connect and not self._serial.connected:
             port = find_ehub_port()
             if port:
-                self._log_append(f"\u26a1 EHUB \u8bbe\u5907\u91cd\u65b0\u63d2\u5165\uff1a{port}\uff0c\u6b63\u5728\u8fde\u63a5\u2026", "config")
+                self._log_append(f"⚡ EHUB 设备重新插入：{port}，正在连接…", "config")
                 self._do_connect(port, PROBE_BAUD)
         self.after(1000, self._hotplug_watch)
 
