@@ -51,3 +51,19 @@ void Bridge_RS485_Send(const uint8_t *data, uint16_t len)
     /* Non-blocking DMA transmit */
     HAL_UART_Transmit_DMA(&huart3, (uint8_t *)data, len);
 }
+
+/* -------------------------------------------------------------------------
+ * Bridge_RS485_Config
+ * param = BRIDGE_CFG_BAUD, value = baud rate (e.g. 115200)
+ * ------------------------------------------------------------------------- */
+void Bridge_RS485_Config(uint8_t param, uint32_t value)
+{
+    if (param != BRIDGE_CFG_BAUD || value == 0U) { return; }
+    HAL_UART_DMAStop(&huart3);
+    HAL_UART_DeInit(&huart3);
+    huart3.Init.BaudRate = value;
+    HAL_UART_Init(&huart3);
+    HAL_GPIO_WritePin(RS485_TX_EN_GPIO_Port, RS485_TX_EN_Pin, GPIO_PIN_RESET);
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart3, Bridge_USART3_RxBuf(), 128U);
+    __HAL_DMA_DISABLE_IT(huart3.hdmarx, DMA_IT_HT);
+}

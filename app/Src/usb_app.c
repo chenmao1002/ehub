@@ -18,6 +18,7 @@
 
 #include "usb_app.h"
 #include "usbd_cdc_if.h"
+#include "usbd_def.h"
 #include "usart.h"
 #include "main.h"
 #include "cmsis_os.h"
@@ -30,6 +31,13 @@ extern void Bridge_SPI_Send  (const uint8_t *data, uint16_t len);
 extern void Bridge_I2C_Send  (const uint8_t *data, uint16_t len);
 extern void Bridge_I2C_Read  (const uint8_t *data, uint16_t len);
 extern void Bridge_CAN_Send  (const uint8_t *data, uint16_t len);
+
+extern void Bridge_RS485_Config(uint8_t param, uint32_t value);
+extern void Bridge_RS422_Config(uint8_t param, uint32_t value);
+extern void Bridge_SPI_Config  (uint8_t param, uint32_t value);
+extern void Bridge_I2C_Config  (uint8_t param, uint32_t value);
+extern void Bridge_CAN_Config  (uint8_t param, uint32_t value);
+extern void Bridge_USART1_Config(uint8_t param, uint32_t value);
 
 /* ---- External init functions --------------------------------------------- */
 extern void Bridge_RS485_Init(void);
@@ -72,6 +80,35 @@ static BridgeMsg_t  s_rx_msg;
 static uint8_t      s_crc;
 static uint16_t     s_idx;
 
+static void Bridge_Config_Reply(uint8_t iface, uint8_t ok)
+{
+    uint8_t rep[2] = { iface, ok ? 0x00U : 0xFFU };
+    Bridge_SendToCDC(BRIDGE_CH_CONFIG, rep, 2U);
+}
+
+static void Bridge_HandleConfig(const BridgeMsg_t *m)
+{
+    if (m->len < 6U) { Bridge_Config_Reply(m->buf[0], 0); return; }
+    uint8_t  iface = m->buf[0];
+    uint8_t  param = m->buf[1];
+    uint32_t value = ((uint32_t)m->buf[2] << 24U)
+                   | ((uint32_t)m->buf[3] << 16U)
+                   | ((uint32_t)m->buf[4] <<  8U)
+                   |  (uint32_t)m->buf[5];
+    switch (iface)
+    {
+        case BRIDGE_CH_USART1: Bridge_USART1_Config(param, value); break;
+        case BRIDGE_CH_RS485:  Bridge_RS485_Config(param, value);  break;
+        case BRIDGE_CH_RS422:  Bridge_RS422_Config(param, value);  break;
+        case BRIDGE_CH_SPI:    Bridge_SPI_Config(param, value);    break;
+        case BRIDGE_CH_I2C_W:
+        case BRIDGE_CH_I2C_R:  Bridge_I2C_Config(param, value);    break;
+        case BRIDGE_CH_CAN:    Bridge_CAN_Config(param, value);    break;
+        default: Bridge_Config_Reply(iface, 0); return;
+    }
+    Bridge_Config_Reply(iface, 1);
+}
+
 static void Bridge_Dispatch(const BridgeMsg_t *m)
 {
     switch (m->ch)
@@ -96,6 +133,9 @@ static void Bridge_Dispatch(const BridgeMsg_t *m)
             break;
         case BRIDGE_CH_CAN:
             Bridge_CAN_Send(m->buf, m->len);
+            break;
+        case BRIDGE_CH_CONFIG:
+            Bridge_HandleConfig(m);
             break;
         default:
             break;
@@ -226,7 +266,6 @@ void Bridge_Task(void *argument)
  *  Section 4 – Bridge_Init
  *===========================================================================*/
 
-static osThreadId_t bridge_task_handle;
 static const osThreadAttr_t bridge_task_attrs = {
     .name       = "bridgeTask",
     .stack_size = 512U * 4U,
@@ -251,7 +290,7 @@ void Bridge_Init(void)
     __HAL_DMA_DISABLE_IT(huart1.hdmarx, DMA_IT_HT);
 
     /* Start bridge task */
-    bridge_task_handle = osThreadNew(Bridge_Task, NULL, &bridge_task_attrs);
+    osThreadNew(Bridge_Task, NULL, &bridge_task_attrs);
 }
 
 /*===========================================================================
@@ -299,6 +338,20 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
         HAL_UARTEx_ReceiveToIdle_DMA(&huart4, uart4_rx_buf, UART_RX_BUF_SIZE);
         __HAL_DMA_DISABLE_IT(huart4.hdmarx, DMA_IT_HT);
     }
+}
+
+/* -------------------------------------------------------------------------
+ * Bridge_USART1_Config  (USART1 baud rate)
+ * ------------------------------------------------------------------------- */
+void Bridge_USART1_Config(uint8_t param, uint32_t value)
+{
+    if (param != BRIDGE_CFG_BAUD || value == 0U) { return; }
+    HAL_UART_DMAStop(&huart1);
+    HAL_UART_DeInit(&huart1);
+    huart1.Init.BaudRate = value;
+    HAL_UART_Init(&huart1);
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart1, usart1_rx_buf, UART_RX_BUF_SIZE);
+    __HAL_DMA_DISABLE_IT(huart1.hdmarx, DMA_IT_HT);
 }
 
 /**

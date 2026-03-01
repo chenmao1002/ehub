@@ -47,6 +47,14 @@ extern "C" {
 #define BRIDGE_CH_I2C_W     0x05U   /* I2C1 master write */
 #define BRIDGE_CH_I2C_R     0x06U   /* I2C1 master read  */
 #define BRIDGE_CH_CAN       0x07U   /* CAN1  */
+#define BRIDGE_CH_CONFIG    0xF0U   /* peripheral re-configuration */
+
+/* ---- CONFIG param types (data[1] of a BRIDGE_CH_CONFIG frame) ----------- */
+#define BRIDGE_CFG_BAUD     0x01U   /* USART1/RS485/RS422 baud rate (uint32 BE) */
+#define BRIDGE_CFG_SPI_SPD  0x02U   /* SPI prescaler index 0-7 (2/4/8/16/32/64/128/256) */
+#define BRIDGE_CFG_SPI_MODE 0x03U   /* SPI CPOL/CPHA mode 0-3 */
+#define BRIDGE_CFG_I2C_SPD  0x04U   /* I2C speed: 100000 or 400000 (uint32 BE) */
+#define BRIDGE_CFG_CAN_BAUD 0x05U   /* CAN baud: 125000/250000/500000/1000000 (uint32 BE) */
 
 /* ---- Payload limits ------------------------------------------------------ */
 #define BRIDGE_MAX_DATA     128U    /* max bytes in one bridge frame payload */

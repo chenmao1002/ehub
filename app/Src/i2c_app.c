@@ -21,3 +21,17 @@ void Bridge_I2C_Read(const uint8_t *data, uint16_t len)
     if (HAL_I2C_Master_Receive(&hi2c1,addr|1,rx_buf,rx_len,I2C_TIMEOUT_MS)==HAL_OK)
         Bridge_SendToCDC(BRIDGE_CH_I2C_R, rx_buf, rx_len);
 }
+
+/* -------------------------------------------------------------------------
+ * Bridge_I2C_Config
+ * BRIDGE_CFG_I2C_SPD : value = 100000 (standard) or 400000 (fast)
+ * ------------------------------------------------------------------------- */
+void Bridge_I2C_Config(uint8_t param, uint32_t value)
+{
+    if (param != BRIDGE_CFG_I2C_SPD) { return; }
+    if (value != 100000U && value != 400000U) { return; }
+    HAL_I2C_DeInit(&hi2c1);
+    hi2c1.Init.ClockSpeed = value;
+    hi2c1.Init.DutyCycle  = (value == 400000U) ? I2C_DUTYCYCLE_2 : I2C_DUTYCYCLE_2;
+    HAL_I2C_Init(&hi2c1);
+}

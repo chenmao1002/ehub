@@ -8,22 +8,12 @@
  *   using the same channel (BRIDGE_CH_SPI).
  *
  * Chip-select pin:
- *   Default = PA4  (SPI1_NSS in software-NSS mode).
- *   Change SPI_CS_PORT / SPI_CS_PIN below if your board wires it elsewhere.
+ *   CS is driven externally — no software CS control in this driver.
  */
 
 #include "usb_app.h"
 #include "spi.h"
-#include "main.h"
 #include <string.h>
-
-/* ---- CS pin configuration — modify to match your hardware --------------- */
-#ifndef SPI_CS_PORT
-  #define SPI_CS_PORT   GPIOA
-#endif
-#ifndef SPI_CS_PIN
-  #define SPI_CS_PIN    GPIO_PIN_4
-#endif
 
 /* -------------------------------------------------------------------------
  * Bridge_SPI_Init
@@ -32,8 +22,7 @@
  * ------------------------------------------------------------------------- */
 void Bridge_SPI_Init(void)
 {
-    /* De-assert CS (idle HIGH) */
-    HAL_GPIO_WritePin(SPI_CS_PORT, SPI_CS_PIN, GPIO_PIN_SET);
+    /* CS controlled externally — nothing to initialise here */
 }
 
 /* -------------------------------------------------------------------------
@@ -47,10 +36,56 @@ void Bridge_SPI_Send(const uint8_t *data, uint16_t len)
     if (data == NULL || len == 0U) { return; }
     if (len > BRIDGE_MAX_DATA) { len = BRIDGE_MAX_DATA; }
 
-    HAL_GPIO_WritePin(SPI_CS_PORT, SPI_CS_PIN, GPIO_PIN_RESET);  /* CS LOW  */
     HAL_SPI_TransmitReceive(&hspi1, (uint8_t *)data, rx_buf, len, 50U);
-    HAL_GPIO_WritePin(SPI_CS_PORT, SPI_CS_PIN, GPIO_PIN_SET);     /* CS HIGH */
 
     /* Return received bytes to PC */
     Bridge_SendToCDC(BRIDGE_CH_SPI, rx_buf, len);
+}
+
+/* -------------------------------------------------------------------------
+ * Bridge_SPI_Config
+ * BRIDGE_CFG_SPI_SPD : value = prescaler index 0-7
+ *   index 0 → SPI_BAUDRATEPRESCALER_2   (42 MHz)
+ *   index 1 → SPI_BAUDRATEPRESCALER_4   (21 MHz)
+ *   index 2 → SPI_BAUDRATEPRESCALER_8   (10.5 MHz)
+ *   index 3 → SPI_BAUDRATEPRESCALER_16  (5.25 MHz)
+ *   index 4 → SPI_BAUDRATEPRESCALER_32  (2.625 MHz)
+ *   index 5 → SPI_BAUDRATEPRESCALER_64  (1.31 MHz)
+ *   index 6 → SPI_BAUDRATEPRESCALER_128 (656 kHz)
+ *   index 7 → SPI_BAUDRATEPRESCALER_256 (328 kHz)
+ * BRIDGE_CFG_SPI_MODE : value = 0/1/2/3 (CPOL<<1 | CPHA)
+ * ------------------------------------------------------------------------- */
+static const uint32_t s_spi_prescalers[8] = {
+    SPI_BAUDRATEPRESCALER_2,
+    SPI_BAUDRATEPRESCALER_4,
+    SPI_BAUDRATEPRESCALER_8,
+    SPI_BAUDRATEPRESCALER_16,
+    SPI_BAUDRATEPRESCALER_32,
+    SPI_BAUDRATEPRESCALER_64,
+    SPI_BAUDRATEPRESCALER_128,
+    SPI_BAUDRATEPRESCALER_256,
+};
+
+void Bridge_SPI_Config(uint8_t param, uint32_t value)
+{
+    HAL_SPI_DeInit(&hspi1);
+
+    if (param == BRIDGE_CFG_SPI_SPD)
+    {
+        if (value > 7U) { value = 7U; }
+        hspi1.Init.BaudRatePrescaler = s_spi_prescalers[value];
+    }
+    else if (param == BRIDGE_CFG_SPI_MODE)
+    {
+        switch (value & 0x03U)
+        {
+            case 0: hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE; break;
+            case 1: hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE; break;
+            case 2: hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH; hspi1.Init.CLKPhase = SPI_PHASE_1EDGE; break;
+            case 3: hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH; hspi1.Init.CLKPhase = SPI_PHASE_2EDGE; break;
+            default: break;
+        }
+    }
+
+    HAL_SPI_Init(&hspi1);
 }

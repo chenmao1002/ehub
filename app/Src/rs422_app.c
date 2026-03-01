@@ -33,3 +33,18 @@ void Bridge_RS422_Send(const uint8_t *data, uint16_t len)
     if (data == NULL || len == 0U) { return; }
     HAL_UART_Transmit_DMA(&huart4, (uint8_t *)data, len);
 }
+
+/* -------------------------------------------------------------------------
+ * Bridge_RS422_Config
+ * param = BRIDGE_CFG_BAUD, value = baud rate
+ * ------------------------------------------------------------------------- */
+void Bridge_RS422_Config(uint8_t param, uint32_t value)
+{
+    if (param != BRIDGE_CFG_BAUD || value == 0U) { return; }
+    HAL_UART_DMAStop(&huart4);
+    HAL_UART_DeInit(&huart4);
+    huart4.Init.BaudRate = value;
+    HAL_UART_Init(&huart4);
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart4, Bridge_UART4_RxBuf(), 128U);
+    __HAL_DMA_DISABLE_IT(huart4.hdmarx, DMA_IT_HT);
+}
