@@ -1253,6 +1253,36 @@
               <FileType>1</FileType>
               <FilePath>..\app\Src\printf_app.c</FilePath>
             </File>
+            <File>
+              <FileName>usb_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\Src\usb_app.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\Src\rs485_app.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs422_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\Src\rs422_app.c</FilePath>
+            </File>
+            <File>
+              <FileName>can_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\Src\can_app.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\Src\spi_app.c</FilePath>
+            </File>
+            <File>
+              <FileName>i2c_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\Src\i2c_app.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
