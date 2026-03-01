@@ -41,6 +41,18 @@ CFG_CAN_BAUD = 0x05
 PROBE_BAUD   = 115200
 PROBE_MAGIC  = b'EHUB'  # 设备 PING 回复中必须包含的标识
 
+# EHUB 设备 USB 标识（VID=0x0D28 ARM Ltd / PID=0x0204 CMSIS-DAP 复合设备）
+EHUB_VID = 0x0D28
+EHUB_PID = 0x0204
+
+
+def find_ehub_port() -> str | None:
+    """通过 USB VID/PID 直接定位 EHUB 设备的 COM 口，不依赖固件应答。"""
+    for p in serial.tools.list_ports.comports():
+        if p.vid == EHUB_VID and p.pid == EHUB_PID:
+            return p.device
+    return None
+
 SPI_SPEED_LABELS = [
     "42 MHz  (÷2)",
     "21 MHz  (÷4)",
@@ -63,21 +75,29 @@ I2C_SPEED_MAP = {
 }
 
 # ─── 设备探测（自动连接用） ────────────────────────────────────────────────────
-def probe_port(portname: str, baud: int = PROBE_BAUD, timeout: float = 0.6) -> bool:
-    """向指定串口发送 PING 帧，收到含 'EHUB' 的回复则判定为目标设备。"""
+def probe_port(portname: str, baud: int = PROBE_BAUD, timeout: float = 1.2) -> bool:
+    """向指定串口发送 PING 帧，收到含 'EHUB' 的回复则判定为目标设备（可选验证）。"""
     try:
-        ping = build_frame(CH["CONFIG"], bytes([0xF0, CFG_PING, 0, 0, 0, 0]))
-        with serial.Serial(portname, baud, timeout=timeout) as s:
+        with serial.Serial(portname, baud,
+                           timeout=0.1,
+                           write_timeout=1.0,
+                           dsrdtr=False,
+                           rtscts=False) as s:
+            time.sleep(0.12)
             s.reset_input_buffer()
+            ping = build_frame(CH["CONFIG"], bytes([0xF0, CFG_PING, 0, 0, 0, 0]))
             s.write(ping)
+            s.flush()
             deadline = time.time() + timeout
             buf = bytearray()
             while time.time() < deadline:
-                chunk = s.read(64)
+                chunk = s.read(128)
                 if chunk:
                     buf.extend(chunk)
                     if b'\xBB\x55\xF0' in buf and PROBE_MAGIC in buf:
                         return True
+                else:
+                    time.sleep(0.02)
             return False
     except Exception:
         return False
@@ -394,7 +414,7 @@ class EHUBApp(ctk.CTk):
         self._stat_conn.grid(row=0, column=0, padx=12)
         ctk.CTkLabel(bar, text="│", font=("微软雅黑", 11),
                      text_color=("gray50","gray40")).grid(row=0, column=1)
-        self._stat_tip = ctk.CTkLabel(bar, text="桥接协议 v1.1  |  插入设备后点击 🔍 自动检测",
+        self._stat_tip = ctk.CTkLabel(bar, text="桥接协议 v1.1  |  插入 EHUB 设备后点击 🔍 自动检测（或等待启动自动识别）",
                      font=("微软雅黑", 11),
                      text_color=("gray50","gray50"))
         self._stat_tip.grid(row=0, column=2, sticky="w", padx=8)
@@ -737,13 +757,22 @@ class EHUBApp(ctk.CTk):
         if self._serial.connected:
             self._log_append("ℹ 已连接，无需自动检测", "config"); return
         if self._auto_thread and self._auto_thread.is_alive():
-            return   # 检测线程已在运行
+            return
+
+        # ── 第一步：VID/PID 快速识别 ──────────────────────────────────────
+        port = find_ehub_port()
+        if port:
+            self._log_append(f"✓ 通过 USB 描述符找到 EHUB 设备：{port}，正在连接…", "config")
+            self._do_connect(port, PROBE_BAUD)
+            return
+
+        # ── 如果 VID/PID 未能识别，退回到 PING 扫描 ──────────────────────
         ports = [p.device for p in serial.tools.list_ports.comports()]
         if not ports:
             self._log_append("⚠ 未检测到任何串口，请检查 USB 连接", "err"); return
         self._detect_btn.configure(state="disabled", text="检测中…")
-        self._stat_tip.configure(text=f"正在检测 {len(ports)} 个串口…")
-        self._log_append(f"开始自动检测，共 {len(ports)} 个串口…", "config")
+        self._stat_tip.configure(text=f"正在扫描 {len(ports)} 个串口（PING 模式）…")
+        self._log_append(f"VID/PID 未匹配，启动 PING 扫描，共 {len(ports)} 个串口…", "config")
         self._auto_thread = threading.Thread(
             target=self._probe_worker, args=(ports,), daemon=True)
         self._auto_thread.start()
@@ -755,8 +784,11 @@ class EHUBApp(ctk.CTk):
             self.after(0, lambda p=port: self._stat_tip.configure(
                 text=f"正在检测 {p}…"))
             self.after(0, lambda p=port: self._log_append(
-                f"  检测 {p} …", "config"))
-            if probe_port(port, baud):
+                f"  → {p}  发送 PING…", "config"))
+            ok = probe_port(port, baud)
+            self.after(0, lambda p=port, r=ok: self._log_append(
+                f"  ← {p}  {'✓ EHUB 应答' if r else '✗ 无应答'}", "config"))
+            if ok:
                 found_port = port
                 break
 
