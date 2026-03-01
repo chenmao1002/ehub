@@ -26,6 +26,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usb_app.h"
+#include "dap_app.h"
+#include "ws2812c.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -137,12 +139,28 @@ void StartDefaultTask(void *argument)
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN StartDefaultTask */
-  /* Initialise CDC↔Bus bridge (must run after USB init) */
+  /* 1. 初始化 CMSIS-DAP HID 缓冲区，必须在 USB 启动后立即调用 */
+  USBD_HID0_Initialize();
+
+  /* 2. 初始化 CDC↔总线桥接（创建 FreeRTOS 队列 + Bridge_Task） */
   Bridge_Init();
+
+  /* 3. 创建 CMSIS-DAP 处理任务 */
+  static const osThreadAttr_t dap_task_attrs = {
+      .name       = "DAPTask",
+      .stack_size = 1024U * 4U,
+      .priority   = (osPriority_t)osPriorityAboveNormal,
+  };
+  osThreadNew(StartDAPTask, NULL, &dap_task_attrs);
+
+  /* 4. LED 群显示系统就绪 (RGB绿色) */
+  WS2812C_SetSingleColor(1, 0, 25, 0);
+  WS2812C_Update();
+
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    osDelay(100);
   }
   /* USER CODE END StartDefaultTask */
 }

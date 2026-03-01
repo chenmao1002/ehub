@@ -43,13 +43,25 @@ void Bridge_RS485_Init(void)
  * ------------------------------------------------------------------------- */
 void Bridge_RS485_Send(const uint8_t *data, uint16_t len)
 {
+    static uint8_t rs485_tx_buf[BRIDGE_MAX_DATA];
+
     if (data == NULL || len == 0U) { return; }
+    if (len > BRIDGE_MAX_DATA) { len = BRIDGE_MAX_DATA; }
+
+    /* Wait previous TX done (best effort) */
+    uint32_t t = HAL_GetTick();
+    while ((HAL_UART_GetState(&huart3) & HAL_UART_STATE_BUSY_TX) != 0U) {
+        if ((HAL_GetTick() - t) > 50U) { return; }
+        osDelay(1);
+    }
+
+    memcpy(rs485_tx_buf, data, len);
 
     /* Switch transceiver to transmit mode */
     HAL_GPIO_WritePin(RS485_TX_EN_GPIO_Port, RS485_TX_EN_Pin, GPIO_PIN_SET);
 
     /* Non-blocking DMA transmit */
-    HAL_UART_Transmit_DMA(&huart3, (uint8_t *)data, len);
+    (void)HAL_UART_Transmit_DMA(&huart3, rs485_tx_buf, len);
 }
 
 /* -------------------------------------------------------------------------

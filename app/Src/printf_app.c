@@ -15,23 +15,25 @@ extern UART_HandleTypeDef huart1;
  */
 int printf_u1(const char *format, ...)
 {
+  /* 使用 static 缓冲区：DMA 传输期间源地址必须有效，
+     局部栈变量在函数返回后即被释放，导致 DMA 读取已回收内存 */
+  static uint8_t buffer[512];
   va_list args;
-  char buffer[512];  // 定义缓冲区
   int len;
-  
-  // 解析可变参数
+
   va_start(args, format);
-  len = vsnprintf(buffer, sizeof(buffer), format, args);
+  len = vsnprintf((char *)buffer, sizeof(buffer), format, args);
   va_end(args);
 
-  // 确保不超过缓冲区大小
-  if (len > sizeof(buffer) - 1) {
-    len = sizeof(buffer) - 1;
-  }
-  // 发送数据
-  HAL_UART_Transmit_DMA(&huart1, (uint8_t *)buffer, len);
+  if (len <= 0) { return len; }
+  if (len > (int)(sizeof(buffer) - 1)) { len = (int)(sizeof(buffer) - 1); }
 
-  // 延时确保数据发送完成
-//  HAL_Delay((len/10)+1);
+  /* 等待上一次 DMA 或 IT 传输完成，再发起新传输 */
+  uint32_t t = HAL_GetTick();
+  while (HAL_UART_GetState(&huart1) & HAL_UART_STATE_BUSY_TX) {
+    if ((HAL_GetTick() - t) > 50U) { return -1; } /* 超时放弃 */
+  }
+
+  HAL_UART_Transmit_DMA(&huart1, buffer, (uint16_t)len);
   return len;
 }

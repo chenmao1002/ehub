@@ -362,9 +362,18 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef *pdev)
   HAL_PCD_RegisterIsoOutIncpltCallback(&hpcd_USB_OTG_FS, PCD_ISOOUTIncompleteCallback);
   HAL_PCD_RegisterIsoInIncpltCallback(&hpcd_USB_OTG_FS, PCD_ISOINIncompleteCallback);
 #endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
+  /* USB OTG FS FIFO allocation (total 320 words = 1.25 KB available)
+   * Rx shared:  0x80 = 128 words (512 B)  for all OUT endpoints
+   * EP0 Tx:     0x20 =  32 words (128 B)  control
+   * EP1 Tx:     0x40 =  64 words (256 B)  HID IN  (0x81)
+   * EP2 Tx:     0x10 =  16 words ( 64 B)  CDC CMD (0x82)
+   * EP3 Tx:     0x40 =  64 words (256 B)  CDC IN  (0x83)
+   * Total: 128+32+64+16+64 = 304 words */
   HAL_PCDEx_SetRxFiFo(&hpcd_USB_OTG_FS, 0x80);
-  HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 0, 0x40);
-  HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 1, 0x80);
+  HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 0, 0x20);
+  HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 1, 0x40);
+  HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 2, 0x10);
+  HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 3, 0x40);
   }
   return USBD_OK;
 }

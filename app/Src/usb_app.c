@@ -88,7 +88,7 @@ static void Bridge_Config_Reply(uint8_t iface, uint8_t ok)
 
 static void Bridge_HandleConfig(const BridgeMsg_t *m)
 {
-    if (m->len < 1U) { Bridge_Config_Reply(m->buf[0], 0); return; }
+    if (m->len < 1U) { Bridge_Config_Reply(BRIDGE_CH_CONFIG, 0); return; }
     uint8_t  iface = m->buf[0];
 
     /* PING: iface=0xF0 param=0x00 — respond with magic "EHUB" */
@@ -124,8 +124,21 @@ static void Bridge_Dispatch(const BridgeMsg_t *m)
     switch (m->ch)
     {
         case BRIDGE_CH_USART1:
-            HAL_UART_Transmit_DMA(&huart1, (uint8_t *)m->buf, m->len);
+        {
+            /* m->buf 指向 Bridge_Task 栈上的局部变量，DMA 异步读取，
+               必须先拷贝到 static 缓冲区再启动 DMA，否则下次循环
+               覆盖 msg.buf 时 DMA 仍在读取旧数据。
+               同时等待上次传输完成，避免 HAL_BUSY 丢包。 */
+            static uint8_t usart1_tx_buf[BRIDGE_MAX_DATA];
+            uint32_t t = HAL_GetTick();
+            while (HAL_UART_GetState(&huart1) & HAL_UART_STATE_BUSY_TX) {
+                if ((HAL_GetTick() - t) > 50U) { break; }
+                osDelay(1);
+            }
+            memcpy(usart1_tx_buf, m->buf, m->len);
+            HAL_UART_Transmit_DMA(&huart1, usart1_tx_buf, m->len);
             break;
+        }
         case BRIDGE_CH_RS485:
             Bridge_RS485_Send(m->buf, m->len);
             break;
@@ -204,7 +217,9 @@ void CDC_Receive_FS(uint8_t *Buf, uint32_t Len)
             case PS_CRC:
                 if (b == s_crc) {
                     /* Post to command queue (non-blocking, ISR-safe) */
-                    osMessageQueuePut(bridge_cmd_queue, &s_rx_msg, 0U, 0U);
+                    if (bridge_cmd_queue != NULL) {
+                        (void)osMessageQueuePut(bridge_cmd_queue, &s_rx_msg, 0U, 0U);
+                    }
                 }
                 s_state = PS_SOF0;
                 break;
@@ -258,16 +273,19 @@ void Bridge_Task(void *argument)
 
     for (;;)
     {
-        /* 1. Forward all pending bus-received frames to PC (non-blocking) */
-        while (osMessageQueueGet(bridge_rx_queue, &msg, NULL, 0U) == osOK)
-        {
-            Bridge_SendToCDC(msg.ch, msg.buf, msg.len);
-        }
-
-        /* 2. Handle one command from PC (block up to 1 ms for next event) */
+        /* 1) Prefer one host command first, keeping command latency bounded */
         if (osMessageQueueGet(bridge_cmd_queue, &msg, NULL, 1U) == osOK)
         {
-            Bridge_Dispatch(&msg);   /* SPI/I2C blocking calls are safe here */
+            Bridge_Dispatch(&msg);
+        }
+
+        /* 2) Then flush at most a few bus-RX frames to avoid starving commands */
+        for (uint8_t budget = 0U; budget < 4U; budget++)
+        {
+            if (osMessageQueueGet(bridge_rx_queue, &msg, NULL, 0U) != osOK) {
+                break;
+            }
+            Bridge_SendToCDC(msg.ch, msg.buf, msg.len);
         }
     }
 }
@@ -325,7 +343,9 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
     {
         msg.ch = BRIDGE_CH_USART1;
         memcpy(msg.buf, usart1_rx_buf, msg.len);
-        osMessageQueuePut(bridge_rx_queue, &msg, 0U, 0U);
+        if (bridge_rx_queue != NULL) {
+            (void)osMessageQueuePut(bridge_rx_queue, &msg, 0U, 0U);
+        }
         /* Re-arm */
         HAL_UARTEx_ReceiveToIdle_DMA(&huart1, usart1_rx_buf, UART_RX_BUF_SIZE);
         __HAL_DMA_DISABLE_IT(huart1.hdmarx, DMA_IT_HT);
@@ -334,7 +354,9 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
     {
         msg.ch = BRIDGE_CH_RS485;
         memcpy(msg.buf, usart3_rx_buf, msg.len);
-        osMessageQueuePut(bridge_rx_queue, &msg, 0U, 0U);
+        if (bridge_rx_queue != NULL) {
+            (void)osMessageQueuePut(bridge_rx_queue, &msg, 0U, 0U);
+        }
         /* Re-arm (DE already LOW — set by TxCplt callback or never changed) */
         HAL_UARTEx_ReceiveToIdle_DMA(&huart3, usart3_rx_buf, UART_RX_BUF_SIZE);
         __HAL_DMA_DISABLE_IT(huart3.hdmarx, DMA_IT_HT);
@@ -343,7 +365,9 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
     {
         msg.ch = BRIDGE_CH_RS422;
         memcpy(msg.buf, uart4_rx_buf, msg.len);
-        osMessageQueuePut(bridge_rx_queue, &msg, 0U, 0U);
+        if (bridge_rx_queue != NULL) {
+            (void)osMessageQueuePut(bridge_rx_queue, &msg, 0U, 0U);
+        }
         /* Re-arm */
         HAL_UARTEx_ReceiveToIdle_DMA(&huart4, uart4_rx_buf, UART_RX_BUF_SIZE);
         __HAL_DMA_DISABLE_IT(huart4.hdmarx, DMA_IT_HT);

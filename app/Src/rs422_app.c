@@ -30,8 +30,19 @@ void Bridge_RS422_Init(void)
  * ------------------------------------------------------------------------- */
 void Bridge_RS422_Send(const uint8_t *data, uint16_t len)
 {
+    static uint8_t rs422_tx_buf[BRIDGE_MAX_DATA];
+
     if (data == NULL || len == 0U) { return; }
-    HAL_UART_Transmit_DMA(&huart4, (uint8_t *)data, len);
+    if (len > BRIDGE_MAX_DATA) { len = BRIDGE_MAX_DATA; }
+
+    uint32_t t = HAL_GetTick();
+    while ((HAL_UART_GetState(&huart4) & HAL_UART_STATE_BUSY_TX) != 0U) {
+        if ((HAL_GetTick() - t) > 50U) { return; }
+        osDelay(1);
+    }
+
+    memcpy(rs422_tx_buf, data, len);
+    (void)HAL_UART_Transmit_DMA(&huart4, rs422_tx_buf, len);
 }
 
 /* -------------------------------------------------------------------------
