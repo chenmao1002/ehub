@@ -47,7 +47,7 @@ extern "C" {
 #define CUSTOM_HID_EPOUT_ADDR                0x01U
 #define CUSTOM_HID_EPOUT_SIZE                0x40U  /* Important: Endpoint packetsize should be 64! Zach Lee */
 
-#define USB_CUSTOM_HID_CONFIG_DESC_SIZ       41U
+#define USB_CUSTOM_HID_CONFIG_DESC_SIZ       107U
 #define USB_CUSTOM_HID_DESC_SIZ              9U
 
 #ifndef CUSTOM_HID_HS_BINTERVAL
@@ -67,6 +67,14 @@ extern "C" {
 
 #define CUSTOM_HID_DESCRIPTOR_TYPE           0x21U
 #define CUSTOM_HID_REPORT_DESC               0x22U
+
+/* CDC endpoint definitions (added for composite HID+CDC) */
+#define CDC_CMD_EP_ADDR                      0x82U
+#define CDC_CMD_EP_SIZE                      0x10U
+
+#define CDC_IN_EP_ADDR                       0x83U
+#define CDC_OUT_EP_ADDR                      0x03U
+#define CDC_DATA_FS_MAX_PACKET_SIZE         0x40U
 
 #define CUSTOM_HID_REQ_SET_PROTOCOL          0x0BU
 #define CUSTOM_HID_REQ_GET_PROTOCOL          0x03U
@@ -111,6 +119,24 @@ typedef struct
   CUSTOM_HID_StateTypeDef     state;
 }
 USBD_CUSTOM_HID_HandleTypeDef;
+
+/* Extend handle to include CDC buffers for composite device */
+typedef struct
+{
+  uint8_t              Report_buf[USBD_CUSTOMHID_OUTREPORT_BUF_SIZE];
+  uint32_t             Protocol;
+  uint32_t             IdleState;
+  uint32_t             AltSetting;
+  uint32_t             IsReportAvailable;
+  CUSTOM_HID_StateTypeDef     state;
+
+  uint8_t              cdc_rx_buf[CDC_DATA_FS_MAX_PACKET_SIZE];
+  uint8_t              cdc_tx_buf[CDC_DATA_FS_MAX_PACKET_SIZE];
+  uint8_t              linecoding[7]; /* dwDTERate(4), bCharFormat, bParityType, bDataBits */
+  uint16_t             control_line_state;
+  uint8_t              is_linecoding_set;
+}
+USBD_CUSTOM_HID_ComposeHandleTypeDef;
 /**
   * @}
   */

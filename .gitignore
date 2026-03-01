@@ -1,0 +1,21 @@
+# Keil MDK build outputs
+MDK-ARM/EHUB/*.o
+MDK-ARM/EHUB/*.crf
+MDK-ARM/EHUB/*.d
+MDK-ARM/EHUB/*.axf
+MDK-ARM/EHUB/*.hex
+MDK-ARM/EHUB/*.htm
+MDK-ARM/EHUB/*.lnp
+MDK-ARM/EHUB/*.map
+MDK-ARM/EHUB/*.dep
+MDK-ARM/EHUB/*.lst
+MDK-ARM/EHUB/*.iex
+MDK-ARM/EHUB/ExtDll.iex
+
+# Keil IDE user-specific files
+MDK-ARM/*.uvguix.*
+MDK-ARM/*.uvoptx
+MDK-ARM/startup_stm32f407xx.lst
+
+# Keep sct linker script
+!MDK-ARM/EHUB/EHUB.sct

@@ -29,14 +29,14 @@
 
 /// Default communication speed on the Debug Access Port for SWD and JTAG mode.
 /// 1MHz 是安全默认值，若需更快可调整（需匹配硬件）
-#define DAP_DEFAULT_SWJ_CLOCK   1000000U        ///< Default SWD/JTAG clock frequency in Hz.
+#define DAP_DEFAULT_SWJ_CLOCK   100000U        ///< Default SWD/JTAG clock frequency in Hz.
 
 /// Maximum Package Size for Command and Response data.
 /// STM32F4 USB 全速 HID 推荐 64 字节，保持默认
 #define DAP_PACKET_SIZE         64U             ///< Specifies Packet Size in bytes.
 
 /// Maximum Package Buffers for Command and Response data.
-#define DAP_PACKET_COUNT        4U              ///< Specifies number of packets buffered.
+#define DAP_PACKET_COUNT        12U              ///< Specifies number of packets buffered.
 
 /// Indicate that UART Serial Wire Output (SWO) trace is available.
 /// STM32F4 支持 SWO UART 模式，若需要启用可改为 1（需硬件配合）
@@ -44,7 +44,7 @@
 
 /// Maximum SWO UART Baudrate.
 /// 配合 168MHz 主频，最大可支持 25MHz，此处保持默认即可
-#define SWO_UART_MAX_BAUDRATE   10000000U       ///< SWO UART Maximum Baudrate in Hz.
+#define SWO_UART_MAX_BAUDRATE   1000000U       ///< SWO UART Maximum Baudrate in Hz.
 
 /// Indicate that Manchester Serial Wire Output (SWO) trace is available.
 #define SWO_MANCHESTER          0               ///< SWO Manchester:  1 = available, 0 = not available.
@@ -100,23 +100,24 @@ __STATIC_INLINE uint8_t DAP_GetSerNumString (char *str) {
 ///@}
 
 /* Private defines -----------------------------------------------------------*/
-#define JTAG_TCK_Pin GPIO_PIN_10
-#define JTAG_TCK_GPIO_Port GPIOB
+#define JTAG_TCK_Pin GPIO_PIN_7
+#define JTAG_TCK_GPIO_Port GPIOC
 
-#define JTAG_TMS_Pin GPIO_PIN_1
-#define JTAG_TMS_GPIO_Port GPIOB
+#define JTAG_TMS_Pin GPIO_PIN_8
+#define JTAG_TMS_GPIO_Port GPIOC
+
+#define JTAG_TDO_Pin GPIO_PIN_6
+#define JTAG_TDO_GPIO_Port GPIOC
+
+#define JTAG_TDI_Pin GPIO_PIN_15
+#define JTAG_TDI_GPIO_Port GPIOD
 
 #define JTAG_nRESET_Pin GPIO_PIN_12
-#define JTAG_nRESET_GPIO_Port GPIOB
+#define JTAG_nRESET_GPIO_Port GPIOD
 
-#define JTAG_TDI_Pin GPIO_PIN_13
-#define JTAG_TDI_GPIO_Port GPIOB
 
-#define JTAG_TDO_Pin GPIO_PIN_14
-#define JTAG_TDO_GPIO_Port GPIOB
-
-#define JTAG_nTRST_Pin GPIO_PIN_15
-#define JTAG_nTRST_GPIO_Port GPIOB
+#define JTAG_nTRST_Pin GPIO_PIN_11
+#define JTAG_nTRST_GPIO_Port GPIOD
 
 
 // Connected LED                PIN13 of GPIOC
@@ -180,28 +181,31 @@ __STATIC_INLINE void PORT_JTAG_SETUP (void) {
 //  HAL_GPIO_WritePin(JTAG_TDI_GPIO_Port, JTAG_TDI_Pin, GPIO_PIN_SET);
 //  HAL_GPIO_WritePin(JTAG_nTRST_GPIO_Port, JTAG_nTRST_Pin, GPIO_PIN_SET);
 //  HAL_GPIO_WritePin(JTAG_nRESET_GPIO_Port, JTAG_nRESET_Pin, GPIO_PIN_SET);
-  GPIOB->BSRR = JTAG_TCK_Pin|JTAG_TMS_Pin|JTAG_TDI_Pin|JTAG_nTRST_Pin|JTAG_nRESET_Pin;
-
+//  GPIOB->BSRR = JTAG_TCK_Pin|JTAG_TMS_Pin|JTAG_TDI_Pin|JTAG_nTRST_Pin|JTAG_nRESET_Pin;
+//	
+	GPIOC->BSRR = JTAG_TCK_Pin|JTAG_TMS_Pin|JTAG_TDO_Pin;
+	GPIOD->BSRR = JTAG_nTRST_Pin|JTAG_nRESET_Pin|JTAG_TDI_Pin;
+	
   /*Configure GPIO pins : JTAG_TCK_Pin JTAG_TMS_Pin JTAG_TDI_Pin */
-  GPIO_InitStruct.Pin = JTAG_TCK_Pin|JTAG_TMS_Pin|JTAG_TDI_Pin;
+  GPIO_InitStruct.Pin = JTAG_TCK_Pin|JTAG_TMS_Pin|JTAG_TDO_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : JTAG_nRESET_Pin JTAG_nTRST_Pin */
   GPIO_InitStruct.Pin = JTAG_nRESET_Pin|JTAG_nTRST_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pin : JTAG_TDO_Pin */
-  GPIO_InitStruct.Pin = JTAG_TDO_Pin;
+  GPIO_InitStruct.Pin = JTAG_TDI_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 }
 
 /** Setup SWD I/O pins: SWCLK, SWDIO, and nRESET.
@@ -215,13 +219,15 @@ __STATIC_INLINE void PORT_SWD_SETUP (void) {
 //  HAL_GPIO_WritePin(JTAG_TCK_GPIO_Port, JTAG_TCK_Pin, GPIO_PIN_SET);
 //  HAL_GPIO_WritePin(JTAG_TMS_GPIO_Port, JTAG_TMS_Pin, GPIO_PIN_SET);
 //  HAL_GPIO_WritePin(JTAG_nRESET_GPIO_Port, JTAG_nRESET_Pin, GPIO_PIN_SET);
-  GPIOB->BSRR = JTAG_TCK_Pin|JTAG_TMS_Pin|JTAG_nRESET_Pin;
-
+//  GPIOB->BSRR = JTAG_TCK_Pin|JTAG_TMS_Pin|JTAG_nRESET_Pin;
+	GPIOC->BSRR = JTAG_TCK_Pin|JTAG_TMS_Pin;
+	GPIOD->BSRR = JTAG_nRESET_Pin;
+	
   GPIO_InitStruct.Pin = JTAG_TMS_Pin|JTAG_TCK_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   GPIO_InitStruct.Pin = JTAG_nRESET_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
@@ -229,11 +235,17 @@ __STATIC_INLINE void PORT_SWD_SETUP (void) {
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(JTAG_nRESET_GPIO_Port, &GPIO_InitStruct);
 
-  GPIO_InitStruct.Pin = JTAG_TDI_Pin|JTAG_TDO_Pin|JTAG_nTRST_Pin;
+  GPIO_InitStruct.Pin = JTAG_TDI_Pin|JTAG_nTRST_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+	
+	GPIO_InitStruct.Pin = JTAG_TDO_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
 
 /** Disable JTAG/SWD I/O Pins.
@@ -243,12 +255,17 @@ Disables the DAP Hardware I/O pins which configures:
 __STATIC_INLINE void PORT_OFF (void) {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-  GPIO_InitStruct.Pin = JTAG_TMS_Pin|JTAG_TCK_Pin|JTAG_TDI_Pin|
-                        JTAG_TDO_Pin|JTAG_nTRST_Pin|JTAG_nRESET_Pin;
+  GPIO_InitStruct.Pin = JTAG_TMS_Pin|JTAG_TCK_Pin|JTAG_TDO_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	
+	  GPIO_InitStruct.Pin = JTAG_TDI_Pin|JTAG_nTRST_Pin|JTAG_nRESET_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 }
 
 

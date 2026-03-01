@@ -276,7 +276,8 @@ SWD_TransferFunction(Slow)
 //   return:  ACK[2:0]
 uint8_t  SWD_Transfer(uint32_t request, uint32_t *data) {
   if (DAP_Data.fast_clock) {
-    return SWD_TransferFast(request, data);
+//    return SWD_TransferFast(request, data);
+		return SWD_TransferSlow(request, data);
   } else {
     return SWD_TransferSlow(request, data);
   }

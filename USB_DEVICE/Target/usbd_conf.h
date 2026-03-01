@@ -63,11 +63,11 @@
   */
 
 /*---------- -----------*/
-#define USBD_MAX_NUM_INTERFACES     1U
+#define USBD_MAX_NUM_INTERFACES     3U
 /*---------- -----------*/
 #define USBD_MAX_NUM_CONFIGURATION     1U
 /*---------- -----------*/
-#define USBD_MAX_STR_DESC_SIZ     24U
+#define USBD_MAX_STR_DESC_SIZ     48U
 /*---------- -----------*/
 #define USBD_DEBUG_LEVEL     0U
 /*---------- -----------*/
@@ -79,7 +79,7 @@
 /*---------- -----------*/
 #define USBD_CUSTOM_HID_REPORT_DESC_SIZE     32U
 /*---------- -----------*/
-#define CUSTOM_HID_FS_BINTERVAL     0x0AU
+#define CUSTOM_HID_FS_BINTERVAL     0x1U
 
 /****************************************/
 /* #define for FS and HS identification */

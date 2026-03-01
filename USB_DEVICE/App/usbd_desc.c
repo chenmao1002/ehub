@@ -1,21 +1,4 @@
 /* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file           : App/usbd_desc.c
-  * @version        : v1.0_Cube
-  * @brief          : This file implements the USB device descriptors.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -24,7 +7,6 @@
 #include "usbd_conf.h"
 
 /* USER CODE BEGIN INCLUDE */
-
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,8 +14,6 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-/* Private variables ---------------------------------------------------------*/
-
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -50,7 +30,6 @@
   */
 
 /* USER CODE BEGIN PRIVATE_TYPES */
-
 /* USER CODE END PRIVATE_TYPES */
 
 /**
@@ -61,19 +40,18 @@
   * @brief Private defines.
   * @{
   */
-//0xc251 0xf001
-#define USBD_VID     0x0D28  //3368
+
+#define USBD_VID     0x0D28
 #define USBD_LANGID_STRING     1033
 #define USBD_MANUFACTURER_STRING     "GenieKits"
-#define USBD_PID_FS     0x0204 //516
-#define USBD_PRODUCT_STRING_FS     "chenmao CMSIS-DAP"
-#define USBD_CONFIGURATION_STRING_FS     "CMSIS-DAP Interface"
-#define USBD_INTERFACE_STRING_FS     "Custom HID Interface"
+#define USBD_PID_FS     0x0204
+#define USBD_PRODUCT_STRING_FS     "cm CMSIS-DAP"
+#define USBD_CONFIGURATION_STRING_FS     "CMSIS-DAP Config"
+#define USBD_INTERFACE_STRING_FS     "CMSIS-DAP Interface"
 
 #define USB_SIZ_BOS_DESC            0x0C
 
 /* USER CODE BEGIN PRIVATE_DEFINES */
-
 /* USER CODE END PRIVATE_DEFINES */
 
 /**
@@ -81,7 +59,6 @@
   */
 
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 
 /** @defgroup USBD_DESC_Private_Macros USBD_DESC_Private_Macros
@@ -90,7 +67,6 @@
   */
 
 /* USER CODE BEGIN PRIVATE_MACRO */
-
 /* USER CODE END PRIVATE_MACRO */
 
 /**
@@ -164,9 +140,9 @@ __ALIGN_BEGIN uint8_t USBD_FS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
   0x00,                       /*bcdUSB */
 #endif /* (USBD_LPM_ENABLED == 1) */
   0x02,
-  0x00,                       /*bDeviceClass*/
-  0x00,                       /*bDeviceSubClass*/
-  0x00,                       /*bDeviceProtocol*/
+  0xEF,                       /*bDeviceClass: Miscellaneous Device Class (required for IAD composite)*/
+  0x02,                       /*bDeviceSubClass: Common Class*/
+  0x01,                       /*bDeviceProtocol: Interface Association Descriptor*/
   USB_MAX_EP0_SIZE,           /*bMaxPacketSize*/
   LOBYTE(USBD_VID),           /*idVendor*/
   HIBYTE(USBD_VID),           /*idVendor*/
@@ -322,7 +298,6 @@ uint8_t * USBD_FS_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
    * ID */
   Get_SerialNum();
   /* USER CODE BEGIN USBD_FS_SerialStrDescriptor */
-
   /* USER CODE END USBD_FS_SerialStrDescriptor */
   return (uint8_t *) USBD_StringSerial;
 }

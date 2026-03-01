@@ -1525,7 +1525,8 @@ static uint32_t DAP_SWD_WriteAbort(const uint8_t *request, uint8_t *response) {
          (uint32_t)(*(request+4) << 24);
 
   // Write Abort register
-  SWD_Transfer(DP_ABORT, &data);
+	uint32_t ack_b =0;
+  ack_b = SWD_Transfer(DP_ABORT, &data);
 
   *response = DAP_OK;
   return (1U);

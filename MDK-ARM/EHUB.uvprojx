@@ -1098,6 +1098,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>usbd_cdc_if.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../USB_DEVICE/App/usbd_cdc_if.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1242,6 +1247,11 @@
               <FileName>dap_app.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\app\Src\dap_app.c</FilePath>
+            </File>
+            <File>
+              <FileName>printf_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\Src\printf_app.c</FilePath>
             </File>
           </Files>
         </Group>

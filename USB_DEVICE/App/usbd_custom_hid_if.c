@@ -22,7 +22,7 @@
 #include "usbd_custom_hid_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+#include "dap.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,7 +62,7 @@
   */
 
 /* USER CODE BEGIN PRIVATE_DEFINES */
-
+ 
 /* USER CODE END PRIVATE_DEFINES */
 
 /**
@@ -75,7 +75,15 @@
   */
 
 /* USER CODE BEGIN PRIVATE_MACRO */
-
+extern void USBD_InEvent(void);
+extern void USBD_OutEvent(void);
+static int8_t CUSTOM_HID_InEvent_FS(uint8_t event_idx, uint8_t state)
+{
+  /* USER CODE BEGIN extra */
+  USBD_InEvent();       /* INPUT REPORT has been sent. Zach Lee */
+  return (USBD_OK);
+  /* USER CODE END extra */
+}
 /* USER CODE END PRIVATE_MACRO */
 
 /**
@@ -91,7 +99,24 @@
 __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_FS[USBD_CUSTOM_HID_REPORT_DESC_SIZE] __ALIGN_END =
 {
   /* USER CODE BEGIN 0 */
-  0x06,0x00,0xFF,         /*  Usage Page (vendor defined) ($FF00) global */
+// 0x06, 0x00, 0xFF,      // Usage Page (Vendor-defined 0xFF00) 7
+//  0x09, 0x01,            // Usage (Vendor Usage 1)
+//  0xA1, 0x01,            // Collection (Application)
+
+//  0x15, 0x00,            //   LOGICAL_MINIMUM (0) 7
+//  0x26, 0xFF, 0x00,      //   LOGICAL_MAXIMUM (255)
+//  0x75, 0x08,            //   REPORT_SIZE (8)
+
+//  // Input (device -> host) : 64 bytes
+//  0x95, 0x40,            //   REPORT_COUNT (64) 6
+//  0x09, 0x01,            //   USAGE (Vendor Usage 1)
+//  0x81, 0x02,            //   INPUT (Data,Var,Abs)
+
+//  // Output (host -> device) : 64 bytes
+//  0x95, 0x40,            //   REPORT_COUNT (64) 6
+//  0x09, 0x01,            //   USAGE (Vendor Usage 1)
+//  0x91, 0x02,            //   OUTPUT (Data,Var,Abs)
+	0x06,0x00,0xFF,         /*  Usage Page (vendor defined) ($FF00) global */
   0x09,0x01,              /*  Usage (vendor defined) ($01) local */
   0xA1,0x01,              /*  Collection (Application) */
   0x15,0x00,              /*   LOGICAL_MINIMUM (0) */
@@ -193,20 +218,17 @@ static int8_t CUSTOM_HID_DeInit_FS(void)
   * @param  state: Event state
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
-
-
-extern void USBD_OutEvent(void);
 static int8_t CUSTOM_HID_OutEvent_FS(uint8_t event_idx, uint8_t state)
 {
   /* USER CODE BEGIN 6 */
   UNUSED(event_idx);
   UNUSED(state);
-USBD_OutEvent(); 
+		USBD_OutEvent();
   /* Start next USB packet transfer once data processing is completed */
-//  if (USBD_CUSTOM_HID_ReceivePacket(&hUsbDeviceFS) != (uint8_t)USBD_OK)
-//  {
-//    return -1;
-//  }
+  if (USBD_CUSTOM_HID_ReceivePacket(&hUsbDeviceFS) != (uint8_t)USBD_OK)
+  {
+    return -1;
+  }
 
   return (USBD_OK);
   /* USER CODE END 6 */

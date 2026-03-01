@@ -140,7 +140,7 @@ __ALIGN_BEGIN static uint8_t USBD_CUSTOM_HID_CfgFSDesc[USB_CUSTOM_HID_CONFIG_DES
   USB_CUSTOM_HID_CONFIG_DESC_SIZ,
   /* wTotalLength: Bytes returned */
   0x00,
-  0x01,         /*bNumInterfaces: 1 interface*/
+  0x03,         /*bNumInterfaces: 3 interfaces (HID + CDC_comm + CDC_data)*/
   0x01,         /*bConfigurationValue: Configuration value*/
   0x00,         /*iConfiguration: Index of string descriptor describing
   the configuration*/
@@ -188,6 +188,92 @@ __ALIGN_BEGIN static uint8_t USBD_CUSTOM_HID_CfgFSDesc[USB_CUSTOM_HID_CONFIG_DES
   CUSTOM_HID_EPOUT_SIZE,  /* wMaxPacketSize: 2 Bytes max  */
   0x00,
   CUSTOM_HID_FS_BINTERVAL,  /* bInterval: Polling Interval */
+
+  /* ----- CDC ACM descriptors (communication interface) ----- */
+  /* Interface Association Descriptor (IAD) for CDC */
+  0x08,                       /* bLength: IAD size */
+  0x0B,                       /* bDescriptorType: IAD */
+  0x01,                       /* bFirstInterface */
+  0x02,                       /* bInterfaceCount */
+  0x02,                       /* bFunctionClass: Communications Interface Class */
+  0x02,                       /* bFunctionSubClass: Abstract Control Model */
+  0x01,                       /* bFunctionProtocol: AT commands */
+  0x00,                       /* iFunction */
+
+  /* Interface Descriptor: CDC Communication (interface 1) */
+  0x09,                       /* bLength: Interface Descriptor size */
+  USB_DESC_TYPE_INTERFACE,    /* bDescriptorType: Interface */
+  0x01,                       /* bInterfaceNumber: 1 */
+  0x00,                       /* bAlternateSetting: */
+  0x01,                       /* bNumEndpoints: 1 (Notification) */
+  0x02,                       /* bInterfaceClass: Communications Interface Class */
+  0x02,                       /* bInterfaceSubClass: Abstract Control Model */
+  0x01,                       /* bInterfaceProtocol: AT commands (v.25ter) */
+  0x00,                       /* iInterface */
+
+  /* CDC Header Functional Descriptor */
+  0x05,                       /* bFunctionLength */
+  0x24,                       /* bDescriptorType: CS_INTERFACE */
+  0x00,                       /* bDescriptorSubType: Header */
+  0x10, 0x01,                 /* bcdCDC */
+
+  /* CDC Call Management Functional Descriptor */
+  0x05,                       /* bFunctionLength */
+  0x24,                       /* bDescriptorType: CS_INTERFACE */
+  0x01,                       /* bDescriptorSubType: Call Management */
+  0x00,                       /* bmCapabilities */
+  0x02,                       /* bDataInterface: 2 */
+
+  /* CDC ACM Functional Descriptor */
+  0x04,                       /* bFunctionLength */
+  0x24,                       /* bDescriptorType: CS_INTERFACE */
+  0x02,                       /* bDescriptorSubType: Abstract Control Management */
+  0x02,                       /* bmCapabilities */
+
+  /* CDC Union Functional Descriptor */
+  0x05,                       /* bFunctionLength */
+  0x24,                       /* bDescriptorType: CS_INTERFACE */
+  0x06,                       /* bDescriptorSubType: Union */
+  0x01,                       /* bMasterInterface: Communication interface */
+  0x02,                       /* bSlaveInterface0: Data interface */
+
+  /* Notification Endpoint (Interrupt IN) */
+  0x07,                       /* bLength: Endpoint Descriptor size */
+  USB_DESC_TYPE_ENDPOINT,     /* bDescriptorType */
+  CDC_CMD_EP_ADDR,            /* bEndpointAddress: Notification endpoint */
+  0x03,                       /* bmAttributes: Interrupt */
+  LOBYTE(CDC_CMD_EP_SIZE),    /* wMaxPacketSize */
+  HIBYTE(CDC_CMD_EP_SIZE),
+  0x10,                       /* bInterval */
+
+  /* ----- CDC Data interface (interface 2) ----- */
+  0x09,                       /* bLength: Interface Descriptor size */
+  USB_DESC_TYPE_INTERFACE,    /* bDescriptorType: Interface */
+  0x02,                       /* bInterfaceNumber: 2 */
+  0x00,                       /* bAlternateSetting: */
+  0x02,                       /* bNumEndpoints: 2 */
+  0x0A,                       /* bInterfaceClass: CDC Data */
+  0x00,                       /* bInterfaceSubClass: */
+  0x00,                       /* bInterfaceProtocol: */
+  0x00,                       /* iInterface */
+
+  /* Data OUT Endpoint (Bulk) */
+  0x07,                       /* bLength: Endpoint Descriptor size */
+  USB_DESC_TYPE_ENDPOINT,     /* bDescriptorType */
+  CDC_OUT_EP_ADDR,            /* bEndpointAddress: OUT */
+  0x02,                       /* bmAttributes: Bulk */
+  LOBYTE(CDC_DATA_FS_MAX_PACKET_SIZE), /* wMaxPacketSize */
+  HIBYTE(CDC_DATA_FS_MAX_PACKET_SIZE),
+  0x00,                       /* bInterval */
+
+  /* Data IN Endpoint (Bulk) */
+  0x07,                       /* bLength: Endpoint Descriptor size */
+  USB_DESC_TYPE_ENDPOINT,     /* bDescriptorType */
+  CDC_IN_EP_ADDR,             /* bEndpointAddress: IN */
+  0x02,                       /* bmAttributes: Bulk */
+  LOBYTE(CDC_DATA_FS_MAX_PACKET_SIZE), /* wMaxPacketSize */
+  HIBYTE(CDC_DATA_FS_MAX_PACKET_SIZE),
+  0x00,                       /* bInterval */
   /* 41 */
 };
 
@@ -199,7 +285,7 @@ __ALIGN_BEGIN static uint8_t USBD_CUSTOM_HID_CfgHSDesc[USB_CUSTOM_HID_CONFIG_DES
   USB_CUSTOM_HID_CONFIG_DESC_SIZ,
   /* wTotalLength: Bytes returned */
   0x00,
-  0x01,         /*bNumInterfaces: 1 interface*/
+  0x03,         /*bNumInterfaces: 3 interfaces (HID + CDC_comm + CDC_data)*/
   0x01,         /*bConfigurationValue: Configuration value*/
   0x00,         /*iConfiguration: Index of string descriptor describing
   the configuration*/
@@ -238,7 +324,6 @@ __ALIGN_BEGIN static uint8_t USBD_CUSTOM_HID_CfgHSDesc[USB_CUSTOM_HID_CONFIG_DES
   CUSTOM_HID_EPIN_SIZE, /*wMaxPacketSize: 2 Byte max */
   0x00,
   CUSTOM_HID_HS_BINTERVAL,          /*bInterval: Polling Interval */
-  /* 34 */
 
   0x07,          /* bLength: Endpoint Descriptor size */
   USB_DESC_TYPE_ENDPOINT, /* bDescriptorType: */
@@ -247,6 +332,92 @@ __ALIGN_BEGIN static uint8_t USBD_CUSTOM_HID_CfgHSDesc[USB_CUSTOM_HID_CONFIG_DES
   CUSTOM_HID_EPOUT_SIZE,  /* wMaxPacketSize: 2 Bytes max  */
   0x00,
   CUSTOM_HID_HS_BINTERVAL,  /* bInterval: Polling Interval */
+
+  /* ----- CDC ACM descriptors (communication interface) ----- */
+  /* Interface Association Descriptor (IAD) for CDC */
+  0x08,                       /* bLength: IAD size */
+  0x0B,                       /* bDescriptorType: IAD */
+  0x01,                       /* bFirstInterface */
+  0x02,                       /* bInterfaceCount */
+  0x02,                       /* bFunctionClass: Communications Interface Class */
+  0x02,                       /* bFunctionSubClass: Abstract Control Model */
+  0x01,                       /* bFunctionProtocol: AT commands */
+  0x00,                       /* iFunction */
+
+  /* Interface Descriptor: CDC Communication (interface 1) */
+  0x09,                       /* bLength: Interface Descriptor size */
+  USB_DESC_TYPE_INTERFACE,    /* bDescriptorType: Interface */
+  0x01,                       /* bInterfaceNumber: 1 */
+  0x00,                       /* bAlternateSetting: */
+  0x01,                       /* bNumEndpoints: 1 (Notification) */
+  0x02,                       /* bInterfaceClass: Communications Interface Class */
+  0x02,                       /* bInterfaceSubClass: Abstract Control Model */
+  0x01,                       /* bInterfaceProtocol: AT commands (v.25ter) */
+  0x00,                       /* iInterface */
+
+  /* CDC Header Functional Descriptor */
+  0x05,                       /* bFunctionLength */
+  0x24,                       /* bDescriptorType: CS_INTERFACE */
+  0x00,                       /* bDescriptorSubType: Header */
+  0x10, 0x01,                 /* bcdCDC */
+
+  /* CDC Call Management Functional Descriptor */
+  0x05,                       /* bFunctionLength */
+  0x24,                       /* bDescriptorType: CS_INTERFACE */
+  0x01,                       /* bDescriptorSubType: Call Management */
+  0x00,                       /* bmCapabilities */
+  0x02,                       /* bDataInterface: 2 */
+
+  /* CDC ACM Functional Descriptor */
+  0x04,                       /* bFunctionLength */
+  0x24,                       /* bDescriptorType: CS_INTERFACE */
+  0x02,                       /* bDescriptorSubType: Abstract Control Management */
+  0x02,                       /* bmCapabilities */
+
+  /* CDC Union Functional Descriptor */
+  0x05,                       /* bFunctionLength */
+  0x24,                       /* bDescriptorType: CS_INTERFACE */
+  0x06,                       /* bDescriptorSubType: Union */
+  0x01,                       /* bMasterInterface: Communication interface */
+  0x02,                       /* bSlaveInterface0: Data interface */
+
+  /* Notification Endpoint (Interrupt IN) */
+  0x07,                       /* bLength: Endpoint Descriptor size */
+  USB_DESC_TYPE_ENDPOINT,     /* bDescriptorType */
+  CDC_CMD_EP_ADDR,            /* bEndpointAddress: Notification endpoint */
+  0x03,                       /* bmAttributes: Interrupt */
+  LOBYTE(CDC_CMD_EP_SIZE),    /* wMaxPacketSize */
+  HIBYTE(CDC_CMD_EP_SIZE),
+  0x10,                       /* bInterval */
+
+  /* ----- CDC Data interface (interface 2) ----- */
+  0x09,                       /* bLength: Interface Descriptor size */
+  USB_DESC_TYPE_INTERFACE,    /* bDescriptorType: Interface */
+  0x02,                       /* bInterfaceNumber: 2 */
+  0x00,                       /* bAlternateSetting: */
+  0x02,                       /* bNumEndpoints: 2 */
+  0x0A,                       /* bInterfaceClass: CDC Data */
+  0x00,                       /* bInterfaceSubClass: */
+  0x00,                       /* bInterfaceProtocol: */
+  0x00,                       /* iInterface */
+
+  /* Data OUT Endpoint (Bulk) */
+  0x07,                       /* bLength: Endpoint Descriptor size */
+  USB_DESC_TYPE_ENDPOINT,     /* bDescriptorType */
+  CDC_OUT_EP_ADDR,            /* bEndpointAddress: OUT */
+  0x02,                       /* bmAttributes: Bulk */
+  LOBYTE(CDC_DATA_FS_MAX_PACKET_SIZE), /* wMaxPacketSize */
+  HIBYTE(CDC_DATA_FS_MAX_PACKET_SIZE),
+  0x00,                       /* bInterval */
+
+  /* Data IN Endpoint (Bulk) */
+  0x07,                       /* bLength: Endpoint Descriptor size */
+  USB_DESC_TYPE_ENDPOINT,     /* bDescriptorType */
+  CDC_IN_EP_ADDR,             /* bEndpointAddress: IN */
+  0x02,                       /* bmAttributes: Bulk */
+  LOBYTE(CDC_DATA_FS_MAX_PACKET_SIZE), /* wMaxPacketSize */
+  HIBYTE(CDC_DATA_FS_MAX_PACKET_SIZE),
+  0x00,                       /* bInterval */
   /* 41 */
 };
 
@@ -362,19 +533,29 @@ static uint8_t  USBD_CUSTOM_HID_Init(USBD_HandleTypeDef *pdev,
   uint8_t ret = 0U;
   USBD_CUSTOM_HID_HandleTypeDef     *hhid;
 
-  /* Open EP IN */
+  /* Open EP IN (HID) */
   USBD_LL_OpenEP(pdev, CUSTOM_HID_EPIN_ADDR, USBD_EP_TYPE_INTR,
                  CUSTOM_HID_EPIN_SIZE);
 
   pdev->ep_in[CUSTOM_HID_EPIN_ADDR & 0xFU].is_used = 1U;
 
-  /* Open EP OUT */
+  /* Open EP OUT (HID) */
   USBD_LL_OpenEP(pdev, CUSTOM_HID_EPOUT_ADDR, USBD_EP_TYPE_INTR,
                  CUSTOM_HID_EPOUT_SIZE);
 
   pdev->ep_out[CUSTOM_HID_EPOUT_ADDR & 0xFU].is_used = 1U;
 
-  pdev->pClassData = USBD_malloc(sizeof(USBD_CUSTOM_HID_HandleTypeDef));
+  /* Open CDC endpoints (Notification IN, Data IN, Data OUT) */
+  USBD_LL_OpenEP(pdev, CDC_CMD_EP_ADDR, USBD_EP_TYPE_INTR, CDC_CMD_EP_SIZE);
+  pdev->ep_in[CDC_CMD_EP_ADDR & 0xFU].is_used = 1U;
+
+  USBD_LL_OpenEP(pdev, CDC_IN_EP_ADDR, USBD_EP_TYPE_BULK, CDC_DATA_FS_MAX_PACKET_SIZE);
+  pdev->ep_in[CDC_IN_EP_ADDR & 0xFU].is_used = 1U;
+
+  USBD_LL_OpenEP(pdev, CDC_OUT_EP_ADDR, USBD_EP_TYPE_BULK, CDC_DATA_FS_MAX_PACKET_SIZE);
+  pdev->ep_out[CDC_OUT_EP_ADDR & 0xFU].is_used = 1U;
+
+  pdev->pClassData = USBD_malloc(sizeof(USBD_CUSTOM_HID_ComposeHandleTypeDef));
 
   if (pdev->pClassData == NULL)
   {
@@ -382,14 +563,18 @@ static uint8_t  USBD_CUSTOM_HID_Init(USBD_HandleTypeDef *pdev,
   }
   else
   {
-    hhid = (USBD_CUSTOM_HID_HandleTypeDef *) pdev->pClassData;
+    hhid = (USBD_CUSTOM_HID_ComposeHandleTypeDef *) pdev->pClassData;
 
     hhid->state = CUSTOM_HID_IDLE;
     ((USBD_CUSTOM_HID_ItfTypeDef *)pdev->pUserData)->Init();
 
-    /* Prepare Out endpoint to receive 1st packet */
+    /* Prepare HID Out endpoint to receive 1st packet */
     USBD_LL_PrepareReceive(pdev, CUSTOM_HID_EPOUT_ADDR, hhid->Report_buf,
-                           USBD_CUSTOMHID_OUTREPORT_BUF_SIZE);
+                 USBD_CUSTOMHID_OUTREPORT_BUF_SIZE);
+
+    /* Prepare CDC data OUT endpoint to receive data */
+    USBD_LL_PrepareReceive(pdev, CDC_OUT_EP_ADDR, hhid->cdc_rx_buf,
+                 CDC_DATA_FS_MAX_PACKET_SIZE);
   }
 
   return ret;
@@ -413,6 +598,16 @@ static uint8_t  USBD_CUSTOM_HID_DeInit(USBD_HandleTypeDef *pdev,
   USBD_LL_CloseEP(pdev, CUSTOM_HID_EPOUT_ADDR);
   pdev->ep_out[CUSTOM_HID_EPOUT_ADDR & 0xFU].is_used = 0U;
 
+  /* Close CDC endpoints */
+  USBD_LL_CloseEP(pdev, CDC_CMD_EP_ADDR);
+  pdev->ep_in[CDC_CMD_EP_ADDR & 0xFU].is_used = 0U;
+
+  USBD_LL_CloseEP(pdev, CDC_IN_EP_ADDR);
+  pdev->ep_in[CDC_IN_EP_ADDR & 0xFU].is_used = 0U;
+
+  USBD_LL_CloseEP(pdev, CDC_OUT_EP_ADDR);
+  pdev->ep_out[CDC_OUT_EP_ADDR & 0xFU].is_used = 0U;
+
   /* FRee allocated memory */
   if (pdev->pClassData != NULL)
   {
@@ -433,7 +628,7 @@ static uint8_t  USBD_CUSTOM_HID_DeInit(USBD_HandleTypeDef *pdev,
 static uint8_t  USBD_CUSTOM_HID_Setup(USBD_HandleTypeDef *pdev,
                                       USBD_SetupReqTypedef *req)
 {
-  USBD_CUSTOM_HID_HandleTypeDef *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)pdev->pClassData;
+  USBD_CUSTOM_HID_ComposeHandleTypeDef *hhid = (USBD_CUSTOM_HID_ComposeHandleTypeDef *)pdev->pClassData;
   uint16_t len = 0U;
   uint8_t  *pbuf = NULL;
   uint16_t status_info = 0U;
@@ -463,6 +658,20 @@ static uint8_t  USBD_CUSTOM_HID_Setup(USBD_HandleTypeDef *pdev,
         case CUSTOM_HID_REQ_SET_REPORT:
           hhid->IsReportAvailable = 1U;
           USBD_CtlPrepareRx(pdev, hhid->Report_buf, req->wLength);
+          break;
+
+        /* CDC Class-specific requests */
+        case 0x20: /* SET_LINE_CODING */
+          USBD_CtlPrepareRx(pdev, hhid->linecoding, req->wLength);
+          hhid->is_linecoding_set = 1U;
+          break;
+
+        case 0x21: /* GET_LINE_CODING */
+          USBD_CtlSendData(pdev, hhid->linecoding, req->wLength);
+          break;
+
+        case 0x22: /* SET_CONTROL_LINE_STATE */
+          hhid->control_line_state = (uint16_t)(req->wValue);
           break;
 
         default:
@@ -555,7 +764,7 @@ uint8_t USBD_CUSTOM_HID_SendReport(USBD_HandleTypeDef  *pdev,
                                    uint8_t *report,
                                    uint16_t len)
 {
-  USBD_CUSTOM_HID_HandleTypeDef     *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)pdev->pClassData;
+  USBD_CUSTOM_HID_ComposeHandleTypeDef     *hhid = (USBD_CUSTOM_HID_ComposeHandleTypeDef *)pdev->pClassData;
 
   if (pdev->dev_state == USBD_STATE_CONFIGURED)
   {
@@ -625,7 +834,7 @@ static uint8_t  USBD_CUSTOM_HID_DataIn(USBD_HandleTypeDef *pdev,
 
   /* Ensure that the FIFO is empty before a new transfer, this condition could
   be caused by  a new transfer before the end of the previous transfer */
-  USBD_CUSTOM_HID_HandleTypeDef     *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)pdev->pClassData;
+  USBD_CUSTOM_HID_ComposeHandleTypeDef     *hhid = (USBD_CUSTOM_HID_ComposeHandleTypeDef *)pdev->pClassData;
   hhid->state = CUSTOM_HID_IDLE;
 
   /* I add a new interface func in the structure USBD_CUSTOM_HID_ItfTypeDef. Zach Lee */
@@ -646,13 +855,27 @@ static uint8_t  USBD_CUSTOM_HID_DataOut(USBD_HandleTypeDef *pdev,
                                         uint8_t epnum)
 {
 
-  USBD_CUSTOM_HID_HandleTypeDef     *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)pdev->pClassData;
+  USBD_CUSTOM_HID_ComposeHandleTypeDef     *hhid = (USBD_CUSTOM_HID_ComposeHandleTypeDef *)pdev->pClassData;
 
-  ((USBD_CUSTOM_HID_ItfTypeDef *)pdev->pUserData)->OutEvent(hhid->Report_buf[0],
-                                                            hhid->Report_buf[1]);
+  /* Check if data is received on CDC OUT endpoint */
+  if (epnum == (CDC_OUT_EP_ADDR & 0xFU))
+  {
+    uint32_t len = USBD_LL_GetRxDataSize(pdev, CDC_OUT_EP_ADDR);
+    extern void CDC_Receive_FS(uint8_t* Buf, uint32_t Len);
+    CDC_Receive_FS(hhid->cdc_rx_buf, len);
 
-  USBD_LL_PrepareReceive(pdev, CUSTOM_HID_EPOUT_ADDR, hhid->Report_buf,
-                         USBD_CUSTOMHID_OUTREPORT_BUF_SIZE);
+    /* Prepare to receive next packet */
+    USBD_LL_PrepareReceive(pdev, CDC_OUT_EP_ADDR, hhid->cdc_rx_buf,
+                           CDC_DATA_FS_MAX_PACKET_SIZE);
+  }
+  else
+  {
+    ((USBD_CUSTOM_HID_ItfTypeDef *)pdev->pUserData)->OutEvent(hhid->Report_buf[0],
+                                                              hhid->Report_buf[1]);
+
+    USBD_LL_PrepareReceive(pdev, CUSTOM_HID_EPOUT_ADDR, hhid->Report_buf,
+                           USBD_CUSTOMHID_OUTREPORT_BUF_SIZE);
+  }
 
   return USBD_OK;
 }
@@ -665,13 +888,20 @@ static uint8_t  USBD_CUSTOM_HID_DataOut(USBD_HandleTypeDef *pdev,
   */
 static uint8_t USBD_CUSTOM_HID_EP0_RxReady(USBD_HandleTypeDef *pdev)
 {
-  USBD_CUSTOM_HID_HandleTypeDef     *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)pdev->pClassData;
+  USBD_CUSTOM_HID_ComposeHandleTypeDef     *hhid = (USBD_CUSTOM_HID_ComposeHandleTypeDef *)pdev->pClassData;
 
   if (hhid->IsReportAvailable == 1U)
   {
     ((USBD_CUSTOM_HID_ItfTypeDef *)pdev->pUserData)->OutEvent(hhid->Report_buf[0],
                                                               hhid->Report_buf[1]);
     hhid->IsReportAvailable = 0U;
+  }
+
+  /* Handle SET_LINE_CODING reception */
+  if (hhid->is_linecoding_set == 1U)
+  {
+    /* application may apply new line coding now (not implemented) */
+    hhid->is_linecoding_set = 0U;
   }
 
   return USBD_OK;

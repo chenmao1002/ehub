@@ -36,6 +36,7 @@
 # include "dap.h"
 # include "dap_config.h"
 # include "dap_app.h"
+# include "printf_app.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -258,6 +259,46 @@ void USBD_OutEvent(void)
   USBD_CUSTOM_HID_HandleTypeDef *hhid = (USBD_CUSTOM_HID_HandleTypeDef *)hUsbDeviceFS.pClassData;
   USBD_HID0_SetReport(HID_REPORT_OUTPUT, 0, 0, hhid->Report_buf, USBD_CUSTOMHID_OUTREPORT_BUF_SIZE);
 }
+
+
+
+
+void DAP_Test_HaltCPU(void) {
+    uint32_t data;
+    uint8_t ack;
+    uint32_t dhcsr;
+
+    printf_u1("=== DAP Test: Halt CPU ===\n");
+
+    // 1. Select AP=0 (System Control AP)
+    ack = SWD_Transfer((0 << 0) /* DP SELECT addr */, &data); 
+    printf_u1("Step1: DP SELECT AP=0 ACK=%02X DATA=%08X\n", ack, data);
+
+    // 2. Write DHCSR (0xE000EDF0) = 0xA05F0003 (halt CPU + enable debug)
+    // TAR = 0xE000EDF0
+    ack = SWD_Transfer((/* AP write TAR */ 0x0 << 0), &data);  
+    printf_u1("Step2: AP TAR=0xE000EDF0 ACK=%02X\n", ack);
+
+    // DRW = 0xA05F0003
+    data = 0xA05F0003;
+    ack = SWD_Transfer((/* AP write DRW */ 0x1 << 0), &data); 
+    printf_u1("Step3: AP DRW write DHCSR=0xA05F0003 ACK=%02X\n", ack);
+
+    // 3. Read back DHCSR
+    // Posted read: first issue read
+    ack = SWD_Transfer((/* AP read DRW */ 0x1 | 1U /* RnW bit */), &data);
+    printf_u1("Step4: AP DRW read (posted) ACK=%02X\n", ack);
+
+    // Then read DP RDBUFF to get actual value
+    ack = SWD_Transfer((/* DP RDBUFF read */ 0x0C | 1U /* RnW */), &dhcsr);
+    printf_u1("Step5: DP RDBUFF read DHCSR ACK=%02X DATA=%08X\n", ack, dhcsr);
+
+    if ((dhcsr & 0x00000003) == 0x00000003) {
+        printf_u1("SUCCESS: CPU halted (C_DEBUGEN + C_HALT set)\n");
+    } else {
+        printf_u1("FAIL: CPU still running (DHCSR=0x%08X)\n", dhcsr);
+    }
+}
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -269,7 +310,8 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+	uint32_t flags;
+  uint32_t n;
 /* USER CODE END 0 */
 
 /**
@@ -319,26 +361,32 @@ int main(void)
 	HAL_Delay(50);
 	WS2812C_Init();        // 初始化WS2812C
 	MX_USB_DEVICE_Init();
+	/* Enable DWT & ITM */
+CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 
+/* Reset and enable DWT cycle counter */
+DWT->CYCCNT = 0;
+DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 	DAP_Setup(); 
-	uint32_t flags;
-  uint32_t n;
+
 	USBD_HID0_Initialize();
 	WS2812C_SetSingleColor(1,25,0,0);
 		WS2812C_Update();
 		HAL_Delay(1000);
+		uint32_t time =0;
 	while(1){
-		uint8_t tx_buf[5] = "00000";
+//		uint8_t tx_buf[5] = "00000";
 
-		USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, tx_buf, 2);
+//		USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, tx_buf, 2);
 		
 		
 		
 		  for (;;) {
     // Directly process the USB request queue
 		while (USB_RequestCountI != USB_RequestCountO) {
+//			time =0;
 			// Handle Queue Commands
-			uint32_t n = USB_RequestIndexO;
+			n = USB_RequestIndexO;
 			while (USB_Request[n][0] == ID_DAP_QueueCommands) {
 				USB_Request[n][0] = ID_DAP_ExecuteCommands;
 				n++;
@@ -351,8 +399,10 @@ int main(void)
 			}
 
 			// Execute DAP Command (process request and prepare response)
+//			DAP_Test_HaltCPU();
+			
 			DAP_ExecuteCommand(USB_Request[USB_RequestIndexO], USB_Response[USB_ResponseIndexI]);
-
+			
 			// Update Request Index and Count
 			USB_RequestIndexO++;
 			if (USB_RequestIndexO == DAP_PACKET_COUNT) {
@@ -371,7 +421,7 @@ int main(void)
 			if (USB_ResponseIdle) {
 				if (USB_ResponseCountI != USB_ResponseCountO) {
 					// Load data from response buffer to be sent back
-					uint32_t n = USB_ResponseIndexO++;
+					n = USB_ResponseIndexO++;
 					if (USB_ResponseIndexO == DAP_PACKET_COUNT) {
 						USB_ResponseIndexO = 0U;
 					}
@@ -383,6 +433,15 @@ int main(void)
 				}
 			}
 		}
+		
+//		if(USB_RequestCountI == USB_RequestCountO){
+//			time++;
+//		}
+//		if(time > 1000000){
+//		
+//						DAP_Test_HaltCPU();
+//			time = 0;
+//		}
   }
 
 	
