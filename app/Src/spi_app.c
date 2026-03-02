@@ -39,7 +39,7 @@ void Bridge_SPI_Send(const uint8_t *data, uint16_t len)
     HAL_SPI_TransmitReceive(&hspi1, (uint8_t *)data, rx_buf, len, 50U);
 
     /* Return received bytes to PC */
-    Bridge_SendToCDC(BRIDGE_CH_SPI, rx_buf, len);
+    Bridge_SendToAll(BRIDGE_CH_SPI, rx_buf, len);
 }
 
 /* -------------------------------------------------------------------------

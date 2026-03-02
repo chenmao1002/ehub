@@ -60,7 +60,7 @@ void Bridge_I2C_Read(const uint8_t *data, uint16_t len)
     if (rx_len > BRIDGE_MAX_DATA) { rx_len = BRIDGE_MAX_DATA; }
     if (len >= 3U) { uint8_t r=data[2]; HAL_I2C_Master_Transmit(&hi2c1,addr,&r,1,I2C_TIMEOUT_MS); }
     if (HAL_I2C_Master_Receive(&hi2c1,addr,rx_buf,rx_len,I2C_TIMEOUT_MS)==HAL_OK)
-        Bridge_SendToCDC(BRIDGE_CH_I2C_R, rx_buf, rx_len);
+        Bridge_SendToAll(BRIDGE_CH_I2C_R, rx_buf, rx_len);
 }
 
 /* -------------------------------------------------------------------------
@@ -130,7 +130,7 @@ void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)
     if (hi2c != &hi2c1 || s_i2c_role != BRIDGE_I2C_SLAVE) { return; }
 
     if (s_i2c_slave_rx_len > 0U) {
-        Bridge_SendToCDC(BRIDGE_CH_I2C_W, s_i2c_slave_rx_buf, s_i2c_slave_rx_len);
+        Bridge_SendToAll(BRIDGE_CH_I2C_W, s_i2c_slave_rx_buf, s_i2c_slave_rx_len);
         s_i2c_slave_rx_len = 0U;
     }
 

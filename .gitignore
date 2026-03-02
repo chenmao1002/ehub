@@ -19,3 +19,10 @@ MDK-ARM/startup_stm32f407xx.lst
 
 # Keep sct linker script
 !MDK-ARM/EHUB/EHUB.sct
+
+# Python virtual environments and caches
+tools/.venv/
+venv/
+.venv/
+__pycache__/
+

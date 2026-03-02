@@ -24,7 +24,7 @@ extern "C" {
 #define BAT_EMPTY_MV         2000U    /* 空电电压 (mV) */
 #define BAT_SAMPLE_PERIOD_MS 2000U    /* 采样周期 2 s（≤ 3 s 要求） */
 #define BAT_EMA_ALPHA        30U      /* EMA 系数 α/100 (0.30)，越大跟踪越快 */
-#define BAT_CHARGE_THRESH_MV 15U      /* 两次 EMA 差值 > 此值视为充电中 */
+#define BAT_CHARGE_THRESH_MV 5U       /* 两次 EMA 差值 > 此值视为充电中（提高灵敏度） */
 #define BAT_MULTI_SAMPLE     8U       /* 单次采样取多次平均 */
 
 /* ---- 电池状态结构体 ----------------------------------------------------- */

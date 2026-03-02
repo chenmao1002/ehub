@@ -48,6 +48,7 @@ extern "C" {
 #define BRIDGE_CH_I2C_R     0x06U   /* I2C1 master read  */
 #define BRIDGE_CH_CAN       0x07U   /* CAN1  */
 #define BRIDGE_CH_BATTERY   0x08U   /* Battery voltage & charging status */
+#define BRIDGE_CH_WIFI_CTRL 0xE0U   /* WiFi control channel (MCU + ESP32) */
 #define BRIDGE_CH_CONFIG    0xF0U   /* peripheral re-configuration */
 
 /* ---- CONFIG param types (data[1] of a BRIDGE_CH_CONFIG frame) ----------- */
@@ -89,6 +90,13 @@ void Bridge_Init(void);
  * @param  len   Payload length (≤ BRIDGE_MAX_DATA)
  */
 void Bridge_SendToCDC(uint8_t ch, const uint8_t *data, uint16_t len);
+
+/**
+ * @brief  Broadcast a reply frame to ALL active transports (CDC + WiFi).
+ *         Use this instead of Bridge_SendToCDC when the reply must reach
+ *         the PC regardless of which link it is connected on.
+ */
+void Bridge_SendToAll(uint8_t ch, const uint8_t *data, uint16_t len);
 
 /**
  * @brief  FreeRTOS task entry — forwards bus-received frames to PC.
