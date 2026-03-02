@@ -7,5 +7,6 @@
         }
     ],
     "cortex-debug.armToolchainPath": "F:\\vscode\\openstm32\\Arm GNU Toolchain arm-none-eabi\\14.3 rel1\\bin",
-    "cortex-debug.openocdPath": "F:\\vscode\\openstm32\\openocd-20250710\\OpenOCD-20250710-0.12.0\\bin\\openocd.exe"
+    "cortex-debug.openocdPath": "F:\\vscode\\openstm32\\openocd-20250710\\OpenOCD-20250710-0.12.0\\bin\\openocd.exe",
+    "stm32-for-vscode.makePath": false
 }

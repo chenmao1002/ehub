@@ -28,6 +28,7 @@
 #include "usb_app.h"
 #include "dap_app.h"
 #include "ws2812c.h"
+#include "battery_app.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -153,7 +154,15 @@ void StartDefaultTask(void *argument)
   };
   osThreadNew(StartDAPTask, NULL, &dap_task_attrs);
 
-  /* 4. LED 群显示系统就绪 (RGB绿色) */
+  /* 4. 启动电池电量检测任务 */
+  static const osThreadAttr_t bat_task_attrs = {
+      .name       = "BatTask",
+      .stack_size = 256U * 4U,
+      .priority   = (osPriority_t)osPriorityBelowNormal,
+  };
+  osThreadNew(StartBatteryTask, NULL, &bat_task_attrs);
+
+  /* 5. LED 群显示系统就绪 (RGB绿色) */
   WS2812C_SetSingleColor(1, 0, 25, 0);
   WS2812C_Update();
 

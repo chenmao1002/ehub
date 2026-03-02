@@ -47,6 +47,7 @@ extern "C" {
 #define BRIDGE_CH_I2C_W     0x05U   /* I2C1 master write */
 #define BRIDGE_CH_I2C_R     0x06U   /* I2C1 master read  */
 #define BRIDGE_CH_CAN       0x07U   /* CAN1  */
+#define BRIDGE_CH_BATTERY   0x08U   /* Battery voltage & charging status */
 #define BRIDGE_CH_CONFIG    0xF0U   /* peripheral re-configuration */
 
 /* ---- CONFIG param types (data[1] of a BRIDGE_CH_CONFIG frame) ----------- */

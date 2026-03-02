@@ -27,6 +27,7 @@ CH = {
     "I2C_W":   0x05,
     "I2C_R":   0x06,
     "CAN":     0x07,
+    "BATTERY": 0x08,
     "CONFIG":  0xF0,
 }
 CH_NAME = {v: k for k, v in CH.items()}
@@ -311,10 +312,25 @@ class EHUBApp(ctk.CTk):
                                        command=self._toggle_connect, font=TITLE_FONT)
         self._conn_btn.grid(row=0, column=7, padx=10, sticky="w")
 
+        # ── 电池简要状态（位于连接按钮右侧）：图标 -> 百分比 -> 电压 -> 充电提示
+        bat_bar = ctk.CTkFrame(bar, fg_color="transparent")
+        bat_bar.grid(row=0, column=8, padx=(8, 6))
+        self._bat_icon = ctk.CTkLabel(bat_bar, text="🔋", font=("Segoe UI Emoji", 14), anchor="w")
+        self._bat_icon.pack(side="left", padx=(4, 4))
+        self._bat_pct_lbl = ctk.CTkLabel(bat_bar, text="电量: ---%", font=MONO_FONT,
+                          text_color="#a0a0a0", anchor="w")
+        self._bat_pct_lbl.pack(side="left", padx=(4, 8))
+        self._bat_volt_lbl = ctk.CTkLabel(bat_bar, text="电压: --- V", font=MONO_FONT,
+                           text_color="#a0a0a0", anchor="w")
+        self._bat_volt_lbl.pack(side="left", padx=(0, 8))
+        self._bat_chg_lbl = ctk.CTkLabel(bat_bar, text="充电: ---", font=MONO_FONT,
+                          text_color="#a0a0a0", anchor="w")
+        self._bat_chg_lbl.pack(side="left")
+
         self._theme_var = ctk.StringVar(value="🌙")
         ctk.CTkButton(bar, textvariable=self._theme_var, width=36,
-                      command=self._toggle_theme, font=("微软雅黑", 14)
-                      ).grid(row=0, column=8, padx=(0, 10), sticky="e")
+                  command=self._toggle_theme, font=("微软雅黑", 14)
+                  ).grid(row=0, column=9, padx=(0, 10), sticky="e")
 
     def _build_sidebar(self):
         sb = ctk.CTkFrame(self, width=158, corner_radius=0, fg_color=("#d1d5e8","#161b2e"))
@@ -347,6 +363,7 @@ class EHUBApp(ctk.CTk):
         for lbl in (self._stat_tx, self._stat_rx, self._stat_err):
             lbl.pack(anchor="w")
         self._errors = 0
+        
 
     def _build_main(self):
         self._main_frame = ctk.CTkFrame(self, corner_radius=0,
@@ -721,6 +738,10 @@ class EHUBApp(ctk.CTk):
         hex_str = " ".join(f"{b:02X}" for b in data)
         ch_name = CH_NAME.get(ch, f"0x{ch:02X}")
 
+        if ch == CH["BATTERY"]:
+            self._handle_battery(data)
+            return
+
         if ch == CH["CONFIG"]:
             # 自动连接时的 PING 回复（data = [0xF0, 0x00, E, H, U, B]）
             if (len(data) >= 6 and data[0] == 0xF0 and data[1] == 0x00
@@ -740,6 +761,63 @@ class EHUBApp(ctk.CTk):
             if text.isprintable() and len(text) > 0:
                 line += '    \u201c' + text + '\u201d'
             self._log_append(line, "recv")
+
+    # ── Battery 解析 ─────────────────────────────────────────────────────────
+    def _handle_battery(self, data: bytes):
+        """解析 BRIDGE_CH_BATTERY (0x08) 帧：[V_H][V_L][pct][charging]"""
+        if len(data) < 4:
+            return
+        voltage_mv = (data[0] << 8) | data[1]
+        # 设备上报的是分压后的电压（mV），经分压后大约落在 2000-2900 mV
+        # 实际对应电池电压范围为 8400-12600 mV（即 8.4V - 12.6V，4S 电池）
+        reported_pct = data[2]
+        charging   = data[3]
+        # 校准映射参数（以 mV 为单位）
+        MEAS_MIN = 2000
+        MEAS_MAX = 2900
+        ACT_MIN  = 8400
+        ACT_MAX  = 12600
+
+        # 将分压后测得的电压映射回实际电池电压（线性插值并限幅）
+        if voltage_mv <= MEAS_MIN:
+            actual_mv = ACT_MIN
+        elif voltage_mv >= MEAS_MAX:
+            actual_mv = ACT_MAX
+        else:
+            actual_mv = int((voltage_mv - MEAS_MIN) * (ACT_MAX - ACT_MIN) / (MEAS_MAX - MEAS_MIN) + ACT_MIN)
+
+        # 根据映射后的实际电压计算百分比（0-100%），并优先使用映射计算值
+        pct = int((actual_mv - ACT_MIN) * 100 / (ACT_MAX - ACT_MIN))
+        pct = max(0, min(100, pct))
+
+        # 颜色与图标显示
+        if pct > 60:
+            color = "#22c55e"
+        elif pct > 20:
+            color = "#eab308"
+        else:
+            color = "#ef4444"
+
+        chg_text  = "⚡ 充电中" if charging else "🔌 未充电"
+        chg_color = "#22d3ee" if charging else "#a0a0a0"
+
+        if charging:
+            icon = "🔋⚡"
+        elif pct > 75:
+            icon = "🔋"
+        elif pct > 50:
+            icon = "🔋"
+        elif pct > 25:
+            icon = "🪫"
+        else:
+            icon = "🪫"
+
+        self._bat_icon.configure(text=icon)
+        self._bat_pct_lbl.configure(text=f"电量: {pct}%", text_color=color)
+        # 仅显示映射后的实际电压（单位：V，保留两位小数）
+        self._bat_volt_lbl.configure(text=f"电压: {actual_mv/1000:.2f} V", text_color="#94a3b8")
+        # 保留设备原始上报的百分比供参考（可在需要时改为显示）
+        self._bat_chg_lbl.configure(text=f"充电: {chg_text}", text_color=chg_color)
 
     # ── Log helpers ───────────────────────────────────────────────────────────
     def _log_append(self, text: str, tag: str = "recv"):
