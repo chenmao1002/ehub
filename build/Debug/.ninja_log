@@ -11,7 +11,7 @@
 192	923	7941573359302785	CMakeFiles/EHUB.dir/Core/Src/adc.c.obj	c4c937482df78e3b
 156	876	7941573358952464	CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj	71f227cccb79e938
 46	644	7941644329000775	CMakeFiles/EHUB.dir/app/Src/rs422_app.c.obj	bb5738411a45ab86
-113	680	7941644329671384	CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj	66dca6810fafe71
+27	479	7941725290499087	CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj	66dca6810fafe71
 70	664	7941644329245939	CMakeFiles/EHUB.dir/app/Src/spi_app.c.obj	de564c695f1b8079
 182	965	7941573359212707	CMakeFiles/EHUB.dir/Core/Src/system_stm32f4xx.c.obj	c04df7fb66bbcbb4
 58	671	7941644329120878	CMakeFiles/EHUB.dir/app/Src/rs485_app.c.obj	f12340cf64b8f16c
@@ -73,9 +73,9 @@
 2943	3690	7941573386917917	CMakeFiles/EHUB.dir/DAP/src/SW_DP.c.obj	76ea7ae00fd940ba
 2927	3745	7941573386657666	CMakeFiles/EHUB.dir/DAP/src/JTAG_DP.c.obj	b57d2c0abe672652
 2844	3794	7941573385836930	CMakeFiles/EHUB.dir/DAP/src/DAP.c.obj	ed129c744c82e588
-762	1466	7941644336161680	EHUB.elf	e0f7cd0deceba093
-13	597	7941644328670471	CMakeFiles/EHUB.dir/app/Src/battery_app.c.obj	768ed7f87831e14f
-98	712	7941644329521238	CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj	8277c553e4b053d2
-27	479	7941725290499087	CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj	66dca6810fafe71
-14	481	7941725290368960	CMakeFiles/EHUB.dir/app/Src/battery_app.c.obj	768ed7f87831e14f
 481	1239	7941725295043233	EHUB.elf	e0f7cd0deceba093
+14	481	7941725290368960	CMakeFiles/EHUB.dir/app/Src/battery_app.c.obj	768ed7f87831e14f
+98	712	7941644329521238	CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj	8277c553e4b053d2
+13	440	7941767975277719	CMakeFiles/EHUB.dir/app/Src/battery_app.c.obj	768ed7f87831e14f
+25	537	7941767975387829	CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj	fb37ceee2b40bb22
+538	1334	7941767980522498	EHUB.elf	e0f7cd0deceba093

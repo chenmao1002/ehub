@@ -422,6 +422,53 @@ void Bridge_USART1_Config(uint8_t param, uint32_t value)
 }
 
 /**
+ * Called when a UART error occurs (Overrun, Framing, Noise, Parity).
+ * The HAL automatically aborts DMA and sets state to READY.
+ * We MUST re-arm DMA-idle receive here, otherwise reception stops forever.
+ */
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART1)
+    {
+        /* Clear error flags then restart DMA-idle receive */
+        __HAL_UART_CLEAR_OREFLAG(&huart1);
+        __HAL_UART_CLEAR_NEFLAG(&huart1);
+        __HAL_UART_CLEAR_FEFLAG(&huart1);
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart1, usart1_rx_buf, UART_RX_BUF_SIZE);
+        __HAL_DMA_DISABLE_IT(huart1.hdmarx, DMA_IT_HT);
+    }
+    else if (huart->Instance == USART2)
+    {
+        /* WiFi bridge USART2 — re-arm DMA into the WiFi RX buffer */
+        __HAL_UART_CLEAR_OREFLAG(&huart2);
+        __HAL_UART_CLEAR_NEFLAG(&huart2);
+        __HAL_UART_CLEAR_FEFLAG(&huart2);
+        uint8_t *rxbuf = WiFi_Bridge_GetRxBuf();
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart2, rxbuf, WIFI_RX_BUF_SIZE);
+        __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
+    }
+    else if (huart->Instance == USART3)
+    {
+        /* RS485 — ensure DE pin is LOW (receive mode) then re-arm */
+        __HAL_UART_CLEAR_OREFLAG(&huart3);
+        __HAL_UART_CLEAR_NEFLAG(&huart3);
+        __HAL_UART_CLEAR_FEFLAG(&huart3);
+        HAL_GPIO_WritePin(RS485_TX_EN_GPIO_Port, RS485_TX_EN_Pin, GPIO_PIN_RESET);
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart3, usart3_rx_buf, UART_RX_BUF_SIZE);
+        __HAL_DMA_DISABLE_IT(huart3.hdmarx, DMA_IT_HT);
+    }
+    else if (huart->Instance == UART4)
+    {
+        /* RS422 */
+        __HAL_UART_CLEAR_OREFLAG(huart);
+        __HAL_UART_CLEAR_NEFLAG(huart);
+        __HAL_UART_CLEAR_FEFLAG(huart);
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart4, uart4_rx_buf, UART_RX_BUF_SIZE);
+        __HAL_DMA_DISABLE_IT(huart4.hdmarx, DMA_IT_HT);
+    }
+}
+
+/**
  * Called after the last DMA byte is written to the UART shift register.
  * Only needed by RS485 (USART3) to de-assert the transmit-enable pin.
  */
