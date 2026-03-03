@@ -15,7 +15,8 @@
 #define TCP_MAX_CLIENTS     1       // 仅允许 1 个客户端
 
 // ─── CMSIS-DAP over TCP (OpenOCD / elaphureLink) ───
-#define DAP_TCP_PORT        6000    // DAP TCP 端口 (标准 cmsis-dap tcp)
+#define DAP_TCP_PORT        6000    // OpenOCD cmsis-dap tcp 端口
+#define ELAPHURELINK_PORT   3240    // elaphureLink 专用端口
 #define DAP_TCP_MAX_PACKET  256     // DAP 最大包长度
 #define BRIDGE_CH_DAP       0xD0    // Bridge 协议 DAP 通道 ID
 

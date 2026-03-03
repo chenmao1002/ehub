@@ -10639,1041 +10639,1040 @@ LOAD F:/vscode/openstm32/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gc
  .text.Bridge_HandleConfig
                 0x080011b4       0xa4 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
  .text.Bridge_Dispatch
-                0x08001258      0x138 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
+                0x08001258      0x140 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
  .text.Bridge_Task
-                0x08001390       0x50 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
-                0x08001390                Bridge_Task
+                0x08001398       0x50 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
+                0x08001398                Bridge_Task
  .text.HAL_UART_ErrorCallback
-                0x080013e0      0x168 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
-                0x080013e0                HAL_UART_ErrorCallback
+                0x080013e8      0x168 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
+                0x080013e8                HAL_UART_ErrorCallback
  .text.HAL_UART_TxCpltCallback
-                0x08001548       0x50 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
-                0x08001548                HAL_UART_TxCpltCallback
+                0x08001550       0x50 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
+                0x08001550                HAL_UART_TxCpltCallback
  .text.ring_put
-                0x08001598       0x38 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+                0x080015a0       0x38 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
  .text.ring_get
-                0x080015d0       0x3c CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+                0x080015d8       0x3c CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
  .text.wifi_parse_byte
-                0x0800160c      0x100 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+                0x08001614      0x100 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
  .text.WiFi_Bridge_GetRxBuf
-                0x0800170c        0x8 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
-                0x0800170c                WiFi_Bridge_GetRxBuf
+                0x08001714        0x8 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+                0x08001714                WiFi_Bridge_GetRxBuf
  .text.WiFi_Bridge_RxHandler
-                0x08001714       0x1a CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
-                0x08001714                WiFi_Bridge_RxHandler
- *fill*         0x0800172e        0x2 
+                0x0800171c       0x1a CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+                0x0800171c                WiFi_Bridge_RxHandler
+ *fill*         0x08001736        0x2 
  .text.WiFi_Bridge_Send
-                0x08001730       0xa0 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
-                0x08001730                WiFi_Bridge_Send
+                0x08001738       0xa0 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+                0x08001738                WiFi_Bridge_Send
  .text.WiFi_ESP_Reset
-                0x080017d0       0x2c CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
-                0x080017d0                WiFi_ESP_Reset
+                0x080017d8       0x2c CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+                0x080017d8                WiFi_ESP_Reset
  .text.WiFi_ESP_EnterBootloader
-                0x080017fc       0x44 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
-                0x080017fc                WiFi_ESP_EnterBootloader
+                0x08001804       0x44 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+                0x08001804                WiFi_ESP_EnterBootloader
  .text.WiFi_HandleCtrlFromCDC
-                0x08001840       0x36 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
- *fill*         0x08001876        0x2 
+                0x08001848       0x36 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+ *fill*         0x0800187e        0x2 
  .text.WiFi_Bridge_Task
-                0x08001878       0x5c CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
-                0x08001878                WiFi_Bridge_Task
+                0x08001880       0x5c CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+                0x08001880                WiFi_Bridge_Task
  .text.WiFi_Bridge_Init
-                0x080018d4       0x78 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
-                0x080018d4                WiFi_Bridge_Init
+                0x080018dc       0x78 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+                0x080018dc                WiFi_Bridge_Init
  .text.WS2812C_Update
-                0x0800194c       0xdc CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
-                0x0800194c                WS2812C_Update
+                0x08001954       0xdc CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
+                0x08001954                WS2812C_Update
  .text.WS2812C_SetSingleColor
-                0x08001a28       0x28 CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
-                0x08001a28                WS2812C_SetSingleColor
+                0x08001a30       0x28 CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
+                0x08001a30                WS2812C_SetSingleColor
  .text.WS2812C_SetAllColor
-                0x08001a50       0x22 CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
-                0x08001a50                WS2812C_SetAllColor
+                0x08001a58       0x22 CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
+                0x08001a58                WS2812C_SetAllColor
  .text.WS2812C_ClearAll
-                0x08001a72       0x18 CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
-                0x08001a72                WS2812C_ClearAll
- *fill*         0x08001a8a        0x2 
+                0x08001a7a       0x18 CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
+                0x08001a7a                WS2812C_ClearAll
+ *fill*         0x08001a92        0x2 
  .text.WS2812C_Init
-                0x08001a8c       0x14 CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
-                0x08001a8c                WS2812C_Init
+                0x08001a94       0x14 CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
+                0x08001a94                WS2812C_Init
  .text.HAL_TIM_PeriodElapsedCallback
-                0x08001aa0       0x12 CMakeFiles/EHUB.dir/Core/Src/main.c.obj
-                0x08001aa0                HAL_TIM_PeriodElapsedCallback
+                0x08001aa8       0x12 CMakeFiles/EHUB.dir/Core/Src/main.c.obj
+                0x08001aa8                HAL_TIM_PeriodElapsedCallback
  .text.Error_Handler
-                0x08001ab2        0x4 CMakeFiles/EHUB.dir/Core/Src/main.c.obj
-                0x08001ab2                Error_Handler
- *fill*         0x08001ab6        0x2 
+                0x08001aba        0x4 CMakeFiles/EHUB.dir/Core/Src/main.c.obj
+                0x08001aba                Error_Handler
+ *fill*         0x08001abe        0x2 
  .text.SystemClock_Config
-                0x08001ab8       0xa8 CMakeFiles/EHUB.dir/Core/Src/main.c.obj
-                0x08001ab8                SystemClock_Config
- .text.main     0x08001b60       0x94 CMakeFiles/EHUB.dir/Core/Src/main.c.obj
-                0x08001b60                main
+                0x08001ac0       0xa8 CMakeFiles/EHUB.dir/Core/Src/main.c.obj
+                0x08001ac0                SystemClock_Config
+ .text.main     0x08001b68       0x94 CMakeFiles/EHUB.dir/Core/Src/main.c.obj
+                0x08001b68                main
  .text.StartDefaultTask
-                0x08001bf4       0x4c CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
-                0x08001bf4                StartDefaultTask
+                0x08001bfc       0x4c CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
+                0x08001bfc                StartDefaultTask
  .text.StartmyI2CTask
-                0x08001c40        0xa CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
-                0x08001c40                StartmyI2CTask
- *fill*         0x08001c4a        0x2 
+                0x08001c48        0xa CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
+                0x08001c48                StartmyI2CTask
+ *fill*         0x08001c52        0x2 
  .text.MX_FREERTOS_Init
-                0x08001c4c       0x50 CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
-                0x08001c4c                MX_FREERTOS_Init
+                0x08001c54       0x50 CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
+                0x08001c54                MX_FREERTOS_Init
  .text.NMI_Handler
-                0x08001c9c        0x2 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001c9c                NMI_Handler
- .text.HardFault_Handler
-                0x08001c9e        0x2 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001c9e                HardFault_Handler
- .text.MemManage_Handler
-                0x08001ca0        0x2 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001ca0                MemManage_Handler
- .text.BusFault_Handler
-                0x08001ca2        0x2 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001ca2                BusFault_Handler
- .text.UsageFault_Handler
                 0x08001ca4        0x2 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001ca4                UsageFault_Handler
- .text.DebugMon_Handler
+                0x08001ca4                NMI_Handler
+ .text.HardFault_Handler
                 0x08001ca6        0x2 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001ca6                DebugMon_Handler
+                0x08001ca6                HardFault_Handler
+ .text.MemManage_Handler
+                0x08001ca8        0x2 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001ca8                MemManage_Handler
+ .text.BusFault_Handler
+                0x08001caa        0x2 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001caa                BusFault_Handler
+ .text.UsageFault_Handler
+                0x08001cac        0x2 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001cac                UsageFault_Handler
+ .text.DebugMon_Handler
+                0x08001cae        0x2 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001cae                DebugMon_Handler
  .text.DMA1_Stream1_IRQHandler
-                0x08001ca8       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001ca8                DMA1_Stream1_IRQHandler
+                0x08001cb0       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001cb0                DMA1_Stream1_IRQHandler
  .text.DMA1_Stream2_IRQHandler
-                0x08001cb8       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001cb8                DMA1_Stream2_IRQHandler
+                0x08001cc0       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001cc0                DMA1_Stream2_IRQHandler
  .text.DMA1_Stream3_IRQHandler
-                0x08001cc8       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001cc8                DMA1_Stream3_IRQHandler
+                0x08001cd0       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001cd0                DMA1_Stream3_IRQHandler
  .text.DMA1_Stream4_IRQHandler
-                0x08001cd8       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001cd8                DMA1_Stream4_IRQHandler
+                0x08001ce0       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001ce0                DMA1_Stream4_IRQHandler
  .text.DMA1_Stream5_IRQHandler
-                0x08001ce8       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001ce8                DMA1_Stream5_IRQHandler
+                0x08001cf0       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001cf0                DMA1_Stream5_IRQHandler
  .text.DMA1_Stream6_IRQHandler
-                0x08001cf8       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001cf8                DMA1_Stream6_IRQHandler
+                0x08001d00       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001d00                DMA1_Stream6_IRQHandler
  .text.CAN1_TX_IRQHandler
-                0x08001d08       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001d08                CAN1_TX_IRQHandler
+                0x08001d10       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001d10                CAN1_TX_IRQHandler
  .text.CAN1_RX0_IRQHandler
-                0x08001d18       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001d18                CAN1_RX0_IRQHandler
+                0x08001d20       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001d20                CAN1_RX0_IRQHandler
  .text.CAN1_RX1_IRQHandler
-                0x08001d28       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001d28                CAN1_RX1_IRQHandler
+                0x08001d30       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001d30                CAN1_RX1_IRQHandler
  .text.TIM2_IRQHandler
-                0x08001d38       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001d38                TIM2_IRQHandler
+                0x08001d40       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001d40                TIM2_IRQHandler
  .text.TIM4_IRQHandler
-                0x08001d48       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001d48                TIM4_IRQHandler
+                0x08001d50       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001d50                TIM4_IRQHandler
  .text.I2C1_EV_IRQHandler
-                0x08001d58       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001d58                I2C1_EV_IRQHandler
+                0x08001d60       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001d60                I2C1_EV_IRQHandler
  .text.I2C1_ER_IRQHandler
-                0x08001d68       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001d68                I2C1_ER_IRQHandler
+                0x08001d70       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001d70                I2C1_ER_IRQHandler
  .text.USART1_IRQHandler
-                0x08001d78       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001d78                USART1_IRQHandler
+                0x08001d80       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001d80                USART1_IRQHandler
  .text.USART2_IRQHandler
-                0x08001d88       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001d88                USART2_IRQHandler
+                0x08001d90       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001d90                USART2_IRQHandler
  .text.USART3_IRQHandler
-                0x08001d98       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001d98                USART3_IRQHandler
+                0x08001da0       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001da0                USART3_IRQHandler
  .text.DMA1_Stream7_IRQHandler
-                0x08001da8       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001da8                DMA1_Stream7_IRQHandler
+                0x08001db0       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001db0                DMA1_Stream7_IRQHandler
  .text.UART4_IRQHandler
-                0x08001db8       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001db8                UART4_IRQHandler
+                0x08001dc0       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001dc0                UART4_IRQHandler
  .text.DMA2_Stream2_IRQHandler
-                0x08001dc8       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001dc8                DMA2_Stream2_IRQHandler
+                0x08001dd0       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001dd0                DMA2_Stream2_IRQHandler
  .text.OTG_FS_IRQHandler
-                0x08001dd8       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001dd8                OTG_FS_IRQHandler
+                0x08001de0       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001de0                OTG_FS_IRQHandler
  .text.DMA2_Stream7_IRQHandler
-                0x08001de8       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
-                0x08001de8                DMA2_Stream7_IRQHandler
+                0x08001df0       0x10 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+                0x08001df0                DMA2_Stream7_IRQHandler
  .text.HAL_MspInit
-                0x08001df8       0x44 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_msp.c.obj
-                0x08001df8                HAL_MspInit
+                0x08001e00       0x44 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_msp.c.obj
+                0x08001e00                HAL_MspInit
  .text.HAL_InitTick
-                0x08001e3c       0xa4 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_timebase_tim.c.obj
-                0x08001e3c                HAL_InitTick
+                0x08001e44       0xa4 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_timebase_tim.c.obj
+                0x08001e44                HAL_InitTick
  .text.MX_ADC1_Init
-                0x08001ee0       0x6c CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
-                0x08001ee0                MX_ADC1_Init
+                0x08001ee8       0x6c CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
+                0x08001ee8                MX_ADC1_Init
  .text.MX_ADC2_Init
-                0x08001f4c       0x6c CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
-                0x08001f4c                MX_ADC2_Init
+                0x08001f54       0x6c CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
+                0x08001f54                MX_ADC2_Init
  .text.HAL_ADC_MspInit
-                0x08001fb8       0xb4 CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
-                0x08001fb8                HAL_ADC_MspInit
+                0x08001fc0       0xb4 CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
+                0x08001fc0                HAL_ADC_MspInit
  .text.MX_CAN1_Init
-                0x0800206c       0x38 CMakeFiles/EHUB.dir/Core/Src/can.c.obj
-                0x0800206c                MX_CAN1_Init
+                0x08002074       0x38 CMakeFiles/EHUB.dir/Core/Src/can.c.obj
+                0x08002074                MX_CAN1_Init
  .text.HAL_CAN_MspInit
-                0x080020a4       0x9c CMakeFiles/EHUB.dir/Core/Src/can.c.obj
-                0x080020a4                HAL_CAN_MspInit
+                0x080020ac       0x9c CMakeFiles/EHUB.dir/Core/Src/can.c.obj
+                0x080020ac                HAL_CAN_MspInit
  .text.HAL_CAN_MspDeInit
-                0x08002140       0x40 CMakeFiles/EHUB.dir/Core/Src/can.c.obj
-                0x08002140                HAL_CAN_MspDeInit
+                0x08002148       0x40 CMakeFiles/EHUB.dir/Core/Src/can.c.obj
+                0x08002148                HAL_CAN_MspDeInit
  .text.MX_DMA_Init
-                0x08002180       0xc8 CMakeFiles/EHUB.dir/Core/Src/dma.c.obj
-                0x08002180                MX_DMA_Init
+                0x08002188       0xc8 CMakeFiles/EHUB.dir/Core/Src/dma.c.obj
+                0x08002188                MX_DMA_Init
  .text.MX_GPIO_Init
-                0x08002248      0x128 CMakeFiles/EHUB.dir/Core/Src/gpio.c.obj
-                0x08002248                MX_GPIO_Init
+                0x08002250      0x128 CMakeFiles/EHUB.dir/Core/Src/gpio.c.obj
+                0x08002250                MX_GPIO_Init
  .text.MX_I2C1_Init
-                0x08002370       0x3c CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
-                0x08002370                MX_I2C1_Init
+                0x08002378       0x3c CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
+                0x08002378                MX_I2C1_Init
  .text.MX_I2C2_Init
-                0x080023ac       0x3c CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
-                0x080023ac                MX_I2C2_Init
+                0x080023b4       0x3c CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
+                0x080023b4                MX_I2C2_Init
  .text.HAL_I2C_MspInit
-                0x080023e8       0xe0 CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
-                0x080023e8                HAL_I2C_MspInit
+                0x080023f0       0xe0 CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
+                0x080023f0                HAL_I2C_MspInit
  .text.HAL_I2C_MspDeInit
-                0x080024c8       0x70 CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
-                0x080024c8                HAL_I2C_MspDeInit
+                0x080024d0       0x70 CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
+                0x080024d0                HAL_I2C_MspDeInit
  .text.MX_SPI1_Init
-                0x08002538       0x40 CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
-                0x08002538                MX_SPI1_Init
+                0x08002540       0x40 CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
+                0x08002540                MX_SPI1_Init
  .text.HAL_SPI_MspInit
-                0x08002578       0x70 CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
-                0x08002578                HAL_SPI_MspInit
+                0x08002580       0x70 CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
+                0x08002580                HAL_SPI_MspInit
  .text.HAL_SPI_MspDeInit
-                0x080025e8       0x2c CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
-                0x080025e8                HAL_SPI_MspDeInit
+                0x080025f0       0x2c CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
+                0x080025f0                HAL_SPI_MspDeInit
  .text.HAL_TIM_OC_MspInit
-                0x08002614       0x30 CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
-                0x08002614                HAL_TIM_OC_MspInit
+                0x0800261c       0x30 CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
+                0x0800261c                HAL_TIM_OC_MspInit
  .text.HAL_TIM_PWM_MspInit
-                0x08002644       0x9c CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
-                0x08002644                HAL_TIM_PWM_MspInit
+                0x0800264c       0x9c CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
+                0x0800264c                HAL_TIM_PWM_MspInit
  .text.HAL_TIM_MspPostInit
-                0x080026e0       0x98 CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
-                0x080026e0                HAL_TIM_MspPostInit
+                0x080026e8       0x98 CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
+                0x080026e8                HAL_TIM_MspPostInit
  .text.MX_TIM1_Init
-                0x08002778       0xb4 CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
-                0x08002778                MX_TIM1_Init
+                0x08002780       0xb4 CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
+                0x08002780                MX_TIM1_Init
  .text.MX_TIM4_Init
-                0x0800282c       0x80 CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
-                0x0800282c                MX_TIM4_Init
+                0x08002834       0x80 CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
+                0x08002834                MX_TIM4_Init
  .text.MX_UART4_Init
-                0x080028ac       0x34 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
-                0x080028ac                MX_UART4_Init
+                0x080028b4       0x34 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
+                0x080028b4                MX_UART4_Init
  .text.MX_USART1_UART_Init
-                0x080028e0       0x34 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
-                0x080028e0                MX_USART1_UART_Init
+                0x080028e8       0x34 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
+                0x080028e8                MX_USART1_UART_Init
  .text.MX_USART2_UART_Init
-                0x08002914       0x34 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
-                0x08002914                MX_USART2_UART_Init
+                0x0800291c       0x34 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
+                0x0800291c                MX_USART2_UART_Init
  .text.MX_USART3_UART_Init
-                0x08002948       0x34 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
-                0x08002948                MX_USART3_UART_Init
+                0x08002950       0x34 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
+                0x08002950                MX_USART3_UART_Init
  .text.HAL_UART_MspInit
-                0x0800297c      0x3a0 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
-                0x0800297c                HAL_UART_MspInit
+                0x08002984      0x3a0 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
+                0x08002984                HAL_UART_MspInit
  .text.HAL_UART_MspDeInit
-                0x08002d1c       0xe4 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
-                0x08002d1c                HAL_UART_MspDeInit
+                0x08002d24       0xe4 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
+                0x08002d24                HAL_UART_MspDeInit
  .text.HAL_Init
-                0x08002e00       0x34 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
-                0x08002e00                HAL_Init
+                0x08002e08       0x34 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
+                0x08002e08                HAL_Init
  .text.HAL_IncTick
-                0x08002e34       0x18 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
-                0x08002e34                HAL_IncTick
+                0x08002e3c       0x18 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
+                0x08002e3c                HAL_IncTick
  .text.HAL_GetTick
-                0x08002e4c        0xc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
-                0x08002e4c                HAL_GetTick
+                0x08002e54        0xc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
+                0x08002e54                HAL_GetTick
  .text.HAL_Delay
-                0x08002e58       0x28 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
-                0x08002e58                HAL_Delay
+                0x08002e60       0x28 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
+                0x08002e60                HAL_Delay
  .text.ADC_Init
-                0x08002e80      0x134 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
+                0x08002e88      0x134 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
  .text.HAL_ADC_Init
-                0x08002fb4       0x56 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
-                0x08002fb4                HAL_ADC_Init
- *fill*         0x0800300a        0x2 
+                0x08002fbc       0x56 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
+                0x08002fbc                HAL_ADC_Init
+ *fill*         0x08003012        0x2 
  .text.HAL_ADC_Start
-                0x0800300c      0x144 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
-                0x0800300c                HAL_ADC_Start
+                0x08003014      0x144 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
+                0x08003014                HAL_ADC_Start
  .text.HAL_ADC_PollForConversion
-                0x08003150       0xb8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
-                0x08003150                HAL_ADC_PollForConversion
+                0x08003158       0xb8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
+                0x08003158                HAL_ADC_PollForConversion
  .text.HAL_ADC_GetValue
-                0x08003208        0x6 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
-                0x08003208                HAL_ADC_GetValue
- *fill*         0x0800320e        0x2 
+                0x08003210        0x6 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
+                0x08003210                HAL_ADC_GetValue
+ *fill*         0x08003216        0x2 
  .text.HAL_ADC_ConfigChannel
-                0x08003210      0x194 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
-                0x08003210                HAL_ADC_ConfigChannel
+                0x08003218      0x194 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
+                0x08003218                HAL_ADC_ConfigChannel
  .text.HAL_CAN_Init
-                0x080033a4      0x14c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x080033a4                HAL_CAN_Init
+                0x080033ac      0x14c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+                0x080033ac                HAL_CAN_Init
  .text.HAL_CAN_ConfigFilter
-                0x080034f0      0x138 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x080034f0                HAL_CAN_ConfigFilter
+                0x080034f8      0x138 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+                0x080034f8                HAL_CAN_ConfigFilter
  .text.HAL_CAN_Start
-                0x08003628       0x5c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x08003628                HAL_CAN_Start
+                0x08003630       0x5c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+                0x08003630                HAL_CAN_Start
  .text.HAL_CAN_Stop
-                0x08003684       0x60 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x08003684                HAL_CAN_Stop
+                0x0800368c       0x60 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+                0x0800368c                HAL_CAN_Stop
  .text.HAL_CAN_DeInit
-                0x080036e4       0x28 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x080036e4                HAL_CAN_DeInit
+                0x080036ec       0x28 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+                0x080036ec                HAL_CAN_DeInit
  .text.HAL_CAN_AddTxMessage
-                0x0800370c       0xea CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x0800370c                HAL_CAN_AddTxMessage
+                0x08003714       0xea CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+                0x08003714                HAL_CAN_AddTxMessage
  .text.HAL_CAN_GetRxMessage
-                0x080037f6      0x16a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x080037f6                HAL_CAN_GetRxMessage
+                0x080037fe      0x16a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+                0x080037fe                HAL_CAN_GetRxMessage
  .text.HAL_CAN_ActivateNotification
-                0x08003960       0x24 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x08003960                HAL_CAN_ActivateNotification
+                0x08003968       0x24 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+                0x08003968                HAL_CAN_ActivateNotification
  .text.HAL_CAN_TxMailbox0CompleteCallback
-                0x08003984        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x08003984                HAL_CAN_TxMailbox0CompleteCallback
- .text.HAL_CAN_TxMailbox1CompleteCallback
-                0x08003986        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x08003986                HAL_CAN_TxMailbox1CompleteCallback
- .text.HAL_CAN_TxMailbox2CompleteCallback
-                0x08003988        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x08003988                HAL_CAN_TxMailbox2CompleteCallback
- .text.HAL_CAN_TxMailbox0AbortCallback
-                0x0800398a        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x0800398a                HAL_CAN_TxMailbox0AbortCallback
- .text.HAL_CAN_TxMailbox1AbortCallback
                 0x0800398c        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x0800398c                HAL_CAN_TxMailbox1AbortCallback
- .text.HAL_CAN_TxMailbox2AbortCallback
+                0x0800398c                HAL_CAN_TxMailbox0CompleteCallback
+ .text.HAL_CAN_TxMailbox1CompleteCallback
                 0x0800398e        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x0800398e                HAL_CAN_TxMailbox2AbortCallback
- .text.HAL_CAN_RxFifo0FullCallback
+                0x0800398e                HAL_CAN_TxMailbox1CompleteCallback
+ .text.HAL_CAN_TxMailbox2CompleteCallback
                 0x08003990        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x08003990                HAL_CAN_RxFifo0FullCallback
- .text.HAL_CAN_RxFifo1MsgPendingCallback
+                0x08003990                HAL_CAN_TxMailbox2CompleteCallback
+ .text.HAL_CAN_TxMailbox0AbortCallback
                 0x08003992        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x08003992                HAL_CAN_RxFifo1MsgPendingCallback
- .text.HAL_CAN_RxFifo1FullCallback
+                0x08003992                HAL_CAN_TxMailbox0AbortCallback
+ .text.HAL_CAN_TxMailbox1AbortCallback
                 0x08003994        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x08003994                HAL_CAN_RxFifo1FullCallback
- .text.HAL_CAN_SleepCallback
+                0x08003994                HAL_CAN_TxMailbox1AbortCallback
+ .text.HAL_CAN_TxMailbox2AbortCallback
                 0x08003996        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x08003996                HAL_CAN_SleepCallback
- .text.HAL_CAN_WakeUpFromRxMsgCallback
+                0x08003996                HAL_CAN_TxMailbox2AbortCallback
+ .text.HAL_CAN_RxFifo0FullCallback
                 0x08003998        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x08003998                HAL_CAN_WakeUpFromRxMsgCallback
- .text.HAL_CAN_ErrorCallback
+                0x08003998                HAL_CAN_RxFifo0FullCallback
+ .text.HAL_CAN_RxFifo1MsgPendingCallback
                 0x0800399a        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x0800399a                HAL_CAN_ErrorCallback
+                0x0800399a                HAL_CAN_RxFifo1MsgPendingCallback
+ .text.HAL_CAN_RxFifo1FullCallback
+                0x0800399c        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+                0x0800399c                HAL_CAN_RxFifo1FullCallback
+ .text.HAL_CAN_SleepCallback
+                0x0800399e        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+                0x0800399e                HAL_CAN_SleepCallback
+ .text.HAL_CAN_WakeUpFromRxMsgCallback
+                0x080039a0        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+                0x080039a0                HAL_CAN_WakeUpFromRxMsgCallback
+ .text.HAL_CAN_ErrorCallback
+                0x080039a2        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+                0x080039a2                HAL_CAN_ErrorCallback
  .text.HAL_CAN_IRQHandler
-                0x0800399c      0x250 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
-                0x0800399c                HAL_CAN_IRQHandler
+                0x080039a4      0x250 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+                0x080039a4                HAL_CAN_IRQHandler
  .text.__NVIC_EnableIRQ
-                0x08003bec       0x1c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
+                0x08003bf4       0x1c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
  .text.__NVIC_DisableIRQ
-                0x08003c08       0x24 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
+                0x08003c10       0x24 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
  .text.__NVIC_SetPriority
-                0x08003c2c       0x28 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
+                0x08003c34       0x28 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
  .text.NVIC_EncodePriority
-                0x08003c54       0x3e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
- *fill*         0x08003c92        0x2 
+                0x08003c5c       0x3e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
+ *fill*         0x08003c9a        0x2 
  .text.HAL_NVIC_SetPriorityGrouping
-                0x08003c94       0x24 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
-                0x08003c94                HAL_NVIC_SetPriorityGrouping
+                0x08003c9c       0x24 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
+                0x08003c9c                HAL_NVIC_SetPriorityGrouping
  .text.HAL_NVIC_SetPriority
-                0x08003cb8       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
-                0x08003cb8                HAL_NVIC_SetPriority
+                0x08003cc0       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
+                0x08003cc0                HAL_NVIC_SetPriority
  .text.HAL_NVIC_EnableIRQ
-                0x08003cd8        0x8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
-                0x08003cd8                HAL_NVIC_EnableIRQ
- .text.HAL_NVIC_DisableIRQ
                 0x08003ce0        0x8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
-                0x08003ce0                HAL_NVIC_DisableIRQ
+                0x08003ce0                HAL_NVIC_EnableIRQ
+ .text.HAL_NVIC_DisableIRQ
+                0x08003ce8        0x8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
+                0x08003ce8                HAL_NVIC_DisableIRQ
  .text.DMA_SetConfig
-                0x08003ce8       0x2c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+                0x08003cf0       0x2c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
  .text.DMA_CalcBaseAndBitshift
-                0x08003d14       0x3c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+                0x08003d1c       0x3c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
  .text.DMA_CheckFifoParam
-                0x08003d50       0x8e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
- *fill*         0x08003dde        0x2 
+                0x08003d58       0x8e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+ *fill*         0x08003de6        0x2 
  .text.HAL_DMA_Init
-                0x08003de0       0xcc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
-                0x08003de0                HAL_DMA_Init
+                0x08003de8       0xcc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+                0x08003de8                HAL_DMA_Init
  .text.HAL_DMA_DeInit
-                0x08003eac       0x64 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
-                0x08003eac                HAL_DMA_DeInit
+                0x08003eb4       0x64 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+                0x08003eb4                HAL_DMA_DeInit
  .text.HAL_DMA_Start_IT
-                0x08003f10       0x68 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
-                0x08003f10                HAL_DMA_Start_IT
+                0x08003f18       0x68 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+                0x08003f18                HAL_DMA_Start_IT
  .text.HAL_DMA_Abort
-                0x08003f78       0x92 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
-                0x08003f78                HAL_DMA_Abort
+                0x08003f80       0x92 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+                0x08003f80                HAL_DMA_Abort
  .text.HAL_DMA_Abort_IT
-                0x0800400a       0x24 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
-                0x0800400a                HAL_DMA_Abort_IT
- *fill*         0x0800402e        0x2 
+                0x08004012       0x24 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+                0x08004012                HAL_DMA_Abort_IT
+ *fill*         0x08004036        0x2 
  .text.HAL_DMA_IRQHandler
-                0x08004030      0x1dc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
-                0x08004030                HAL_DMA_IRQHandler
+                0x08004038      0x1dc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+                0x08004038                HAL_DMA_IRQHandler
  .text.HAL_DMA_GetState
-                0x0800420c        0x6 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
-                0x0800420c                HAL_DMA_GetState
- *fill*         0x08004212        0x2 
+                0x08004214        0x6 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+                0x08004214                HAL_DMA_GetState
+ *fill*         0x0800421a        0x2 
  .text.HAL_GPIO_Init
-                0x08004214      0x1ec CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
-                0x08004214                HAL_GPIO_Init
+                0x0800421c      0x1ec CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
+                0x0800421c                HAL_GPIO_Init
  .text.HAL_GPIO_DeInit
-                0x08004400      0x134 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
-                0x08004400                HAL_GPIO_DeInit
+                0x08004408      0x134 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
+                0x08004408                HAL_GPIO_DeInit
  .text.HAL_GPIO_WritePin
-                0x08004534        0xc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
-                0x08004534                HAL_GPIO_WritePin
+                0x0800453c        0xc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
+                0x0800453c                HAL_GPIO_WritePin
  .text.I2C_Flush_DR
-                0x08004540       0x10 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004548       0x10 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_Master_SB
-                0x08004550       0xa4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004558       0xa4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_Master_ADD10
-                0x080045f4       0x2a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
- *fill*         0x0800461e        0x2 
+                0x080045fc       0x2a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+ *fill*         0x08004626        0x2 
  .text.I2C_Master_ADDR
-                0x08004620      0x230 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004628      0x230 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_SlaveTransmit_BTF
-                0x08004850       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004858       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_SlaveReceive_BTF
-                0x08004870       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004878       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_WaitOnSTOPRequestThroughIT
-                0x08004890       0x48 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004898       0x48 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_IsAcknowledgeFailed
-                0x080048d8       0x32 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x080048e0       0x32 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_ConvertOtherXferOptions
-                0x0800490a       0x1e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004912       0x1e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_WaitOnFlagUntilTimeout
-                0x08004928       0xaa CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004930       0xaa CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_WaitOnMasterAddressFlagUntilTimeout
-                0x080049d2       0xd6 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x080049da       0xd6 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_MasterRequestWrite
-                0x08004aa8       0xb4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004ab0       0xb4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_MasterRequestRead
-                0x08004b5c      0x120 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004b64      0x120 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_WaitOnTXEFlagUntilTimeout
-                0x08004c7c       0x5e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004c84       0x5e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_WaitOnBTFFlagUntilTimeout
-                0x08004cda       0x5e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004ce2       0x5e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_WaitOnRXNEFlagUntilTimeout
-                0x08004d38       0x78 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004d40       0x78 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.HAL_I2C_Init
-                0x08004db0      0x1bc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x08004db0                HAL_I2C_Init
+                0x08004db8      0x1bc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004db8                HAL_I2C_Init
  .text.HAL_I2C_DeInit
-                0x08004f6c       0x32 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x08004f6c                HAL_I2C_DeInit
- *fill*         0x08004f9e        0x2 
+                0x08004f74       0x32 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004f74                HAL_I2C_DeInit
+ *fill*         0x08004fa6        0x2 
  .text.HAL_I2C_Master_Transmit
-                0x08004fa0      0x174 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x08004fa0                HAL_I2C_Master_Transmit
+                0x08004fa8      0x174 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08004fa8                HAL_I2C_Master_Transmit
  .text.HAL_I2C_Master_Receive
-                0x08005114      0x2fc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x08005114                HAL_I2C_Master_Receive
+                0x0800511c      0x2fc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x0800511c                HAL_I2C_Master_Receive
  .text.HAL_I2C_Slave_Seq_Transmit_IT
-                0x08005410       0x90 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x08005410                HAL_I2C_Slave_Seq_Transmit_IT
+                0x08005418       0x90 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08005418                HAL_I2C_Slave_Seq_Transmit_IT
  .text.HAL_I2C_Slave_Seq_Receive_IT
-                0x080054a0       0x90 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x080054a0                HAL_I2C_Slave_Seq_Receive_IT
+                0x080054a8       0x90 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x080054a8                HAL_I2C_Slave_Seq_Receive_IT
  .text.HAL_I2C_EnableListen_IT
-                0x08005530       0x3c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x08005530                HAL_I2C_EnableListen_IT
+                0x08005538       0x3c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08005538                HAL_I2C_EnableListen_IT
  .text.HAL_I2C_MasterTxCpltCallback
-                0x0800556c        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x0800556c                HAL_I2C_MasterTxCpltCallback
+                0x08005574        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08005574                HAL_I2C_MasterTxCpltCallback
  .text.HAL_I2C_MasterRxCpltCallback
-                0x0800556e        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x0800556e                HAL_I2C_MasterRxCpltCallback
+                0x08005576        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08005576                HAL_I2C_MasterRxCpltCallback
  .text.HAL_I2C_SlaveTxCpltCallback
-                0x08005570        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x08005570                HAL_I2C_SlaveTxCpltCallback
+                0x08005578        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08005578                HAL_I2C_SlaveTxCpltCallback
  .text.I2C_SlaveTransmit_TXE
-                0x08005572       0x4c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x0800557a       0x4c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_SlaveReceive_RXNE
-                0x080055be       0x4c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x080055c6       0x4c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_Slave_ADDR
-                0x0800560a       0x5a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08005612       0x5a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_Slave_AF
-                0x08005664       0xa0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x0800566c       0xa0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.HAL_I2C_MemTxCpltCallback
-                0x08005704        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x08005704                HAL_I2C_MemTxCpltCallback
+                0x0800570c        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x0800570c                HAL_I2C_MemTxCpltCallback
  .text.I2C_MasterTransmit_BTF
-                0x08005706       0x9a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x0800570e       0x9a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_MemoryTransmit_TXE_BTF
-                0x080057a0       0xc4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x080057a8       0xc4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_MasterTransmit_TXE
-                0x08005864       0xd0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x0800586c       0xd0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.HAL_I2C_MemRxCpltCallback
-                0x08005934        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x08005934                HAL_I2C_MemRxCpltCallback
+                0x0800593c        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x0800593c                HAL_I2C_MemRxCpltCallback
  .text.I2C_MasterReceive_BTF
-                0x08005936      0x13e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x0800593e      0x13e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_MasterReceive_RXNE
-                0x08005a74      0x102 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08005a7c      0x102 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.HAL_I2C_AbortCpltCallback
-                0x08005b76        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x08005b76                HAL_I2C_AbortCpltCallback
+                0x08005b7e        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08005b7e                HAL_I2C_AbortCpltCallback
  .text.I2C_DMAAbort
-                0x08005b78       0xe0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08005b80       0xe0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_ITError
-                0x08005c58      0x174 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08005c60      0x174 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.I2C_Slave_STOPF
-                0x08005dcc      0x18c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08005dd4      0x18c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
  .text.HAL_I2C_EV_IRQHandler
-                0x08005f58      0x19e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x08005f58                HAL_I2C_EV_IRQHandler
+                0x08005f60      0x19e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x08005f60                HAL_I2C_EV_IRQHandler
  .text.HAL_I2C_ER_IRQHandler
-                0x080060f6       0xc4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
-                0x080060f6                HAL_I2C_ER_IRQHandler
+                0x080060fe       0xc4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+                0x080060fe                HAL_I2C_ER_IRQHandler
  .text.PCD_WriteEmptyTxFifo
-                0x080061ba       0xd0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x080061c2       0xd0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
  .text.HAL_PCD_Init
-                0x0800628a      0x102 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
-                0x0800628a                HAL_PCD_Init
+                0x08006292      0x102 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x08006292                HAL_PCD_Init
  .text.HAL_PCD_Start
-                0x0800638c       0x44 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
-                0x0800638c                HAL_PCD_Start
+                0x08006394       0x44 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x08006394                HAL_PCD_Start
  .text.PCD_EP_OutXfrComplete_int
-                0x080063d0      0x104 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x080063d8      0x104 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
  .text.PCD_EP_OutSetupPacket_int
-                0x080064d4       0x50 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x080064dc       0x50 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
  .text.HAL_PCD_SetAddress
-                0x08006524       0x26 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
-                0x08006524                HAL_PCD_SetAddress
+                0x0800652c       0x26 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x0800652c                HAL_PCD_SetAddress
  .text.HAL_PCD_EP_Open
-                0x0800654a       0x8c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
-                0x0800654a                HAL_PCD_EP_Open
+                0x08006552       0x8c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x08006552                HAL_PCD_EP_Open
  .text.HAL_PCD_EP_Close
-                0x080065d6       0x70 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
-                0x080065d6                HAL_PCD_EP_Close
+                0x080065de       0x70 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x080065de                HAL_PCD_EP_Close
  .text.HAL_PCD_EP_Receive
-                0x08006646       0x4a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
-                0x08006646                HAL_PCD_EP_Receive
+                0x0800664e       0x4a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x0800664e                HAL_PCD_EP_Receive
  .text.HAL_PCD_EP_GetRxCount
-                0x08006690       0x12 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
-                0x08006690                HAL_PCD_EP_GetRxCount
+                0x08006698       0x12 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x08006698                HAL_PCD_EP_GetRxCount
  .text.HAL_PCD_EP_Transmit
-                0x080066a2       0x4a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
-                0x080066a2                HAL_PCD_EP_Transmit
+                0x080066aa       0x4a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x080066aa                HAL_PCD_EP_Transmit
  .text.HAL_PCD_EP_SetStall
-                0x080066ec       0x86 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
-                0x080066ec                HAL_PCD_EP_SetStall
+                0x080066f4       0x86 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x080066f4                HAL_PCD_EP_SetStall
  .text.HAL_PCD_EP_ClrStall
-                0x08006772       0x74 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
-                0x08006772                HAL_PCD_EP_ClrStall
+                0x0800677a       0x74 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x0800677a                HAL_PCD_EP_ClrStall
  .text.HAL_PCD_EP_Abort
-                0x080067e6       0x34 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
-                0x080067e6                HAL_PCD_EP_Abort
+                0x080067ee       0x34 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x080067ee                HAL_PCD_EP_Abort
  .text.HAL_PCD_IRQHandler
-                0x0800681a      0x5be CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
-                0x0800681a                HAL_PCD_IRQHandler
+                0x08006822      0x5be CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+                0x08006822                HAL_PCD_IRQHandler
  .text.HAL_PCDEx_SetTxFiFo
-                0x08006dd8       0x4c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
-                0x08006dd8                HAL_PCDEx_SetTxFiFo
+                0x08006de0       0x4c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
+                0x08006de0                HAL_PCDEx_SetTxFiFo
  .text.HAL_PCDEx_SetRxFiFo
-                0x08006e24        0x8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
-                0x08006e24                HAL_PCDEx_SetRxFiFo
+                0x08006e2c        0x8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
+                0x08006e2c                HAL_PCDEx_SetRxFiFo
  .text.HAL_PCDEx_LPM_Callback
-                0x08006e2c        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
-                0x08006e2c                HAL_PCDEx_LPM_Callback
- *fill*         0x08006e2e        0x2 
+                0x08006e34        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
+                0x08006e34                HAL_PCDEx_LPM_Callback
+ *fill*         0x08006e36        0x2 
  .text.HAL_RCC_OscConfig
-                0x08006e30      0x3f8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
-                0x08006e30                HAL_RCC_OscConfig
+                0x08006e38      0x3f8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
+                0x08006e38                HAL_RCC_OscConfig
  .text.HAL_RCC_GetSysClockFreq
-                0x08007228       0xa8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
-                0x08007228                HAL_RCC_GetSysClockFreq
+                0x08007230       0xa8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
+                0x08007230                HAL_RCC_GetSysClockFreq
  .text.HAL_RCC_ClockConfig
-                0x080072d0      0x160 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
-                0x080072d0                HAL_RCC_ClockConfig
+                0x080072d8      0x160 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
+                0x080072d8                HAL_RCC_ClockConfig
  .text.HAL_RCC_GetHCLKFreq
-                0x08007430        0xc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
-                0x08007430                HAL_RCC_GetHCLKFreq
+                0x08007438        0xc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
+                0x08007438                HAL_RCC_GetHCLKFreq
  .text.HAL_RCC_GetPCLK1Freq
-                0x0800743c       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
-                0x0800743c                HAL_RCC_GetPCLK1Freq
+                0x08007444       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
+                0x08007444                HAL_RCC_GetPCLK1Freq
  .text.HAL_RCC_GetPCLK2Freq
-                0x0800745c       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
-                0x0800745c                HAL_RCC_GetPCLK2Freq
+                0x08007464       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
+                0x08007464                HAL_RCC_GetPCLK2Freq
  .text.HAL_RCC_GetClockConfig
-                0x0800747c       0x3c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
-                0x0800747c                HAL_RCC_GetClockConfig
+                0x08007484       0x3c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
+                0x08007484                HAL_RCC_GetClockConfig
  .text.SPI_WaitFlagStateUntilTimeout
-                0x080074b8       0xc8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
+                0x080074c0       0xc8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
  .text.SPI_EndRxTxTransaction
-                0x08007580       0x80 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
+                0x08007588       0x80 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
  .text.HAL_SPI_Init
-                0x08007600       0xbe CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
-                0x08007600                HAL_SPI_Init
+                0x08007608       0xbe CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
+                0x08007608                HAL_SPI_Init
  .text.HAL_SPI_DeInit
-                0x080076be       0x2c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
-                0x080076be                HAL_SPI_DeInit
+                0x080076c6       0x2c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
+                0x080076c6                HAL_SPI_DeInit
  .text.HAL_SPI_TransmitReceive
-                0x080076ea      0x252 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
-                0x080076ea                HAL_SPI_TransmitReceive
+                0x080076f2      0x252 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
+                0x080076f2                HAL_SPI_TransmitReceive
  .text.TIM_OC1_SetConfig
-                0x0800793c       0x70 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007944       0x70 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
  .text.TIM_OC3_SetConfig
-                0x080079ac       0x70 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x080079b4       0x70 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
  .text.TIM_OC4_SetConfig
-                0x08007a1c       0x50 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007a24       0x50 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
  .text.HAL_TIM_Base_MspInit
-                0x08007a6c        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007a6c                HAL_TIM_Base_MspInit
- *fill*         0x08007a6e        0x2 
+                0x08007a74        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007a74                HAL_TIM_Base_MspInit
+ *fill*         0x08007a76        0x2 
  .text.HAL_TIM_Base_Start_IT
-                0x08007a70       0x84 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007a70                HAL_TIM_Base_Start_IT
+                0x08007a78       0x84 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007a78                HAL_TIM_Base_Start_IT
  .text.HAL_TIM_OC_DelayElapsedCallback
-                0x08007af4        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007af4                HAL_TIM_OC_DelayElapsedCallback
+                0x08007afc        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007afc                HAL_TIM_OC_DelayElapsedCallback
  .text.HAL_TIM_IC_CaptureCallback
-                0x08007af6        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007af6                HAL_TIM_IC_CaptureCallback
+                0x08007afe        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007afe                HAL_TIM_IC_CaptureCallback
  .text.HAL_TIM_PWM_PulseFinishedCallback
-                0x08007af8        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007af8                HAL_TIM_PWM_PulseFinishedCallback
+                0x08007b00        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007b00                HAL_TIM_PWM_PulseFinishedCallback
  .text.HAL_TIM_TriggerCallback
-                0x08007afa        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007afa                HAL_TIM_TriggerCallback
+                0x08007b02        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007b02                HAL_TIM_TriggerCallback
  .text.HAL_TIM_IRQHandler
-                0x08007afc      0x15e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007afc                HAL_TIM_IRQHandler
- *fill*         0x08007c5a        0x2 
+                0x08007b04      0x15e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007b04                HAL_TIM_IRQHandler
+ *fill*         0x08007c62        0x2 
  .text.TIM_Base_SetConfig
-                0x08007c5c       0xd0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007c5c                TIM_Base_SetConfig
+                0x08007c64       0xd0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007c64                TIM_Base_SetConfig
  .text.HAL_TIM_Base_Init
-                0x08007d2c       0x58 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007d2c                HAL_TIM_Base_Init
+                0x08007d34       0x58 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007d34                HAL_TIM_Base_Init
  .text.HAL_TIM_OC_Init
-                0x08007d84       0x58 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007d84                HAL_TIM_OC_Init
+                0x08007d8c       0x58 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007d8c                HAL_TIM_OC_Init
  .text.HAL_TIM_PWM_Init
-                0x08007ddc       0x58 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007ddc                HAL_TIM_PWM_Init
+                0x08007de4       0x58 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007de4                HAL_TIM_PWM_Init
  .text.TIM_OC2_SetConfig
-                0x08007e34       0x70 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007e34                TIM_OC2_SetConfig
+                0x08007e3c       0x70 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007e3c                TIM_OC2_SetConfig
  .text.HAL_TIM_OC_ConfigChannel
-                0x08007ea4       0x5e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007ea4                HAL_TIM_OC_ConfigChannel
+                0x08007eac       0x5e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007eac                HAL_TIM_OC_ConfigChannel
  .text.HAL_TIM_PWM_ConfigChannel
-                0x08007f02       0xdc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007f02                HAL_TIM_PWM_ConfigChannel
+                0x08007f0a       0xdc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007f0a                HAL_TIM_PWM_ConfigChannel
  .text.TIM_CCxChannelCmd
-                0x08007fde       0x1e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007fde                TIM_CCxChannelCmd
+                0x08007fe6       0x1e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08007fe6                TIM_CCxChannelCmd
  .text.HAL_TIM_PWM_Start
-                0x08007ffc       0xfc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x08007ffc                HAL_TIM_PWM_Start
+                0x08008004       0xfc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08008004                HAL_TIM_PWM_Start
  .text.HAL_TIM_PWM_Stop
-                0x080080f8       0x8c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
-                0x080080f8                HAL_TIM_PWM_Stop
+                0x08008100       0x8c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+                0x08008100                HAL_TIM_PWM_Stop
  .text.HAL_TIMEx_MasterConfigSynchronization
-                0x08008184       0x8c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
-                0x08008184                HAL_TIMEx_MasterConfigSynchronization
+                0x0800818c       0x8c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
+                0x0800818c                HAL_TIMEx_MasterConfigSynchronization
  .text.HAL_TIMEx_ConfigBreakDeadTime
-                0x08008210       0x52 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
-                0x08008210                HAL_TIMEx_ConfigBreakDeadTime
+                0x08008218       0x52 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
+                0x08008218                HAL_TIMEx_ConfigBreakDeadTime
  .text.HAL_TIMEx_CommutCallback
-                0x08008262        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
-                0x08008262                HAL_TIMEx_CommutCallback
+                0x0800826a        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
+                0x0800826a                HAL_TIMEx_CommutCallback
  .text.HAL_TIMEx_BreakCallback
-                0x08008264        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
-                0x08008264                HAL_TIMEx_BreakCallback
+                0x0800826c        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
+                0x0800826c                HAL_TIMEx_BreakCallback
  .text.UART_EndTxTransfer
-                0x08008266       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x0800826e       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
  .text.UART_EndRxTransfer
-                0x08008286       0x5c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x0800828e       0x5c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
  .text.UART_Transmit_IT
-                0x080082e2       0x5e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x080082ea       0x5e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
  .text.UART_SetConfig
-                0x08008340      0x110 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x08008348      0x110 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
  .text.HAL_UART_Init
-                0x08008450       0x60 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
-                0x08008450                HAL_UART_Init
+                0x08008458       0x60 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x08008458                HAL_UART_Init
  .text.HAL_UART_DeInit
-                0x080084b0       0x34 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
-                0x080084b0                HAL_UART_DeInit
+                0x080084b8       0x34 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x080084b8                HAL_UART_DeInit
  .text.HAL_UART_Transmit_DMA
-                0x080084e4       0x90 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
-                0x080084e4                HAL_UART_Transmit_DMA
+                0x080084ec       0x90 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x080084ec                HAL_UART_Transmit_DMA
  .text.HAL_UART_DMAStop
-                0x08008574       0x80 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
-                0x08008574                HAL_UART_DMAStop
+                0x0800857c       0x80 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x0800857c                HAL_UART_DMAStop
  .text.UART_DMATransmitCplt
-                0x080085f4       0x4c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x080085fc       0x4c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
  .text.UART_EndTransmit_IT
-                0x08008640       0x1a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x08008648       0x1a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
  .text.HAL_UART_TxHalfCpltCallback
-                0x0800865a        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
-                0x0800865a                HAL_UART_TxHalfCpltCallback
+                0x08008662        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x08008662                HAL_UART_TxHalfCpltCallback
  .text.UART_DMATxHalfCplt
-                0x0800865c        0xa CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x08008664        0xa CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
  .text.HAL_UART_RxCpltCallback
-                0x08008666        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
-                0x08008666                HAL_UART_RxCpltCallback
+                0x0800866e        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x0800866e                HAL_UART_RxCpltCallback
  .text.HAL_UART_RxHalfCpltCallback
-                0x08008668        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
-                0x08008668                HAL_UART_RxHalfCpltCallback
+                0x08008670        0x2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x08008670                HAL_UART_RxHalfCpltCallback
  .text.UART_DMAError
-                0x0800866a       0x54 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x08008672       0x54 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
  .text.UART_DMAAbortOnError
-                0x080086be        0xe CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x080086c6        0xe CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
  .text.UART_Receive_IT
-                0x080086cc       0xe4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x080086d4       0xe4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
  .text.HAL_UART_IRQHandler
-                0x080087b0      0x2a0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
-                0x080087b0                HAL_UART_IRQHandler
+                0x080087b8      0x2a0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x080087b8                HAL_UART_IRQHandler
  .text.UART_DMARxHalfCplt
-                0x08008a50       0x1e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x08008a58       0x1e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
  .text.UART_DMAReceiveCplt
-                0x08008a6e       0x9a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x08008a76       0x9a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
  .text.HAL_UART_GetState
-                0x08008b08        0xc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
-                0x08008b08                HAL_UART_GetState
+                0x08008b10        0xc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x08008b10                HAL_UART_GetState
  .text.UART_Start_Receive_DMA
-                0x08008b14       0xb8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
-                0x08008b14                UART_Start_Receive_DMA
+                0x08008b1c       0xb8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x08008b1c                UART_Start_Receive_DMA
  .text.HAL_UARTEx_ReceiveToIdle_DMA
-                0x08008bcc       0x60 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
-                0x08008bcc                HAL_UARTEx_ReceiveToIdle_DMA
+                0x08008bd4       0x60 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+                0x08008bd4                HAL_UARTEx_ReceiveToIdle_DMA
  .text.USB_CoreReset
-                0x08008c2c       0x58 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08008c34       0x58 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
  .text.USB_CoreInit
-                0x08008c84       0x92 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08008c84                USB_CoreInit
- *fill*         0x08008d16        0x2 
+                0x08008c8c       0x92 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08008c8c                USB_CoreInit
+ *fill*         0x08008d1e        0x2 
  .text.USB_SetTurnaroundTime
-                0x08008d18       0xe4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08008d18                USB_SetTurnaroundTime
+                0x08008d20       0xe4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08008d20                USB_SetTurnaroundTime
  .text.USB_EnableGlobalInt
-                0x08008dfc        0xc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08008dfc                USB_EnableGlobalInt
+                0x08008e04        0xc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08008e04                USB_EnableGlobalInt
  .text.USB_DisableGlobalInt
-                0x08008e08        0xc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08008e08                USB_DisableGlobalInt
+                0x08008e10        0xc CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08008e10                USB_DisableGlobalInt
  .text.USB_FlushTxFifo
-                0x08008e14       0x4a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08008e14                USB_FlushTxFifo
+                0x08008e1c       0x4a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08008e1c                USB_FlushTxFifo
  .text.USB_FlushRxFifo
-                0x08008e5e       0x46 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08008e5e                USB_FlushRxFifo
+                0x08008e66       0x46 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08008e66                USB_FlushRxFifo
  .text.USB_SetDevSpeed
-                0x08008ea4        0xe CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08008ea4                USB_SetDevSpeed
- *fill*         0x08008eb2        0x2 
+                0x08008eac        0xe CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08008eac                USB_SetDevSpeed
+ *fill*         0x08008eba        0x2 
  .text.USB_DevInit
-                0x08008eb4      0x198 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08008eb4                USB_DevInit
+                0x08008ebc      0x198 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08008ebc                USB_DevInit
  .text.USB_GetDevSpeed
-                0x0800904c       0x22 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x0800904c                USB_GetDevSpeed
+                0x08009054       0x22 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08009054                USB_GetDevSpeed
  .text.USB_ActivateEndpoint
-                0x0800906e       0x9a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x0800906e                USB_ActivateEndpoint
+                0x08009076       0x9a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08009076                USB_ActivateEndpoint
  .text.USB_DeactivateEndpoint
-                0x08009108       0xe0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08009108                USB_DeactivateEndpoint
+                0x08009110       0xe0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08009110                USB_DeactivateEndpoint
  .text.USB_EPStopXfer
-                0x080091e8       0xbe CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x080091e8                USB_EPStopXfer
+                0x080091f0       0xbe CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x080091f0                USB_EPStopXfer
  .text.USB_WritePacket
-                0x080092a6       0x2e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x080092a6                USB_WritePacket
+                0x080092ae       0x2e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x080092ae                USB_WritePacket
  .text.USB_EPStartXfer
-                0x080092d4      0x244 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x080092d4                USB_EPStartXfer
+                0x080092dc      0x244 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x080092dc                USB_EPStartXfer
  .text.USB_ReadPacket
-                0x08009518       0x46 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08009518                USB_ReadPacket
+                0x08009520       0x46 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08009520                USB_ReadPacket
  .text.USB_EPSetStall
-                0x0800955e       0x5a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x0800955e                USB_EPSetStall
+                0x08009566       0x5a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08009566                USB_EPSetStall
  .text.USB_EPClearStall
-                0x080095b8       0x5c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x080095b8                USB_EPClearStall
+                0x080095c0       0x5c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x080095c0                USB_EPClearStall
  .text.USB_SetDevAddress
-                0x08009614       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08009614                USB_SetDevAddress
+                0x0800961c       0x20 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x0800961c                USB_SetDevAddress
  .text.USB_DevConnect
-                0x08009634       0x1c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08009634                USB_DevConnect
+                0x0800963c       0x1c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x0800963c                USB_DevConnect
  .text.USB_DevDisconnect
-                0x08009650       0x1c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08009650                USB_DevDisconnect
+                0x08009658       0x1c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08009658                USB_DevDisconnect
  .text.USB_ReadInterrupts
-                0x0800966c        0x8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x0800966c                USB_ReadInterrupts
+                0x08009674        0x8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08009674                USB_ReadInterrupts
  .text.USB_ReadDevAllOutEpInterrupt
-                0x08009674       0x10 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08009674                USB_ReadDevAllOutEpInterrupt
+                0x0800967c       0x10 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x0800967c                USB_ReadDevAllOutEpInterrupt
  .text.USB_ReadDevAllInEpInterrupt
-                0x08009684       0x10 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08009684                USB_ReadDevAllInEpInterrupt
+                0x0800968c       0x10 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x0800968c                USB_ReadDevAllInEpInterrupt
  .text.USB_ReadDevOutEPInterrupt
-                0x08009694       0x12 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08009694                USB_ReadDevOutEPInterrupt
+                0x0800969c       0x12 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x0800969c                USB_ReadDevOutEPInterrupt
  .text.USB_ReadDevInEPInterrupt
-                0x080096a6       0x24 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x080096a6                USB_ReadDevInEPInterrupt
+                0x080096ae       0x24 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x080096ae                USB_ReadDevInEPInterrupt
  .text.USB_GetMode
-                0x080096ca        0x8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x080096ca                USB_GetMode
+                0x080096d2        0x8 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x080096d2                USB_GetMode
  .text.USB_SetCurrentMode
-                0x080096d2       0x62 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x080096d2                USB_SetCurrentMode
+                0x080096da       0x62 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x080096da                USB_SetCurrentMode
  .text.USB_ActivateSetup
-                0x08009734       0x1c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08009734                USB_ActivateSetup
+                0x0800973c       0x1c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x0800973c                USB_ActivateSetup
  .text.USB_EP0_OutStart
-                0x08009750       0x60 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
-                0x08009750                USB_EP0_OutStart
+                0x08009758       0x60 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+                0x08009758                USB_EP0_OutStart
  .text.vListInitialise
-                0x080097b0       0x16 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
-                0x080097b0                vListInitialise
+                0x080097b8       0x16 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
+                0x080097b8                vListInitialise
  .text.vListInitialiseItem
-                0x080097c6        0x6 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
-                0x080097c6                vListInitialiseItem
+                0x080097ce        0x6 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
+                0x080097ce                vListInitialiseItem
  .text.vListInsertEnd
-                0x080097cc       0x16 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
-                0x080097cc                vListInsertEnd
+                0x080097d4       0x16 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
+                0x080097d4                vListInsertEnd
  .text.vListInsert
-                0x080097e2       0x32 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
-                0x080097e2                vListInsert
+                0x080097ea       0x32 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
+                0x080097ea                vListInsert
  .text.uxListRemove
-                0x08009814       0x26 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
-                0x08009814                uxListRemove
+                0x0800981c       0x26 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
+                0x0800981c                uxListRemove
  .text.prvGetDisinheritPriorityAfterTimeout
-                0x0800983a       0x10 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009842       0x10 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
  .text.prvIsQueueFull
-                0x0800984a       0x1e CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009852       0x1e CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
  .text.prvIsQueueEmpty
-                0x08009868       0x1a CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009870       0x1a CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
  .text.prvCopyDataToQueue
-                0x08009882       0x76 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x0800988a       0x76 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
  .text.prvCopyDataFromQueue
-                0x080098f8       0x24 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009900       0x24 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
  .text.prvUnlockQueue
-                0x0800991c       0x6e CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009924       0x6e CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
  .text.xQueueGenericReset
-                0x0800998a       0x84 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x0800998a                xQueueGenericReset
+                0x08009992       0x84 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009992                xQueueGenericReset
  .text.prvInitialiseNewQueue
-                0x08009a0e       0x22 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009a16       0x22 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
  .text.xQueueGenericCreateStatic
-                0x08009a30       0x94 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x08009a30                xQueueGenericCreateStatic
+                0x08009a38       0x94 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009a38                xQueueGenericCreateStatic
  .text.xQueueGenericCreate
-                0x08009ac4       0x48 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x08009ac4                xQueueGenericCreate
+                0x08009acc       0x48 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009acc                xQueueGenericCreate
  .text.xQueueGenericSend
-                0x08009b0c      0x188 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x08009b0c                xQueueGenericSend
+                0x08009b14      0x188 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009b14                xQueueGenericSend
  .text.prvInitialiseMutex
-                0x08009c94       0x18 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009c9c       0x18 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
  .text.xQueueCreateMutex
-                0x08009cac       0x16 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x08009cac                xQueueCreateMutex
+                0x08009cb4       0x16 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009cb4                xQueueCreateMutex
  .text.xQueueCreateMutexStatic
-                0x08009cc2       0x1e CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x08009cc2                xQueueCreateMutexStatic
+                0x08009cca       0x1e CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009cca                xQueueCreateMutexStatic
  .text.xQueueGiveMutexRecursive
-                0x08009ce0       0x40 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x08009ce0                xQueueGiveMutexRecursive
+                0x08009ce8       0x40 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009ce8                xQueueGiveMutexRecursive
  .text.xQueueGenericSendFromISR
-                0x08009d20       0xce CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x08009d20                xQueueGenericSendFromISR
+                0x08009d28       0xce CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009d28                xQueueGenericSendFromISR
  .text.xQueueReceive
-                0x08009dee      0x15e CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x08009dee                xQueueReceive
+                0x08009df6      0x15e CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009df6                xQueueReceive
  .text.xQueueSemaphoreTake
-                0x08009f4c      0x1a6 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x08009f4c                xQueueSemaphoreTake
+                0x08009f54      0x1a6 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x08009f54                xQueueSemaphoreTake
  .text.xQueueTakeMutexRecursive
-                0x0800a0f2       0x40 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x0800a0f2                xQueueTakeMutexRecursive
+                0x0800a0fa       0x40 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x0800a0fa                xQueueTakeMutexRecursive
  .text.xQueueReceiveFromISR
-                0x0800a132       0xae CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x0800a132                xQueueReceiveFromISR
+                0x0800a13a       0xae CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x0800a13a                xQueueReceiveFromISR
  .text.vQueueAddToRegistry
-                0x0800a1e0       0x28 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x0800a1e0                vQueueAddToRegistry
+                0x0800a1e8       0x28 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x0800a1e8                vQueueAddToRegistry
  .text.vQueueWaitForMessageRestricted
-                0x0800a208       0x52 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
-                0x0800a208                vQueueWaitForMessageRestricted
- *fill*         0x0800a25a        0x2 
+                0x0800a210       0x52 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+                0x0800a210                vQueueWaitForMessageRestricted
+ *fill*         0x0800a262        0x2 
  .text.prvResetNextTaskUnblockTime
-                0x0800a25c       0x2c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a264       0x2c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
  .text.prvInitialiseNewTask
-                0x0800a288       0xa2 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
- *fill*         0x0800a32a        0x2 
+                0x0800a290       0xa2 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+ *fill*         0x0800a332        0x2 
  .text.prvInitialiseTaskLists
-                0x0800a32c       0x68 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a334       0x68 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
  .text.prvAddNewTaskToReadyList
-                0x0800a394       0xac CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a39c       0xac CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
  .text.prvDeleteTCB
-                0x0800a440       0x38 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a448       0x38 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
  .text.prvCheckTasksWaitingTermination
-                0x0800a478       0x4c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a480       0x4c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
  .text.prvIdleTask
-                0x0800a4c4       0x28 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a4cc       0x28 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
  .text.prvAddCurrentTaskToDelayedList
-                0x0800a4ec       0x7c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a4f4       0x7c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
  .text.xTaskCreateStatic
-                0x0800a568       0x76 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800a568                xTaskCreateStatic
+                0x0800a570       0x76 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a570                xTaskCreateStatic
  .text.xTaskCreate
-                0x0800a5de       0x64 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800a5de                xTaskCreate
- *fill*         0x0800a642        0x2 
+                0x0800a5e6       0x64 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a5e6                xTaskCreate
+ *fill*         0x0800a64a        0x2 
  .text.vTaskStartScheduler
-                0x0800a644       0x98 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800a644                vTaskStartScheduler
+                0x0800a64c       0x98 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a64c                vTaskStartScheduler
  .text.vTaskSuspendAll
-                0x0800a6dc       0x10 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800a6dc                vTaskSuspendAll
+                0x0800a6e4       0x10 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a6e4                vTaskSuspendAll
  .text.xTaskGetTickCount
-                0x0800a6ec        0xc CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800a6ec                xTaskGetTickCount
+                0x0800a6f4        0xc CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a6f4                xTaskGetTickCount
  .text.xTaskIncrementTick
-                0x0800a6f8      0x118 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800a6f8                xTaskIncrementTick
+                0x0800a700      0x118 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a700                xTaskIncrementTick
  .text.xTaskResumeAll
-                0x0800a810       0xf8 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800a810                xTaskResumeAll
+                0x0800a818       0xf8 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a818                xTaskResumeAll
  .text.vTaskDelay
-                0x0800a908       0x4c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800a908                vTaskDelay
+                0x0800a910       0x4c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a910                vTaskDelay
  .text.vTaskSwitchContext
-                0x0800a954       0x98 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800a954                vTaskSwitchContext
+                0x0800a95c       0x98 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a95c                vTaskSwitchContext
  .text.vTaskPlaceOnEventList
-                0x0800a9ec       0x30 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800a9ec                vTaskPlaceOnEventList
+                0x0800a9f4       0x30 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800a9f4                vTaskPlaceOnEventList
  .text.vTaskPlaceOnEventListRestricted
-                0x0800aa1c       0x38 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800aa1c                vTaskPlaceOnEventListRestricted
+                0x0800aa24       0x38 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800aa24                vTaskPlaceOnEventListRestricted
  .text.xTaskRemoveFromEventList
-                0x0800aa54       0x8c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800aa54                xTaskRemoveFromEventList
+                0x0800aa5c       0x8c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800aa5c                xTaskRemoveFromEventList
  .text.vTaskInternalSetTimeOutState
-                0x0800aae0       0x18 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800aae0                vTaskInternalSetTimeOutState
+                0x0800aae8       0x18 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800aae8                vTaskInternalSetTimeOutState
  .text.xTaskCheckForTimeOut
-                0x0800aaf8       0x88 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800aaf8                xTaskCheckForTimeOut
+                0x0800ab00       0x88 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800ab00                xTaskCheckForTimeOut
  .text.vTaskMissedYield
-                0x0800ab80        0xc CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800ab80                vTaskMissedYield
+                0x0800ab88        0xc CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800ab88                vTaskMissedYield
  .text.xTaskGetCurrentTaskHandle
-                0x0800ab8c        0xc CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800ab8c                xTaskGetCurrentTaskHandle
+                0x0800ab94        0xc CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800ab94                xTaskGetCurrentTaskHandle
  .text.xTaskGetSchedulerState
-                0x0800ab98       0x20 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800ab98                xTaskGetSchedulerState
+                0x0800aba0       0x20 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800aba0                xTaskGetSchedulerState
  .text.xTaskPriorityInherit
-                0x0800abb8       0x98 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800abb8                xTaskPriorityInherit
+                0x0800abc0       0x98 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800abc0                xTaskPriorityInherit
  .text.xTaskPriorityDisinherit
-                0x0800ac50       0x90 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800ac50                xTaskPriorityDisinherit
+                0x0800ac58       0x90 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800ac58                xTaskPriorityDisinherit
  .text.vTaskPriorityDisinheritAfterTimeout
-                0x0800ace0       0xa0 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800ace0                vTaskPriorityDisinheritAfterTimeout
+                0x0800ace8       0xa0 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800ace8                vTaskPriorityDisinheritAfterTimeout
  .text.pvTaskIncrementMutexHeldCount
-                0x0800ad80       0x1c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
-                0x0800ad80                pvTaskIncrementMutexHeldCount
+                0x0800ad88       0x1c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+                0x0800ad88                pvTaskIncrementMutexHeldCount
  .text.prvGetNextExpireTime
-                0x0800ad9c       0x20 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+                0x0800ada4       0x20 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
  .text.prvInsertTimerInActiveList
-                0x0800adbc       0x48 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+                0x0800adc4       0x48 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
  .text.prvCheckForValidListAndQueue
-                0x0800ae04       0x70 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+                0x0800ae0c       0x70 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
  .text.xTimerCreateTimerTask
-                0x0800ae74       0x64 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
-                0x0800ae74                xTimerCreateTimerTask
+                0x0800ae7c       0x64 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+                0x0800ae7c                xTimerCreateTimerTask
  .text.xTimerGenericCommand
-                0x0800aed8       0x6c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
-                0x0800aed8                xTimerGenericCommand
+                0x0800aee0       0x6c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+                0x0800aee0                xTimerGenericCommand
  .text.prvSwitchTimerLists
-                0x0800af44       0x7c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+                0x0800af4c       0x7c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
  .text.prvSampleTimeNow
-                0x0800afc0       0x2c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+                0x0800afc8       0x2c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
  .text.prvProcessExpiredTimer
-                0x0800afec       0x6c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+                0x0800aff4       0x6c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
  .text.prvProcessTimerOrBlockTask
-                0x0800b058       0x74 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+                0x0800b060       0x74 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
  .text.prvProcessReceivedCommands
-                0x0800b0cc      0x10c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+                0x0800b0d4      0x10c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
  .text.prvTimerTask
-                0x0800b1d8       0x16 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+                0x0800b1e0       0x16 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
  .text.SysTick_Handler
-                0x0800b1ee       0x18 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
-                0x0800b1ee                SysTick_Handler
- *fill*         0x0800b206        0x2 
+                0x0800b1f6       0x18 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+                0x0800b1f6                SysTick_Handler
+ *fill*         0x0800b20e        0x2 
  .text.osKernelInitialize
-                0x0800b208       0x24 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
-                0x0800b208                osKernelInitialize
+                0x0800b210       0x24 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+                0x0800b210                osKernelInitialize
  .text.osKernelStart
-                0x0800b22c       0x38 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
-                0x0800b22c                osKernelStart
+                0x0800b234       0x38 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+                0x0800b234                osKernelStart
  .text.osThreadNew
-                0x0800b264       0xb4 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
-                0x0800b264                osThreadNew
- .text.osDelay  0x0800b318       0x1c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
-                0x0800b318                osDelay
+                0x0800b26c       0xb4 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+                0x0800b26c                osThreadNew
+ .text.osDelay  0x0800b320       0x1c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+                0x0800b320                osDelay
  .text.osMutexNew
-                0x0800b334       0x96 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
-                0x0800b334                osMutexNew
+                0x0800b33c       0x96 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+                0x0800b33c                osMutexNew
  .text.osMutexAcquire
-                0x0800b3ca       0x5e CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
-                0x0800b3ca                osMutexAcquire
+                0x0800b3d2       0x5e CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+                0x0800b3d2                osMutexAcquire
  .text.osMutexRelease
-                0x0800b428       0x4e CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
-                0x0800b428                osMutexRelease
+                0x0800b430       0x4e CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+                0x0800b430                osMutexRelease
  .text.osMessageQueueNew
-                0x0800b476       0x96 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
-                0x0800b476                osMessageQueueNew
+                0x0800b47e       0x96 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+                0x0800b47e                osMessageQueueNew
  .text.osMessageQueuePut
-                0x0800b50c       0x84 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
-                0x0800b50c                osMessageQueuePut
+                0x0800b514       0x84 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+                0x0800b514                osMessageQueuePut
  .text.osMessageQueueGet
-                0x0800b590       0x82 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
-                0x0800b590                osMessageQueueGet
- *fill*         0x0800b612        0x2 
+                0x0800b598       0x82 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+                0x0800b598                osMessageQueueGet
+ *fill*         0x0800b61a        0x2 
  .text.vApplicationGetIdleTaskMemory
-                0x0800b614       0x18 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
-                0x0800b614                vApplicationGetIdleTaskMemory
+                0x0800b61c       0x18 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+                0x0800b61c                vApplicationGetIdleTaskMemory
  .text.vApplicationGetTimerTaskMemory
-                0x0800b62c       0x18 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
-                0x0800b62c                vApplicationGetTimerTaskMemory
+                0x0800b634       0x18 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+                0x0800b634                vApplicationGetTimerTaskMemory
  .text.prvTaskExitError
-                0x0800b644       0x40 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
+                0x0800b64c       0x40 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
  .text.prvStartFirstTask
-                0x0800b684       0x20 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
+                0x0800b68c       0x20 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
  .text.prvEnableVFP
-                0x0800b6a4       0x18 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
+                0x0800b6ac       0x18 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
  .text.pxPortInitialiseStack
-                0x0800b6bc       0x2c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
-                0x0800b6bc                pxPortInitialiseStack
- *fill*         0x0800b6e8        0x8 
+                0x0800b6c4       0x2c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
+                0x0800b6c4                pxPortInitialiseStack
  .text.SVC_Handler
                 0x0800b6f0       0x24 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
                 0x0800b6f0                SVC_Handler
@@ -12797,7 +12796,7 @@ LOAD F:/vscode/openstm32/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gc
  .debug_frame   0x000072c8       0x34 F:/vscode/openstm32/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard\libgcc.a(_udivmoddi4.o)
  .debug_frame   0x000072fc       0x28 F:/vscode/openstm32/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libg_nano.a(libc_a-memcpy-stub.o)
 
-.debug_line     0x00000000    0x48aed
+.debug_line     0x00000000    0x48b11
  .debug_line    0x00000000       0xa0 CMakeFiles/EHUB.dir/startup_stm32f407xx_gcc.s.obj
  .debug_line    0x000000a0      0xb63 CMakeFiles/EHUB.dir/app/Src/battery_app.c.obj
  .debug_line    0x00000c03      0xc61 CMakeFiles/EHUB.dir/app/Src/can_app.c.obj
@@ -12806,60 +12805,60 @@ LOAD F:/vscode/openstm32/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gc
  .debug_line    0x0000345b      0xab8 CMakeFiles/EHUB.dir/app/Src/rs422_app.c.obj
  .debug_line    0x00003f13      0xabc CMakeFiles/EHUB.dir/app/Src/rs485_app.c.obj
  .debug_line    0x000049cf      0xaf8 CMakeFiles/EHUB.dir/app/Src/spi_app.c.obj
- .debug_line    0x000054c7     0x130d CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
- .debug_line    0x000067d4      0xe9b CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
- .debug_line    0x0000766f      0xa2e CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
- .debug_line    0x0000809d      0xdf3 CMakeFiles/EHUB.dir/Core/Src/main.c.obj
- .debug_line    0x00008e90      0x9e5 CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
- .debug_line    0x00009875      0x9cc CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
- .debug_line    0x0000a241      0x744 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_msp.c.obj
- .debug_line    0x0000a985      0x822 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_timebase_tim.c.obj
- .debug_line    0x0000b1a7      0x7f6 CMakeFiles/EHUB.dir/Core/Src/system_stm32f4xx.c.obj
- .debug_line    0x0000b99d      0x95a CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
- .debug_line    0x0000c2f7      0x849 CMakeFiles/EHUB.dir/Core/Src/can.c.obj
- .debug_line    0x0000cb40      0x750 CMakeFiles/EHUB.dir/Core/Src/dma.c.obj
- .debug_line    0x0000d290      0x7c8 CMakeFiles/EHUB.dir/Core/Src/gpio.c.obj
- .debug_line    0x0000da58      0x8f5 CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
- .debug_line    0x0000e34d      0x83c CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
- .debug_line    0x0000eb89      0xac3 CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
- .debug_line    0x0000f64c      0xdb7 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
- .debug_line    0x00010403      0xa9c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
- .debug_line    0x00010e9f     0x1599 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
- .debug_line    0x00012438     0x1699 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
- .debug_line    0x00013ad1      0xd9f CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
- .debug_line    0x00014870     0x1374 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
- .debug_line    0x00015be4      0xc79 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
- .debug_line    0x0001685d     0x58f7 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
- .debug_line    0x0001c154     0x1984 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
- .debug_line    0x0001dad8      0x81e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
- .debug_line    0x0001e2f6     0x10eb CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
- .debug_line    0x0001f3e1     0x294e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
- .debug_line    0x00021d2f     0x4bed CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
- .debug_line    0x0002691c     0x1f4b CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
- .debug_line    0x00028867     0x392c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
- .debug_line    0x0002c193     0x24d0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
- .debug_line    0x0002e663      0x626 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
- .debug_line    0x0002ec89     0x1d38 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
- .debug_line    0x000309c1     0x280a CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
- .debug_line    0x000331cb      0xf72 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
- .debug_line    0x0003413d     0x321a CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
- .debug_line    0x00037357      0x75b CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
- .debug_line    0x00037ab2      0x946 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c.obj
- .debug_line    0x000383f8     0x1171 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c.obj
- .debug_line    0x00039569     0x14a0 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c.obj
- .debug_line    0x0003aa09      0xa55 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c.obj
- .debug_line    0x0003b45e     0x10c9 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Src/usbd_customhid.c.obj
- .debug_line    0x0003c527      0x9f3 CMakeFiles/EHUB.dir/USB_DEVICE/App/usb_device.c.obj
- .debug_line    0x0003cf1a      0xa18 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_cdc_if.c.obj
- .debug_line    0x0003d932      0xa19 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_custom_hid_if.c.obj
- .debug_line    0x0003e34b      0xad1 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_desc.c.obj
- .debug_line    0x0003ee1c      0xec8 CMakeFiles/EHUB.dir/USB_DEVICE/Target/usbd_conf.c.obj
- .debug_line    0x0003fce4     0x2bd9 CMakeFiles/EHUB.dir/DAP/src/DAP.c.obj
- .debug_line    0x000428bd      0x787 CMakeFiles/EHUB.dir/DAP/src/DAP_vendor.c.obj
- .debug_line    0x00043044     0x3d5f CMakeFiles/EHUB.dir/DAP/src/JTAG_DP.c.obj
- .debug_line    0x00046da3     0x1d4a CMakeFiles/EHUB.dir/DAP/src/SW_DP.c.obj
+ .debug_line    0x000054c7     0x1331 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
+ .debug_line    0x000067f8      0xe9b CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+ .debug_line    0x00007693      0xa2e CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
+ .debug_line    0x000080c1      0xdf3 CMakeFiles/EHUB.dir/Core/Src/main.c.obj
+ .debug_line    0x00008eb4      0x9e5 CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
+ .debug_line    0x00009899      0x9cc CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+ .debug_line    0x0000a265      0x744 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_msp.c.obj
+ .debug_line    0x0000a9a9      0x822 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_timebase_tim.c.obj
+ .debug_line    0x0000b1cb      0x7f6 CMakeFiles/EHUB.dir/Core/Src/system_stm32f4xx.c.obj
+ .debug_line    0x0000b9c1      0x95a CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
+ .debug_line    0x0000c31b      0x849 CMakeFiles/EHUB.dir/Core/Src/can.c.obj
+ .debug_line    0x0000cb64      0x750 CMakeFiles/EHUB.dir/Core/Src/dma.c.obj
+ .debug_line    0x0000d2b4      0x7c8 CMakeFiles/EHUB.dir/Core/Src/gpio.c.obj
+ .debug_line    0x0000da7c      0x8f5 CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
+ .debug_line    0x0000e371      0x83c CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
+ .debug_line    0x0000ebad      0xac3 CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
+ .debug_line    0x0000f670      0xdb7 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
+ .debug_line    0x00010427      0xa9c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
+ .debug_line    0x00010ec3     0x1599 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
+ .debug_line    0x0001245c     0x1699 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+ .debug_line    0x00013af5      0xd9f CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
+ .debug_line    0x00014894     0x1374 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+ .debug_line    0x00015c08      0xc79 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
+ .debug_line    0x00016881     0x58f7 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+ .debug_line    0x0001c178     0x1984 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+ .debug_line    0x0001dafc      0x81e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
+ .debug_line    0x0001e31a     0x10eb CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
+ .debug_line    0x0001f405     0x294e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
+ .debug_line    0x00021d53     0x4bed CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+ .debug_line    0x00026940     0x1f4b CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
+ .debug_line    0x0002888b     0x392c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+ .debug_line    0x0002c1b7     0x24d0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+ .debug_line    0x0002e687      0x626 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
+ .debug_line    0x0002ecad     0x1d38 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+ .debug_line    0x000309e5     0x280a CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+ .debug_line    0x000331ef      0xf72 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+ .debug_line    0x00034161     0x321a CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+ .debug_line    0x0003737b      0x75b CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
+ .debug_line    0x00037ad6      0x946 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c.obj
+ .debug_line    0x0003841c     0x1171 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c.obj
+ .debug_line    0x0003958d     0x14a0 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c.obj
+ .debug_line    0x0003aa2d      0xa55 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c.obj
+ .debug_line    0x0003b482     0x10c9 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Src/usbd_customhid.c.obj
+ .debug_line    0x0003c54b      0x9f3 CMakeFiles/EHUB.dir/USB_DEVICE/App/usb_device.c.obj
+ .debug_line    0x0003cf3e      0xa18 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_cdc_if.c.obj
+ .debug_line    0x0003d956      0xa19 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_custom_hid_if.c.obj
+ .debug_line    0x0003e36f      0xad1 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_desc.c.obj
+ .debug_line    0x0003ee40      0xec8 CMakeFiles/EHUB.dir/USB_DEVICE/Target/usbd_conf.c.obj
+ .debug_line    0x0003fd08     0x2bd9 CMakeFiles/EHUB.dir/DAP/src/DAP.c.obj
+ .debug_line    0x000428e1      0x787 CMakeFiles/EHUB.dir/DAP/src/DAP_vendor.c.obj
+ .debug_line    0x00043068     0x3d5f CMakeFiles/EHUB.dir/DAP/src/JTAG_DP.c.obj
+ .debug_line    0x00046dc7     0x1d4a CMakeFiles/EHUB.dir/DAP/src/SW_DP.c.obj
 
-.debug_info     0x00000000    0x4cf55
+.debug_info     0x00000000    0x4cf7d
  .debug_info    0x00000000       0x30 CMakeFiles/EHUB.dir/startup_stm32f407xx_gcc.s.obj
  .debug_info    0x00000030      0xa4d CMakeFiles/EHUB.dir/app/Src/battery_app.c.obj
  .debug_info    0x00000a7d      0xe0a CMakeFiles/EHUB.dir/app/Src/can_app.c.obj
@@ -12868,58 +12867,58 @@ LOAD F:/vscode/openstm32/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gc
  .debug_info    0x00003044      0x99f CMakeFiles/EHUB.dir/app/Src/rs422_app.c.obj
  .debug_info    0x000039e3      0xb11 CMakeFiles/EHUB.dir/app/Src/rs485_app.c.obj
  .debug_info    0x000044f4      0x8a8 CMakeFiles/EHUB.dir/app/Src/spi_app.c.obj
- .debug_info    0x00004d9c     0x1e17 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
- .debug_info    0x00006bb3     0x13d7 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
- .debug_info    0x00007f8a      0xbf9 CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
- .debug_info    0x00008b83     0x11fa CMakeFiles/EHUB.dir/Core/Src/main.c.obj
- .debug_info    0x00009d7d      0x6c4 CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
- .debug_info    0x0000a441     0x1b1b CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
- .debug_info    0x0000bf5c      0x55e CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_msp.c.obj
- .debug_info    0x0000c4ba      0xde6 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_timebase_tim.c.obj
- .debug_info    0x0000d2a0      0x5b7 CMakeFiles/EHUB.dir/Core/Src/system_stm32f4xx.c.obj
- .debug_info    0x0000d857      0xcc3 CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
- .debug_info    0x0000e51a      0xd3a CMakeFiles/EHUB.dir/Core/Src/can.c.obj
- .debug_info    0x0000f254      0x715 CMakeFiles/EHUB.dir/Core/Src/dma.c.obj
- .debug_info    0x0000f969      0x606 CMakeFiles/EHUB.dir/Core/Src/gpio.c.obj
- .debug_info    0x0000ff6f      0xf73 CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
- .debug_info    0x00010ee2      0xb5a CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
- .debug_info    0x00011a3c     0x13e3 CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
- .debug_info    0x00012e1f     0x1335 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
- .debug_info    0x00014154      0xafe CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
- .debug_info    0x00014c52     0x105e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
- .debug_info    0x00015cb0     0x13d6 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
- .debug_info    0x00017086     0x11e4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
- .debug_info    0x0001826a      0xbd2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
- .debug_info    0x00018e3c      0x84c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
- .debug_info    0x00019688     0x3c14 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
- .debug_info    0x0001d29c     0x1f3b CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
- .debug_info    0x0001f1d7      0x7cf CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
- .debug_info    0x0001f9a6      0xc24 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
- .debug_info    0x000205ca     0x1f84 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
- .debug_info    0x0002254e     0x41a4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
- .debug_info    0x000266f2     0x1d9b CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
- .debug_info    0x0002848d     0x43b9 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
- .debug_info    0x0002c846     0x2206 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
- .debug_info    0x0002ea4c      0x313 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
- .debug_info    0x0002ed5f     0x2a4c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
- .debug_info    0x000317ab     0x33b2 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
- .debug_info    0x00034b5d     0x1d2f CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
- .debug_info    0x0003688c     0x53bd CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
- .debug_info    0x0003bc49      0x566 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
- .debug_info    0x0003c1af      0x610 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c.obj
- .debug_info    0x0003c7bf     0x1468 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c.obj
- .debug_info    0x0003dc27     0x15f8 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c.obj
- .debug_info    0x0003f21f      0xa2d CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c.obj
- .debug_info    0x0003fc4c     0x12e9 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Src/usbd_customhid.c.obj
- .debug_info    0x00040f35      0x853 CMakeFiles/EHUB.dir/USB_DEVICE/App/usb_device.c.obj
- .debug_info    0x00041788      0x751 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_cdc_if.c.obj
- .debug_info    0x00041ed9      0x7df CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_custom_hid_if.c.obj
- .debug_info    0x000426b8      0x665 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_desc.c.obj
- .debug_info    0x00042d1d     0x2505 CMakeFiles/EHUB.dir/USB_DEVICE/Target/usbd_conf.c.obj
- .debug_info    0x00045222     0x24c0 CMakeFiles/EHUB.dir/DAP/src/DAP.c.obj
- .debug_info    0x000476e2      0x10f CMakeFiles/EHUB.dir/DAP/src/DAP_vendor.c.obj
- .debug_info    0x000477f1     0x3ad1 CMakeFiles/EHUB.dir/DAP/src/JTAG_DP.c.obj
- .debug_info    0x0004b2c2     0x1c93 CMakeFiles/EHUB.dir/DAP/src/SW_DP.c.obj
+ .debug_info    0x00004d9c     0x1e3f CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
+ .debug_info    0x00006bdb     0x13d7 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+ .debug_info    0x00007fb2      0xbf9 CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
+ .debug_info    0x00008bab     0x11fa CMakeFiles/EHUB.dir/Core/Src/main.c.obj
+ .debug_info    0x00009da5      0x6c4 CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
+ .debug_info    0x0000a469     0x1b1b CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+ .debug_info    0x0000bf84      0x55e CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_msp.c.obj
+ .debug_info    0x0000c4e2      0xde6 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_timebase_tim.c.obj
+ .debug_info    0x0000d2c8      0x5b7 CMakeFiles/EHUB.dir/Core/Src/system_stm32f4xx.c.obj
+ .debug_info    0x0000d87f      0xcc3 CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
+ .debug_info    0x0000e542      0xd3a CMakeFiles/EHUB.dir/Core/Src/can.c.obj
+ .debug_info    0x0000f27c      0x715 CMakeFiles/EHUB.dir/Core/Src/dma.c.obj
+ .debug_info    0x0000f991      0x606 CMakeFiles/EHUB.dir/Core/Src/gpio.c.obj
+ .debug_info    0x0000ff97      0xf73 CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
+ .debug_info    0x00010f0a      0xb5a CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
+ .debug_info    0x00011a64     0x13e3 CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
+ .debug_info    0x00012e47     0x1335 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
+ .debug_info    0x0001417c      0xafe CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
+ .debug_info    0x00014c7a     0x105e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
+ .debug_info    0x00015cd8     0x13d6 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+ .debug_info    0x000170ae     0x11e4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
+ .debug_info    0x00018292      0xbd2 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+ .debug_info    0x00018e64      0x84c CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
+ .debug_info    0x000196b0     0x3c14 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+ .debug_info    0x0001d2c4     0x1f3b CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+ .debug_info    0x0001f1ff      0x7cf CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
+ .debug_info    0x0001f9ce      0xc24 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
+ .debug_info    0x000205f2     0x1f84 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
+ .debug_info    0x00022576     0x41a4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+ .debug_info    0x0002671a     0x1d9b CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
+ .debug_info    0x000284b5     0x43b9 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+ .debug_info    0x0002c86e     0x2206 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+ .debug_info    0x0002ea74      0x313 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
+ .debug_info    0x0002ed87     0x2a4c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+ .debug_info    0x000317d3     0x33b2 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+ .debug_info    0x00034b85     0x1d2f CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+ .debug_info    0x000368b4     0x53bd CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+ .debug_info    0x0003bc71      0x566 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
+ .debug_info    0x0003c1d7      0x610 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c.obj
+ .debug_info    0x0003c7e7     0x1468 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c.obj
+ .debug_info    0x0003dc4f     0x15f8 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c.obj
+ .debug_info    0x0003f247      0xa2d CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c.obj
+ .debug_info    0x0003fc74     0x12e9 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Src/usbd_customhid.c.obj
+ .debug_info    0x00040f5d      0x853 CMakeFiles/EHUB.dir/USB_DEVICE/App/usb_device.c.obj
+ .debug_info    0x000417b0      0x751 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_cdc_if.c.obj
+ .debug_info    0x00041f01      0x7df CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_custom_hid_if.c.obj
+ .debug_info    0x000426e0      0x665 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_desc.c.obj
+ .debug_info    0x00042d45     0x2505 CMakeFiles/EHUB.dir/USB_DEVICE/Target/usbd_conf.c.obj
+ .debug_info    0x0004524a     0x24c0 CMakeFiles/EHUB.dir/DAP/src/DAP.c.obj
+ .debug_info    0x0004770a      0x10f CMakeFiles/EHUB.dir/DAP/src/DAP_vendor.c.obj
+ .debug_info    0x00047819     0x3ad1 CMakeFiles/EHUB.dir/DAP/src/JTAG_DP.c.obj
+ .debug_info    0x0004b2ea     0x1c93 CMakeFiles/EHUB.dir/DAP/src/SW_DP.c.obj
 
 .debug_abbrev   0x00000000     0x98b8
  .debug_abbrev  0x00000000       0x1d CMakeFiles/EHUB.dir/startup_stm32f407xx_gcc.s.obj
@@ -13105,68 +13104,68 @@ LOAD F:/vscode/openstm32/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gc
  .debug_aranges
                 0x000028c0       0x38 CMakeFiles/EHUB.dir/DAP/src/SW_DP.c.obj
 
-.debug_str      0x00000000    0xf12f8
- .debug_str     0x00000000    0xf12f8 CMakeFiles/EHUB.dir/startup_stm32f407xx_gcc.s.obj
+.debug_str      0x00000000    0xf1309
+ .debug_str     0x00000000    0xf1309 CMakeFiles/EHUB.dir/startup_stm32f407xx_gcc.s.obj
                                  0x98 (size before relaxing)
- .debug_str     0x000f12f8    0xdbbb1 CMakeFiles/EHUB.dir/app/Src/battery_app.c.obj
- .debug_str     0x000f12f8    0xde6e3 CMakeFiles/EHUB.dir/app/Src/can_app.c.obj
- .debug_str     0x000f12f8    0xe0828 CMakeFiles/EHUB.dir/app/Src/dap_app.c.obj
- .debug_str     0x000f12f8    0xde808 CMakeFiles/EHUB.dir/app/Src/i2c_app.c.obj
- .debug_str     0x000f12f8    0xde6a2 CMakeFiles/EHUB.dir/app/Src/rs422_app.c.obj
- .debug_str     0x000f12f8    0xde711 CMakeFiles/EHUB.dir/app/Src/rs485_app.c.obj
- .debug_str     0x000f12f8    0xde5c6 CMakeFiles/EHUB.dir/app/Src/spi_app.c.obj
- .debug_str     0x000f12f8    0xe10b7 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
- .debug_str     0x000f12f8    0xdee61 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
- .debug_str     0x000f12f8    0xd70ce CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
- .debug_str     0x000f12f8    0xe0caf CMakeFiles/EHUB.dir/Core/Src/main.c.obj
- .debug_str     0x000f12f8    0xdbcc6 CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
- .debug_str     0x000f12f8    0xd7cac CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
- .debug_str     0x000f12f8    0xd6fc9 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_msp.c.obj
- .debug_str     0x000f12f8    0xd73a7 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_timebase_tim.c.obj
- .debug_str     0x000f12f8    0xd68b0 CMakeFiles/EHUB.dir/Core/Src/system_stm32f4xx.c.obj
- .debug_str     0x000f12f8    0xd700c CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
- .debug_str     0x000f12f8    0xd7369 CMakeFiles/EHUB.dir/Core/Src/can.c.obj
- .debug_str     0x000f12f8    0xd6fd9 CMakeFiles/EHUB.dir/Core/Src/dma.c.obj
- .debug_str     0x000f12f8    0xd6b87 CMakeFiles/EHUB.dir/Core/Src/gpio.c.obj
- .debug_str     0x000f12f8    0xd75fd CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
- .debug_str     0x000f12f8    0xd7013 CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
- .debug_str     0x000f12f8    0xd78bb CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
- .debug_str     0x000f12f8    0xd7655 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
- .debug_str     0x000f12f8    0xd7434 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
- .debug_str     0x000f12f8    0xd6e9d CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
- .debug_str     0x000f12f8    0xd6faa CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
- .debug_str     0x000f12f8    0xd71b0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
- .debug_str     0x000f12f8    0xd6cca CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
- .debug_str     0x000f12f8    0xd6a2b CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
- .debug_str     0x000f12f8    0xd78ce CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
- .debug_str     0x000f12f8    0xd738e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
- .debug_str     0x000f12f8    0xd6c7e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
- .debug_str     0x000f12f8    0xd6cf5 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
- .debug_str     0x000f12f8    0xd716e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
- .debug_str     0x000f12f8    0xd7c3a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
- .debug_str     0x000f12f8    0xd7446 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
- .debug_str     0x000f12f8    0xd72d6 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
- .debug_str     0x000f12f8    0xd7269 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
- .debug_str     0x000f12f8     0xa5bd CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
- .debug_str     0x000f12f8     0xc0be CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
- .debug_str     0x000f12f8     0xcb6a CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
- .debug_str     0x000f12f8     0xc62f CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
- .debug_str     0x000f12f8    0xe0eda CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
- .debug_str     0x000f12f8     0x86f0 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
- .debug_str     0x000f12f8     0xaeff CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c.obj
- .debug_str     0x000f12f8    0xdafa7 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c.obj
- .debug_str     0x000f12f8    0xdadd2 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c.obj
- .debug_str     0x000f12f8    0xdaca7 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c.obj
- .debug_str     0x000f12f8    0xdb30c CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Src/usbd_customhid.c.obj
- .debug_str     0x000f12f8    0xdafc9 CMakeFiles/EHUB.dir/USB_DEVICE/App/usb_device.c.obj
- .debug_str     0x000f12f8    0xdaea4 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_cdc_if.c.obj
- .debug_str     0x000f12f8    0xdba3c CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_custom_hid_if.c.obj
- .debug_str     0x000f12f8    0xdab9c CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_desc.c.obj
- .debug_str     0x000f12f8    0xdbe20 CMakeFiles/EHUB.dir/USB_DEVICE/Target/usbd_conf.c.obj
- .debug_str     0x000f12f8    0xda875 CMakeFiles/EHUB.dir/DAP/src/DAP.c.obj
- .debug_str     0x000f12f8    0xd7489 CMakeFiles/EHUB.dir/DAP/src/DAP_vendor.c.obj
- .debug_str     0x000f12f8    0xd820e CMakeFiles/EHUB.dir/DAP/src/JTAG_DP.c.obj
- .debug_str     0x000f12f8    0xd8162 CMakeFiles/EHUB.dir/DAP/src/SW_DP.c.obj
+ .debug_str     0x000f1309    0xdbbb1 CMakeFiles/EHUB.dir/app/Src/battery_app.c.obj
+ .debug_str     0x000f1309    0xde6e3 CMakeFiles/EHUB.dir/app/Src/can_app.c.obj
+ .debug_str     0x000f1309    0xe0828 CMakeFiles/EHUB.dir/app/Src/dap_app.c.obj
+ .debug_str     0x000f1309    0xde808 CMakeFiles/EHUB.dir/app/Src/i2c_app.c.obj
+ .debug_str     0x000f1309    0xde6a2 CMakeFiles/EHUB.dir/app/Src/rs422_app.c.obj
+ .debug_str     0x000f1309    0xde711 CMakeFiles/EHUB.dir/app/Src/rs485_app.c.obj
+ .debug_str     0x000f1309    0xde5c6 CMakeFiles/EHUB.dir/app/Src/spi_app.c.obj
+ .debug_str     0x000f1309    0xe10c8 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
+ .debug_str     0x000f1309    0xdee61 CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+ .debug_str     0x000f1309    0xd70ce CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
+ .debug_str     0x000f1309    0xe0caf CMakeFiles/EHUB.dir/Core/Src/main.c.obj
+ .debug_str     0x000f1309    0xdbcc6 CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
+ .debug_str     0x000f1309    0xd7cac CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+ .debug_str     0x000f1309    0xd6fc9 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_msp.c.obj
+ .debug_str     0x000f1309    0xd73a7 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_timebase_tim.c.obj
+ .debug_str     0x000f1309    0xd68b0 CMakeFiles/EHUB.dir/Core/Src/system_stm32f4xx.c.obj
+ .debug_str     0x000f1309    0xd700c CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
+ .debug_str     0x000f1309    0xd7369 CMakeFiles/EHUB.dir/Core/Src/can.c.obj
+ .debug_str     0x000f1309    0xd6fd9 CMakeFiles/EHUB.dir/Core/Src/dma.c.obj
+ .debug_str     0x000f1309    0xd6b87 CMakeFiles/EHUB.dir/Core/Src/gpio.c.obj
+ .debug_str     0x000f1309    0xd75fd CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
+ .debug_str     0x000f1309    0xd7013 CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
+ .debug_str     0x000f1309    0xd78bb CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
+ .debug_str     0x000f1309    0xd7655 CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
+ .debug_str     0x000f1309    0xd7434 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
+ .debug_str     0x000f1309    0xd6e9d CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
+ .debug_str     0x000f1309    0xd6faa CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+ .debug_str     0x000f1309    0xd71b0 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
+ .debug_str     0x000f1309    0xd6cca CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+ .debug_str     0x000f1309    0xd6a2b CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
+ .debug_str     0x000f1309    0xd78ce CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+ .debug_str     0x000f1309    0xd738e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+ .debug_str     0x000f1309    0xd6c7e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
+ .debug_str     0x000f1309    0xd6cf5 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
+ .debug_str     0x000f1309    0xd716e CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
+ .debug_str     0x000f1309    0xd7c3a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+ .debug_str     0x000f1309    0xd7446 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
+ .debug_str     0x000f1309    0xd72d6 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+ .debug_str     0x000f1309    0xd7269 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+ .debug_str     0x000f1309     0xa5bd CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
+ .debug_str     0x000f1309     0xc0be CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+ .debug_str     0x000f1309     0xcb6a CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+ .debug_str     0x000f1309     0xc62f CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+ .debug_str     0x000f1309    0xe0eda CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+ .debug_str     0x000f1309     0x86f0 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
+ .debug_str     0x000f1309     0xaeff CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c.obj
+ .debug_str     0x000f1309    0xdafa7 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c.obj
+ .debug_str     0x000f1309    0xdadd2 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c.obj
+ .debug_str     0x000f1309    0xdaca7 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c.obj
+ .debug_str     0x000f1309    0xdb30c CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Src/usbd_customhid.c.obj
+ .debug_str     0x000f1309    0xdafc9 CMakeFiles/EHUB.dir/USB_DEVICE/App/usb_device.c.obj
+ .debug_str     0x000f1309    0xdaea4 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_cdc_if.c.obj
+ .debug_str     0x000f1309    0xdba3c CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_custom_hid_if.c.obj
+ .debug_str     0x000f1309    0xdab9c CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_desc.c.obj
+ .debug_str     0x000f1309    0xdbe20 CMakeFiles/EHUB.dir/USB_DEVICE/Target/usbd_conf.c.obj
+ .debug_str     0x000f1309    0xda875 CMakeFiles/EHUB.dir/DAP/src/DAP.c.obj
+ .debug_str     0x000f1309    0xd7489 CMakeFiles/EHUB.dir/DAP/src/DAP_vendor.c.obj
+ .debug_str     0x000f1309    0xd820e CMakeFiles/EHUB.dir/DAP/src/JTAG_DP.c.obj
+ .debug_str     0x000f1309    0xd8162 CMakeFiles/EHUB.dir/DAP/src/SW_DP.c.obj
 
 .debug_ranges   0x00000000     0x2fa0
  .debug_ranges  0x00000000       0x20 CMakeFiles/EHUB.dir/startup_stm32f407xx_gcc.s.obj
@@ -13230,7 +13229,7 @@ LOAD F:/vscode/openstm32/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gc
  .debug_ranges  0x000027f0      0x4e8 CMakeFiles/EHUB.dir/DAP/src/JTAG_DP.c.obj
  .debug_ranges  0x00002cd8      0x2c8 CMakeFiles/EHUB.dir/DAP/src/SW_DP.c.obj
 
-.debug_loc      0x00000000    0x3d36d
+.debug_loc      0x00000000    0x3d387
  .debug_loc     0x00000000      0x34c CMakeFiles/EHUB.dir/app/Src/battery_app.c.obj
  .debug_loc     0x0000034c      0x3a0 CMakeFiles/EHUB.dir/app/Src/can_app.c.obj
  .debug_loc     0x000006ec      0x404 CMakeFiles/EHUB.dir/app/Src/dap_app.c.obj
@@ -13238,58 +13237,58 @@ LOAD F:/vscode/openstm32/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/../lib/gc
  .debug_loc     0x000010ea      0x19c CMakeFiles/EHUB.dir/app/Src/rs422_app.c.obj
  .debug_loc     0x00001286      0x19c CMakeFiles/EHUB.dir/app/Src/rs485_app.c.obj
  .debug_loc     0x00001422      0x178 CMakeFiles/EHUB.dir/app/Src/spi_app.c.obj
- .debug_loc     0x0000159a      0xcf0 CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
- .debug_loc     0x0000228a      0x6cc CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
- .debug_loc     0x00002956      0x6e7 CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
- .debug_loc     0x0000303d       0xd4 CMakeFiles/EHUB.dir/Core/Src/main.c.obj
- .debug_loc     0x00003111       0xb6 CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
- .debug_loc     0x000031c7      0x2a0 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
- .debug_loc     0x00003467       0x38 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_msp.c.obj
- .debug_loc     0x0000349f      0x150 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_timebase_tim.c.obj
- .debug_loc     0x000035ef       0xb0 CMakeFiles/EHUB.dir/Core/Src/system_stm32f4xx.c.obj
- .debug_loc     0x0000369f      0x1ce CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
- .debug_loc     0x0000386d      0x120 CMakeFiles/EHUB.dir/Core/Src/can.c.obj
- .debug_loc     0x0000398d       0x38 CMakeFiles/EHUB.dir/Core/Src/dma.c.obj
- .debug_loc     0x000039c5       0x39 CMakeFiles/EHUB.dir/Core/Src/gpio.c.obj
- .debug_loc     0x000039fe      0x186 CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
- .debug_loc     0x00003b84      0x120 CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
- .debug_loc     0x00003ca4      0x23f CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
- .debug_loc     0x00003ee3      0x1fa CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
- .debug_loc     0x000040dd      0x1f9 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
- .debug_loc     0x000042d6      0xfce CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
- .debug_loc     0x000052a4     0x10d3 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
- .debug_loc     0x00006377      0x8ff CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
- .debug_loc     0x00006c76      0xe9a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
- .debug_loc     0x00007b10      0x60b CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
- .debug_loc     0x0000811b     0x545a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
- .debug_loc     0x0000d575     0x1832 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
- .debug_loc     0x0000eda7      0x13d CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
- .debug_loc     0x0000eee4      0x712 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
- .debug_loc     0x0000f5f6     0x2590 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
- .debug_loc     0x00011b86     0x60a7 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
- .debug_loc     0x00017c2d     0x2309 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
- .debug_loc     0x00019f36     0x507d CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
- .debug_loc     0x0001efb3     0x2ab4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
- .debug_loc     0x00021a67       0xeb CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
- .debug_loc     0x00021b52     0x212d CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
- .debug_loc     0x00023c7f     0x2c36 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
- .debug_loc     0x000268b5     0x170b CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
- .debug_loc     0x00027fc0     0x65e1 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
- .debug_loc     0x0002e5a1      0x182 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
- .debug_loc     0x0002e723      0x51c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c.obj
- .debug_loc     0x0002ec3f     0x115e CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c.obj
- .debug_loc     0x0002fd9d     0x1afd CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c.obj
- .debug_loc     0x0003189a      0x3f8 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c.obj
- .debug_loc     0x00031c92      0xf5d CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Src/usbd_customhid.c.obj
- .debug_loc     0x00032bef       0x20 CMakeFiles/EHUB.dir/USB_DEVICE/App/usb_device.c.obj
- .debug_loc     0x00032c0f       0xf0 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_cdc_if.c.obj
- .debug_loc     0x00032cff       0x76 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_custom_hid_if.c.obj
- .debug_loc     0x00032d75      0x4e7 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_desc.c.obj
- .debug_loc     0x0003325c     0x10f3 CMakeFiles/EHUB.dir/USB_DEVICE/Target/usbd_conf.c.obj
- .debug_loc     0x0003434f     0x401f CMakeFiles/EHUB.dir/DAP/src/DAP.c.obj
- .debug_loc     0x0003836e       0x60 CMakeFiles/EHUB.dir/DAP/src/DAP_vendor.c.obj
- .debug_loc     0x000383ce     0x345c CMakeFiles/EHUB.dir/DAP/src/JTAG_DP.c.obj
- .debug_loc     0x0003b82a     0x1b43 CMakeFiles/EHUB.dir/DAP/src/SW_DP.c.obj
+ .debug_loc     0x0000159a      0xd0a CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj
+ .debug_loc     0x000022a4      0x6cc CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj
+ .debug_loc     0x00002970      0x6e7 CMakeFiles/EHUB.dir/app/Src/ws2812c.c.obj
+ .debug_loc     0x00003057       0xd4 CMakeFiles/EHUB.dir/Core/Src/main.c.obj
+ .debug_loc     0x0000312b       0xb6 CMakeFiles/EHUB.dir/Core/Src/freertos.c.obj
+ .debug_loc     0x000031e1      0x2a0 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_it.c.obj
+ .debug_loc     0x00003481       0x38 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_msp.c.obj
+ .debug_loc     0x000034b9      0x150 CMakeFiles/EHUB.dir/Core/Src/stm32f4xx_hal_timebase_tim.c.obj
+ .debug_loc     0x00003609       0xb0 CMakeFiles/EHUB.dir/Core/Src/system_stm32f4xx.c.obj
+ .debug_loc     0x000036b9      0x1ce CMakeFiles/EHUB.dir/Core/Src/adc.c.obj
+ .debug_loc     0x00003887      0x120 CMakeFiles/EHUB.dir/Core/Src/can.c.obj
+ .debug_loc     0x000039a7       0x38 CMakeFiles/EHUB.dir/Core/Src/dma.c.obj
+ .debug_loc     0x000039df       0x39 CMakeFiles/EHUB.dir/Core/Src/gpio.c.obj
+ .debug_loc     0x00003a18      0x186 CMakeFiles/EHUB.dir/Core/Src/i2c.c.obj
+ .debug_loc     0x00003b9e      0x120 CMakeFiles/EHUB.dir/Core/Src/spi.c.obj
+ .debug_loc     0x00003cbe      0x23f CMakeFiles/EHUB.dir/Core/Src/tim.c.obj
+ .debug_loc     0x00003efd      0x1fa CMakeFiles/EHUB.dir/Core/Src/usart.c.obj
+ .debug_loc     0x000040f7      0x1f9 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.obj
+ .debug_loc     0x000042f0      0xfce CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.obj
+ .debug_loc     0x000052be     0x10d3 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.obj
+ .debug_loc     0x00006391      0x8ff CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.obj
+ .debug_loc     0x00006c90      0xe9a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.obj
+ .debug_loc     0x00007b2a      0x60b CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.obj
+ .debug_loc     0x00008135     0x545a CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c.obj
+ .debug_loc     0x0000d58f     0x1832 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c.obj
+ .debug_loc     0x0000edc1      0x13d CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c.obj
+ .debug_loc     0x0000eefe      0x712 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.obj
+ .debug_loc     0x0000f610     0x2590 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c.obj
+ .debug_loc     0x00011ba0     0x60a7 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.obj
+ .debug_loc     0x00017c47     0x2309 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.obj
+ .debug_loc     0x00019f50     0x507d CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c.obj
+ .debug_loc     0x0001efcd     0x2ab4 CMakeFiles/EHUB.dir/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c.obj
+ .debug_loc     0x00021a81       0xeb CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/list.c.obj
+ .debug_loc     0x00021b6c     0x212d CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/queue.c.obj
+ .debug_loc     0x00023c99     0x2c36 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/tasks.c.obj
+ .debug_loc     0x000268cf     0x170b CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/timers.c.obj
+ .debug_loc     0x00027fda     0x65e1 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c.obj
+ .debug_loc     0x0002e5bb      0x182 CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c.obj
+ .debug_loc     0x0002e73d      0x51c CMakeFiles/EHUB.dir/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c.obj
+ .debug_loc     0x0002ec59     0x115e CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c.obj
+ .debug_loc     0x0002fdb7     0x1afd CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c.obj
+ .debug_loc     0x000318b4      0x3f8 CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c.obj
+ .debug_loc     0x00031cac      0xf5d CMakeFiles/EHUB.dir/Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Src/usbd_customhid.c.obj
+ .debug_loc     0x00032c09       0x20 CMakeFiles/EHUB.dir/USB_DEVICE/App/usb_device.c.obj
+ .debug_loc     0x00032c29       0xf0 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_cdc_if.c.obj
+ .debug_loc     0x00032d19       0x76 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_custom_hid_if.c.obj
+ .debug_loc     0x00032d8f      0x4e7 CMakeFiles/EHUB.dir/USB_DEVICE/App/usbd_desc.c.obj
+ .debug_loc     0x00033276     0x10f3 CMakeFiles/EHUB.dir/USB_DEVICE/Target/usbd_conf.c.obj
+ .debug_loc     0x00034369     0x401f CMakeFiles/EHUB.dir/DAP/src/DAP.c.obj
+ .debug_loc     0x00038388       0x60 CMakeFiles/EHUB.dir/DAP/src/DAP_vendor.c.obj
+ .debug_loc     0x000383e8     0x345c CMakeFiles/EHUB.dir/DAP/src/JTAG_DP.c.obj
+ .debug_loc     0x0003b844     0x1b43 CMakeFiles/EHUB.dir/DAP/src/SW_DP.c.obj
 
 .debug_macro    0x00000000    0x2df31
  .debug_macro   0x00000000      0x30f CMakeFiles/EHUB.dir/app/Src/battery_app.c.obj

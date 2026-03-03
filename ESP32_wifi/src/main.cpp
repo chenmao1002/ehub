@@ -278,16 +278,18 @@ void setup() {
         MDNS.addService(MDNS_SERVICE, MDNS_PROTOCOL, TCP_PORT);
         MDNS.addServiceTxt(MDNS_SERVICE, MDNS_PROTOCOL, "version", FW_VERSION);
         MDNS.addServiceTxt(MDNS_SERVICE, MDNS_PROTOCOL, "device", "EHUB");
-        // Advertise DAP TCP service for cmsis-dap discovery
+        // Advertise DAP TCP service for cmsis-dap discovery (OpenOCD)
         MDNS.addService("_dap", "_tcp", DAP_TCP_PORT);
         MDNS.addServiceTxt("_dap", "_tcp", "version", FW_VERSION);
+        // Advertise elaphureLink service
+        MDNS.addService("_elaphurelink", "_tcp", ELAPHURELINK_PORT);
     }
 
     // 5. TCP 服务器
     tcpServer.begin(TCP_PORT);   // 5000
 
-    // 6. DAP TCP 服务器 (CMSIS-DAP over TCP)
-    dapServer.begin(DAP_TCP_PORT);  // 6000
+    // 6. DAP TCP 服务器 (CMSIS-DAP over TCP + elaphureLink)
+    dapServer.begin();  // port 6000 (OpenOCD) + port 3240 (elaphureLink)
 
     // 7. Web 配置
     webCfg.begin(wifiMgr, tcpServer);

@@ -178,8 +178,11 @@ static void Bridge_Dispatch(const BridgeMsg_t *m)
                 break;
             }
 
-            DAP_ExecuteCommand(dap_wifi_req, dap_wifi_rsp);
-            WiFi_Bridge_Send(BRIDGE_CH_DAP, dap_wifi_rsp, DAP_PACKET_SIZE);
+            uint32_t rsp_len = DAP_ExecuteCommand(dap_wifi_req, dap_wifi_rsp);
+            /* Send actual response length, not full packet */
+            uint16_t send_len = (rsp_len > 0 && rsp_len <= DAP_PACKET_SIZE)
+                                ? (uint16_t)rsp_len : DAP_PACKET_SIZE;
+            WiFi_Bridge_Send(BRIDGE_CH_DAP, dap_wifi_rsp, send_len);
             break;
         }
         case BRIDGE_CH_WIFI_CTRL:
