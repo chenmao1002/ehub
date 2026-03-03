@@ -5,10 +5,10 @@
 #define FW_VERSION          "1.0.0"
 
 // ─── UART 配置 ───
-#define UART_BAUDRATE       921600
+#define UART_BAUDRATE       1000000
 #define UART_RX_PIN         3       // GPIO3 = RXD0
 #define UART_TX_PIN         1       // GPIO1 = TXD0
-#define UART_RX_BUF_SIZE    1024    // 接收缓冲区
+#define UART_RX_BUF_SIZE    4096    // 接收缓冲区 (≥ bridge frame with 512-byte DAP)
 
 // ─── TCP 配置 ───
 #define TCP_PORT            5000
@@ -17,7 +17,7 @@
 // ─── CMSIS-DAP over TCP (OpenOCD / elaphureLink) ───
 #define DAP_TCP_PORT        6000    // OpenOCD cmsis-dap tcp 端口
 #define ELAPHURELINK_PORT   3240    // elaphureLink 专用端口
-#define DAP_TCP_MAX_PACKET  256     // DAP 最大包长度
+#define DAP_TCP_MAX_PACKET  512     // DAP 最大包长度 (matches MCU DAP_PACKET_SIZE)
 #define BRIDGE_CH_DAP       0xD0    // Bridge 协议 DAP 通道 ID
 
 // ─── WiFi 默认配置 ───
@@ -43,7 +43,7 @@
 #define BRIDGE_SOF1         0x55
 #define BRIDGE_SOF0_RPY     0xBB
 #define BRIDGE_CH_WIFI_CTRL 0xE0
-#define BRIDGE_MAX_DATA     128
+#define BRIDGE_MAX_DATA     520
 
 // ─── 心跳 ───
 #define HEARTBEAT_INTERVAL_MS  3000   // 每 3 秒发送一次心跳到 MCU

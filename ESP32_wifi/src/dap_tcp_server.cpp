@@ -5,7 +5,10 @@
  * Two independent TCP servers:
  *   Port 6000: OpenOCD cmsis-dap tcp — 8-byte header protocol
  *              [4B signature 0x00504144][2B LE length][1B type][1B reserved]
- *   Port 3240: elaphureLink — 12-byte handshake, then raw DAP data
+ *   Port 3240: elaphureLink Proxy Protocol
+ *              12-byte handshake (handled locally on ESP32),
+ *              then raw CMSIS-DAP commands without any framing.
+ *              See: https://github.com/windowsair/elaphureLink/blob/master/docs/proxy_protocol.md
  *
  * The ESP32 does NOT process DAP commands. It wraps them in Bridge protocol
  * frames (CH=0xD0) and forwards to the MCU via UART. MCU executes the DAP
@@ -154,46 +157,58 @@ bool DAPTCPServer::readOpenOCD(uint8_t* buf, uint16_t* len) {
     return false;
 }
 
-// ─── elaphureLink protocol: 12-byte handshake, then raw DAP data ───
+// ─── elaphureLink Proxy Protocol ───
+// Handshake: 12 bytes REQ_HANDSHAKE / RES_HANDSHAKE (ESP32 handles locally)
+//   [0..3]  0x8a656c70  — elaphureLink identifier (big-endian)
+//   [4..7]  0x00000000  — command code: handshake
+//   [8..11] version     — client/server version
+// After handshake: raw CMSIS-DAP commands, no framing, no padding.
+// Each TCP write = one complete DAP command or response.
 bool DAPTCPServer::readElaphureLink(uint8_t* buf, uint16_t* len) {
-    if (!_client.available()) return false;
+    int avail = _client.available();
+    if (avail <= 0) return false;
 
-    // Phase 1: Handshake detection
+    // ── Phase 1: Handshake ──
     if (!_elHandshakeDone) {
-        // Read available data
-        int avail = _client.available();
-        if (avail < 12) return false;  // Wait for full handshake
+        // Need at least 12 bytes for a valid handshake
+        if (avail < 12) return false;
 
         uint8_t hsBuf[12];
         _client.readBytes(hsBuf, 12);
 
-        // Check elaphureLink handshake signature: 0x8a 0x65 0x6c
-        if (hsBuf[0] == 0x8a && hsBuf[1] == 0x65 && hsBuf[2] == 0x6c) {
-            // Respond to handshake: modify bytes [8..11] = {0,0,0,1}
-            hsBuf[8] = 0;
-            hsBuf[9] = 0;
-            hsBuf[10] = 0;
-            hsBuf[11] = 1;
-            _client.write(hsBuf, 12);
+        // Check elaphureLink identifier: 0x8a 0x65 0x6c 0x70
+        if (hsBuf[0] == 0x8a && hsBuf[1] == 0x65 &&
+            hsBuf[2] == 0x6c && hsBuf[3] == 0x70) {
+            // RES_HANDSHAKE: same identifier + cmd=0 + fw_version
+            uint8_t resp[12] = {
+                0x8a, 0x65, 0x6c, 0x70,   // elaphureLink identifier
+                0x00, 0x00, 0x00, 0x00,   // command: handshake
+                0x00, 0x02, 0x00, 0x00    // firmware version: 2.0.0
+            };
+            _client.write(resp, 12);
             _client.flush();
             _elHandshakeDone = true;
             return false;  // Handshake done, no DAP data yet
-        } else {
-            // Not a valid handshake — treat as raw data anyway
-            _elHandshakeDone = true;
-            memcpy(buf, hsBuf, 12);
-            *len = 12;
-            return true;
         }
+
+        // Not a handshake — treat first 12 bytes as DAP command data
+        _elHandshakeDone = true;
+        memcpy(buf, hsBuf, 12);
+        // Also read any remaining data that arrived with this segment
+        int extra = _client.available();
+        if (extra > 0 && extra <= (int)DAP_TCP_MAX_PACKET - 12) {
+            int r = _client.readBytes(buf + 12, extra);
+            *len = (uint16_t)(12 + r);
+        } else {
+            *len = 12;
+        }
+        return true;
     }
 
-    // Phase 2: After handshake — raw DAP data
-    // elaphureLink sends DAP commands as raw bytes,
-    // we read all available data as one command
-    int avail = _client.available();
-    if (avail <= 0) return false;
-
-    int toRead = (avail > DAP_TCP_MAX_PACKET) ? DAP_TCP_MAX_PACKET : avail;
+    // ── Phase 2: Raw CMSIS-DAP commands ──
+    // Read all available bytes as one DAP command.
+    // With TCP_NODELAY, each client write() arrives as one TCP segment.
+    int toRead = (avail > (int)DAP_TCP_MAX_PACKET) ? (int)DAP_TCP_MAX_PACKET : avail;
     int n = _client.readBytes(buf, toRead);
     if (n > 0) {
         *len = (uint16_t)n;
@@ -221,25 +236,25 @@ void DAPTCPServer::sendResponse(const uint8_t* buf, uint16_t len) {
     switch (_protocol) {
     case DAP_PROTO_OPENOCD:
     {
-        // OpenOCD: send 8-byte header + data
-        // [4B signature][2B LE length][1B type=0x02][1B reserved=0x00]
-        uint8_t header[8];
-        header[0] = 0x44; // 'D'
-        header[1] = 0x41; // 'A'
-        header[2] = 0x50; // 'P'
-        header[3] = 0x00; // '\0'
-        header[4] = (uint8_t)(len & 0xFF);
-        header[5] = (uint8_t)((len >> 8) & 0xFF);
-        header[6] = DAP_TYPE_RSP; // 0x02
-        header[7] = 0x00;         // reserved
-        _client.write(header, 8);
-        _client.write(buf, len);
+        // OpenOCD: send 8-byte header + data as SINGLE write to avoid TCP fragmentation
+        // [4B signature][2B LE length][1B type=0x02][1B reserved=0x00][payload]
+        uint8_t pkt[8 + DAP_TCP_MAX_PACKET];
+        pkt[0] = 0x44; // 'D'
+        pkt[1] = 0x41; // 'A'
+        pkt[2] = 0x50; // 'P'
+        pkt[3] = 0x00; // '\0'
+        pkt[4] = (uint8_t)(len & 0xFF);
+        pkt[5] = (uint8_t)((len >> 8) & 0xFF);
+        pkt[6] = DAP_TYPE_RSP; // 0x02
+        pkt[7] = 0x00;         // reserved
+        memcpy(pkt + 8, buf, len);
+        _client.write(pkt, 8 + len);
         _client.flush();
         break;
     }
     case DAP_PROTO_ELAPHURELINK:
     {
-        // elaphureLink: send raw DAP response data (no header)
+        // elaphureLink: raw DAP response, no framing, no padding
         _client.write(buf, len);
         _client.flush();
         break;

@@ -27,6 +27,19 @@ static bool          ledState      = false;
 static unsigned long lastHeartbeatSend = 0;
 static unsigned long lastHeartbeatRecv = 0;
 
+// ─── Debug counters ───
+static volatile uint32_t dbg_dapTcpRead   = 0;   // DAP commands read from TCP
+static volatile uint32_t dbg_dapUartTx     = 0;   // Bridge frames sent to UART
+static volatile uint32_t dbg_dapUartRx     = 0;   // DAP responses received from UART
+static volatile uint32_t dbg_dapTcpSend    = 0;   // DAP responses sent to TCP
+static volatile uint32_t dbg_dapTimeout    = 0;   // DAP response timeouts
+static volatile uint32_t dbg_uartBytesRx   = 0;   // Total UART bytes received
+static volatile uint32_t dbg_uartFramesRx  = 0;   // Total UART frames parsed
+static uint8_t dbg_lastDapCmd[8] = {0};           // First 8 bytes of last DAP command
+static uint16_t dbg_lastDapCmdLen = 0;
+static uint8_t dbg_lastBridgeTx[16] = {0};       // First 16 bytes of last bridge frame TX
+static uint16_t dbg_lastBridgeTxLen = 0;
+
 // ═══════════════════════════════════════════════════════════════
 // WiFi 控制帧处理（来自 TCP/PC）
 // ═══════════════════════════════════════════════════════════════
@@ -101,6 +114,48 @@ void handleWifiCtrl(const BridgeFrame& frame) {
             uint8_t txBuf[BRIDGE_MAX_DATA + 6];
             int txLen = buildFrame(txBuf, BRIDGE_SOF0_RPY, BRIDGE_CH_WIFI_CTRL,
                                    frame.data, frame.len);
+            tcpServer.write(txBuf, txLen);
+            break;
+        }
+        case 0xF0: { // DEBUG_DIAG — return DAP debug counters + GPIO diag
+            uint8_t reply[80];
+            int pos = 0;
+            reply[pos++] = 0xF0;  // subcmd echo
+            // Copy volatile counters to local vars first
+            uint32_t v;
+            v = dbg_dapTcpRead;  memcpy(&reply[pos], &v, 4); pos += 4;
+            v = dbg_dapUartTx;   memcpy(&reply[pos], &v, 4); pos += 4;
+            v = dbg_dapUartRx;   memcpy(&reply[pos], &v, 4); pos += 4;
+            v = dbg_dapTcpSend;  memcpy(&reply[pos], &v, 4); pos += 4;
+            v = dbg_dapTimeout;  memcpy(&reply[pos], &v, 4); pos += 4;
+            v = dbg_uartBytesRx; memcpy(&reply[pos], &v, 4); pos += 4;
+            v = dbg_uartFramesRx;memcpy(&reply[pos], &v, 4); pos += 4;
+            // 2 bytes: lastDapCmdLen
+            uint16_t v16 = dbg_lastDapCmdLen;
+            memcpy(&reply[pos], &v16, 2); pos += 2;
+            // 8 bytes: lastDapCmd
+            memcpy(&reply[pos], dbg_lastDapCmd, 8); pos += 8;
+            // 2 bytes: lastBridgeTxLen
+            v16 = dbg_lastBridgeTxLen;
+            memcpy(&reply[pos], &v16, 2); pos += 2;
+            // 16 bytes: lastBridgeTx
+            memcpy(&reply[pos], dbg_lastBridgeTx, 16); pos += 16;
+
+            // GPIO state diagnostics (read raw pin levels)
+            // NOTE: avoid digitalRead on GPIO1/GPIO3 — they are UART0 pins
+            // and digitalRead might interfere with UART function on some ESP32 versions
+            reply[pos++] = 0xFF;  // GPIO1 placeholder (cannot safely read UART TX pin)
+            reply[pos++] = 0xFF;  // GPIO3 placeholder (cannot safely read UART RX pin)
+            // Serial.available() counter
+            v = (uint32_t)Serial.available();
+            memcpy(&reply[pos], &v, 4); pos += 4;
+            // UART baud rate verification
+            v = (uint32_t)Serial.baudRate();
+            memcpy(&reply[pos], &v, 4); pos += 4;
+
+            uint8_t txBuf[BRIDGE_MAX_DATA + 6];
+            int txLen = buildFrame(txBuf, BRIDGE_SOF0_RPY, BRIDGE_CH_WIFI_CTRL,
+                                   reply, pos);
             tcpServer.write(txBuf, txLen);
             break;
         }
@@ -305,27 +360,105 @@ void setup() {
 // ═══════════════════════════════════════════════════════════════
 // Arduino loop()
 // ═══════════════════════════════════════════════════════════════
+
+// Track whether a DAP session is active to reduce non-essential processing
+static bool dapSessionActive = false;
+
 void loop() {
     // ── WiFi 管理（自动重连）──
     wifiMgr.loop();
 
+    // ── DAP TCP 处理 (最高优先级) ──
+    dapServer.loop();
+    bool dapConnected = dapServer.hasClient();
+
+    // Track DAP session state changes
+    if (dapConnected && !dapSessionActive) {
+        dapSessionActive = true;
+        // Set UART timeout to minimum for fast DAP response reads
+        Serial.setTimeout(10);
+    } else if (!dapConnected && dapSessionActive) {
+        dapSessionActive = false;
+        Serial.setTimeout(1000);
+    }
+
+    if (dapConnected) {
+        uint8_t dapCmd[DAP_TCP_MAX_PACKET];
+        uint16_t dapLen;
+        while (dapServer.readCommand(dapCmd, &dapLen)) {
+            dbg_dapTcpRead++;
+            // Save debug info
+            dbg_lastDapCmdLen = dapLen;
+            memcpy(dbg_lastDapCmd, dapCmd, (dapLen < 8) ? dapLen : 8);
+
+            // Wrap DAP command in Bridge frame (CH=0xD0) and send to MCU
+            uint8_t txBuf[BRIDGE_MAX_DATA + 6];
+            int txLen = buildFrame(txBuf, BRIDGE_SOF0_CMD, BRIDGE_CH_DAP,
+                                   dapCmd, dapLen);
+            
+            // Save bridge TX debug info
+            dbg_lastBridgeTxLen = txLen;
+            memcpy(dbg_lastBridgeTx, txBuf, (txLen < 16) ? txLen : 16);
+            
+            uart.write(txBuf, txLen);
+            dbg_dapUartTx++;
+
+            // Wait for and forward DAP response immediately (tight loop)
+            // This ensures the response is sent back to TCP before processing
+            // anything else, minimizing latency and preventing data loss.
+            unsigned long t0 = millis();
+            bool gotResponse = false;
+            while (!gotResponse && (millis() - t0 < 2000)) {
+                // Read UART
+                uint8_t uBuf[1024];
+                int n = uart.read(uBuf, sizeof(uBuf));
+                dbg_uartBytesRx += n;
+                for (int i = 0; i < n; i++) {
+                    BridgeFrame frame;
+                    if (uartParser.feed(uBuf[i], frame)) {
+                        dbg_uartFramesRx++;
+                        if (!frame.valid) continue;
+                        if (frame.ch == BRIDGE_CH_DAP) {
+                            dbg_dapUartRx++;
+                            dapServer.sendResponse(frame.data, frame.len);
+                            dbg_dapTcpSend++;
+                            gotResponse = true;
+                            break;
+                        } else if (frame.ch == BRIDGE_CH_WIFI_CTRL) {
+                            handleWifiCtrlFromMCU(frame);
+                        } else {
+                            // Non-DAP response — forward to bridge TCP
+                            uint8_t fwdBuf[BRIDGE_MAX_DATA + 6];
+                            int fwdLen = buildFrame(fwdBuf, frame.sof0, frame.ch,
+                                                    frame.data, frame.len);
+                            tcpServer.write(fwdBuf, fwdLen);
+                        }
+                    }
+                }
+                if (!gotResponse) {
+                    yield(); // Let WiFi stack process
+                }
+            }
+            if (!gotResponse) {
+                dbg_dapTimeout++;
+            }
+        }
+    }
+
     // ── TCP → UART (PC 命令发往 MCU) ──
     tcpServer.loop();
     if (tcpServer.hasClient()) {
-        uint8_t buf[256];
+        uint8_t buf[1024];
         int n = tcpServer.read(buf, sizeof(buf));
         for (int i = 0; i < n; i++) {
             BridgeFrame frame;
             if (tcpParser.feed(buf[i], frame)) {
                 if (!frame.valid) {
-                    // CRC 校验失败，丢弃
                     continue;
                 }
                 if (frame.ch == BRIDGE_CH_WIFI_CTRL) {
-                    // ESP32 本地处理 WiFi 控制命令
                     handleWifiCtrl(frame);
                 } else {
-                    // 透传到 MCU: 重建完整帧发送到 UART
                     uint8_t txBuf[BRIDGE_MAX_DATA + 6];
                     int txLen = buildFrame(txBuf, frame.sof0, frame.ch,
                                            frame.data, frame.len);
@@ -335,39 +468,20 @@ void loop() {
         }
     }
 
-    // ── DAP TCP → UART (OpenOCD/elaphureLink DAP 命令发往 MCU) ──
-    dapServer.loop();
-    if (dapServer.hasClient()) {
-        uint8_t dapCmd[DAP_TCP_MAX_PACKET];
-        uint16_t dapLen;
-        while (dapServer.readCommand(dapCmd, &dapLen)) {
-            // Wrap DAP command in Bridge frame (CH=0xD0) and send to MCU
-            uint8_t txBuf[BRIDGE_MAX_DATA + 6];
-            int txLen = buildFrame(txBuf, BRIDGE_SOF0_CMD, BRIDGE_CH_DAP,
-                                   dapCmd, dapLen);
-            uart.write(txBuf, txLen);
-        }
-    }
-
-    // ── UART → TCP / DAP TCP (MCU 回复) ──
+    // ── UART → TCP / DAP TCP (MCU 回复 — 非 DAP 活跃时处理) ──
     {
-        uint8_t buf[256];
+        uint8_t buf[1024];
         int n = uart.read(buf, sizeof(buf));
         for (int i = 0; i < n; i++) {
             BridgeFrame frame;
             if (uartParser.feed(buf[i], frame)) {
-                if (!frame.valid) {
-                    // CRC 错误，丢弃该帧
-                    continue;
-                }
+                if (!frame.valid) continue;
                 if (frame.ch == BRIDGE_CH_DAP) {
-                    // DAP 响应 → 发送到 DAP TCP 客户端 (带 4 字节长度头)
+                    // Stale DAP response (not matched above) — still forward it
                     dapServer.sendResponse(frame.data, frame.len);
                 } else if (frame.ch == BRIDGE_CH_WIFI_CTRL) {
-                    // MCU 发来的 WiFi 控制帧，ESP32 处理
                     handleWifiCtrlFromMCU(frame);
                 } else {
-                    // 透传到 PC: 重建帧发送到 TCP
                     uint8_t txBuf[BRIDGE_MAX_DATA + 6];
                     int txLen = buildFrame(txBuf, frame.sof0, frame.ch,
                                            frame.data, frame.len);
@@ -377,12 +491,19 @@ void loop() {
         }
     }
 
-    // ── Web 配置服务 ──
-    webCfg.loop();
+    // ── 低优先级服务 (DAP 活跃时减少处理频率) ──
+    static unsigned long lastSlowService = 0;
+    unsigned long now = millis();
+    if (!dapSessionActive || (now - lastSlowService >= 100)) {
+        lastSlowService = now;
+        webCfg.loop();
+        updateLED();
+    }
 
-    // ── LED 状态指示 ──
-    updateLED();
+    // ── 心跳 (DAP 活跃时暂停，避免 UART 干扰) ──
+    if (!dapSessionActive) {
+        handleHeartbeat();
+    }
 
-    // ── 心跳 ──
-    handleHeartbeat();
+    yield(); // Ensure WiFi stack gets CPU time
 }

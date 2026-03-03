@@ -1,4 +1,5 @@
 #include "wifi_manager.h"
+#include <esp_wifi.h>
 
 WiFiManager::WiFiManager()
     : _apActive(false)
@@ -77,6 +78,12 @@ void WiFiManager::begin() {
         // 没有 STA 配置，直接 AP 模式
         startAP();
     }
+
+    // ─── 最大性能模式 ───
+    // 禁用 WiFi modem sleep，保持射频始终开启，最小化接收延迟
+    esp_wifi_set_ps(WIFI_PS_NONE);
+    // 设置最大发射功率 (19.5 dBm)
+    WiFi.setTxPower(WIFI_POWER_19_5dBm);
 }
 
 // ─── 主循环（自动重连）───

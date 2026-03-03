@@ -9,9 +9,9 @@
  *                     [1-byte type: 0x01=req, 0x02=rsp]
  *                     [1-byte reserved = 0x00]
  *
- *   2. Port 3240 (ELAPHURELINK_PORT) — elaphureLink protocol
- *      Handshake: 12-byte packet starting with 0x8a 0x65 0x6c
- *      After handshake: raw DAP data (no length header)
+ *   2. Port 3240 (ELAPHURELINK_PORT) — elaphureLink Proxy Protocol
+ *      12-byte handshake (ESP32-local), then raw CMSIS-DAP commands.
+ *      See: https://github.com/windowsair/elaphureLink/blob/master/docs/proxy_protocol.md
  *
  * ESP32 does NOT execute DAP commands — it wraps them in Bridge protocol
  * frames (CH=0xD0) and forwards to MCU via UART. MCU responses are routed
@@ -69,7 +69,7 @@ private:
     bool        _connected;
 
     // elaphureLink handshake state
-    bool _elHandshakeDone;
+    bool     _elHandshakeDone;
 
     // OpenOCD: state machine for 8-byte header
     //   Header: [4B signature][2B LE length][1B type][1B reserved]

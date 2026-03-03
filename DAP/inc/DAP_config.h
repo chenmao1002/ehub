@@ -32,11 +32,12 @@
 #define DAP_DEFAULT_SWJ_CLOCK   100000U        ///< Default SWD/JTAG clock frequency in Hz.
 
 /// Maximum Package Size for Command and Response data.
-/// STM32F4 USB 全速 HID 推荐 64 字节，保持默认
-#define DAP_PACKET_SIZE         64U             ///< Specifies Packet Size in bytes.
+/// 512 bytes for WiFi TCP path (reduces round-trips ~8x vs 64).
+/// USB HID endpoint is still 64 bytes — dap_app.c uses DAP_USB_PACKET_SIZE.
+#define DAP_PACKET_SIZE         512U            ///< Specifies Packet Size in bytes.
 
 /// Maximum Package Buffers for Command and Response data.
-#define DAP_PACKET_COUNT        12U              ///< Specifies number of packets buffered.
+#define DAP_PACKET_COUNT        8U              ///< Specifies number of packets buffered.
 
 /// Indicate that UART Serial Wire Output (SWO) trace is available.
 /// STM32F4 支持 SWO UART 模式，若需要启用可改为 1（需硬件配合）

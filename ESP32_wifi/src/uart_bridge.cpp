@@ -5,7 +5,8 @@ UARTBridge::UARTBridge() {
 
 void UARTBridge::begin(unsigned long baud) {
     // 设置更大的 RX 缓冲区（默认 256 字节不够用）
-    Serial.setRxBufferSize(UART_RX_BUF_SIZE);  // 1024
+    Serial.setRxBufferSize(UART_RX_BUF_SIZE);  // 4096
+    // 使用默认 UART0 引脚 (GPIO1=TX, GPIO3=RX)，通过 IO_MUX 路由
     Serial.begin(baud);
 }
 
