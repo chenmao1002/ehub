@@ -37,13 +37,13 @@ extern "C" {
 #define WIFI_SUBCMD_HEARTBEAT    0x10U  /* heartbeat ping/pong         */
 
 /* ---- MCU ↔ ESP32 UART fixed baud rate ---------------------------------- */
-#define WIFI_UART_BAUDRATE       921600U
+#define WIFI_UART_BAUDRATE       1000000U
 
-/* ---- DMA receive buffer size (> max frame = 134 bytes) ------------------ */
-#define WIFI_RX_BUF_SIZE         256U
+/* ---- DMA receive buffer size (> max frame ≈ 528 bytes) ----------------- */
+#define WIFI_RX_BUF_SIZE         1024U
 
 /* ---- Ring buffer between ISR and Task ----------------------------------- */
-#define WIFI_RING_SIZE           512U
+#define WIFI_RING_SIZE           4096U
 
 /**
  * @brief  Initialise the WiFi bridge module.
@@ -95,10 +95,20 @@ void WiFi_Bridge_Task(void *argument);
 void WiFi_ESP_Reset(void);
 
 /**
- * @brief  Put ESP32 into bootloader mode:
- *         BOOT low → EN low 100 ms → EN high → delay → BOOT high
+ * @brief  Put ESP32 into bootloader mode AND release USART2 pins:
+ *         1. Stop USART2 DMA + HAL_UART_DeInit (PA2/PA3 → high-Z)
+ *         2. BOOT low → EN low 100 ms → EN high → BOOT high
+ *         After this call, an external programmer can flash ESP32 via
+ *         the shared USART2 lines (COM port).  MCU firmware re-flash
+ *         via OpenOCD will restore USART2 on next boot.
  */
 void WiFi_ESP_EnterBootloader(void);
+
+/**
+ * @brief  Returns non-zero if ESP32 is in bootloader mode
+ *         (USART2 deinitialized, PA2/PA3 floating).
+ */
+uint8_t WiFi_Bridge_IsBootloader(void);
 
 #ifdef __cplusplus
 }

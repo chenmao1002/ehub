@@ -48,6 +48,7 @@ extern "C" {
 #define BRIDGE_CH_I2C_R     0x06U   /* I2C1 master read  */
 #define BRIDGE_CH_CAN       0x07U   /* CAN1  */
 #define BRIDGE_CH_BATTERY   0x08U   /* Battery voltage & charging status */
+#define BRIDGE_CH_DAP       0xD0U   /* CMSIS-DAP over WiFi (TCP) */
 #define BRIDGE_CH_WIFI_CTRL 0xE0U   /* WiFi control channel (MCU + ESP32) */
 #define BRIDGE_CH_CONFIG    0xF0U   /* peripheral re-configuration */
 
@@ -62,7 +63,7 @@ extern "C" {
 #define BRIDGE_CFG_I2C_OWN  0x08U   /* I2C own 7-bit address (0x08~0x77) */
 
 /* ---- Payload limits ------------------------------------------------------ */
-#define BRIDGE_MAX_DATA     128U    /* max bytes in one bridge frame payload */
+#define BRIDGE_MAX_DATA     520U    /* max bytes in one bridge frame payload (≥ DAP 512) */
 
 /* ---- Message type passed through the FreeRTOS queue --------------------- */
 typedef struct {

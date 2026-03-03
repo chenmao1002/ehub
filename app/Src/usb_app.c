@@ -23,6 +23,8 @@
 #include "usart.h"
 #include "main.h"
 #include "cmsis_os.h"
+#include "DAP.h"
+#include "DAP_config.h"
 #include <string.h>
 
 /* ---- External bus-send functions (implemented in their own .c files) ----- */
@@ -161,6 +163,31 @@ static void Bridge_Dispatch(const BridgeMsg_t *m)
         case BRIDGE_CH_CONFIG:
             Bridge_HandleConfig(m);
             break;
+        case BRIDGE_CH_DAP:
+        {
+            /* CMSIS-DAP commands from WiFi TCP — execute on MCU, reply to WiFi only */
+            static uint8_t dap_wifi_req[DAP_PACKET_SIZE];
+            static uint8_t dap_wifi_rsp[DAP_PACKET_SIZE];
+            uint16_t copy_len = (m->len > DAP_PACKET_SIZE) ? DAP_PACKET_SIZE : m->len;
+            memset(dap_wifi_req, 0, DAP_PACKET_SIZE);
+            memset(dap_wifi_rsp, 0, DAP_PACKET_SIZE);
+            memcpy(dap_wifi_req, m->buf, copy_len);
+
+            if (dap_wifi_req[0] == ID_DAP_TransferAbort) {
+                DAP_TransferAbort = 1U;
+                break;
+            }
+
+            uint32_t rsp_len = DAP_ExecuteCommand(dap_wifi_req, dap_wifi_rsp);
+            /* DAP_ExecuteCommand returns (request_count << 16) | response_size.
+             * Extract lower 16 bits for the actual response length. */
+            uint16_t send_len = (uint16_t)(rsp_len & 0xFFFFU);
+            if (send_len == 0U || send_len > DAP_PACKET_SIZE) {
+                send_len = DAP_PACKET_SIZE;
+            }
+            WiFi_Bridge_Send(BRIDGE_CH_DAP, dap_wifi_rsp, send_len);
+            break;
+        }
         case BRIDGE_CH_WIFI_CTRL:
             /* WiFi control frames from CDC: forward to ESP32 via USART2,
                except ESP_RESET and ESP_BOOT which MCU handles locally. */
@@ -168,6 +195,116 @@ static void Bridge_Dispatch(const BridgeMsg_t *m)
                 WiFi_ESP_Reset();
             } else if (m->len >= 1U && m->buf[0] == WIFI_SUBCMD_ESP_BOOT) {
                 WiFi_ESP_EnterBootloader();
+            } else if (m->len >= 1U && m->buf[0] == 0xF1U) {
+                /* MCU-side UART2 diagnostic — handle locally */
+                extern volatile uint32_t s_dbg_uart2_tx_ok;
+                extern volatile uint32_t s_dbg_uart2_tx_fail;
+                extern volatile uint32_t s_dbg_uart2_rx_event;
+                extern volatile uint32_t s_dbg_uart2_rx_bytes;
+                extern volatile uint32_t s_dbg_uart2_error;
+                extern volatile uint32_t s_dbg_uart2_frames;
+                extern volatile uint32_t s_dbg_dma_init_rc;
+                extern volatile uint32_t s_dbg_uart2_sr;
+                extern volatile uint32_t s_dbg_dma_cr;
+                extern volatile uint32_t s_dbg_dma_ndtr;
+                /* Snapshot DMA and UART status registers */
+                s_dbg_uart2_sr = USART2->SR;
+                if (huart2.hdmarx && huart2.hdmarx->Instance) {
+                    DMA_Stream_TypeDef *dma = (DMA_Stream_TypeDef *)huart2.hdmarx->Instance;
+                    s_dbg_dma_cr = dma->CR;
+                    s_dbg_dma_ndtr = dma->NDTR;
+                }
+                uint8_t rpl[1 + 10*4];   /* subcmd + 10 x uint32 */
+                rpl[0] = 0xF1U;
+                uint32_t v; uint16_t pos = 1U;
+                v = s_dbg_uart2_tx_ok;    memcpy(&rpl[pos], &v, 4U); pos += 4U;
+                v = s_dbg_uart2_tx_fail;  memcpy(&rpl[pos], &v, 4U); pos += 4U;
+                v = s_dbg_uart2_rx_event; memcpy(&rpl[pos], &v, 4U); pos += 4U;
+                v = s_dbg_uart2_rx_bytes; memcpy(&rpl[pos], &v, 4U); pos += 4U;
+                v = s_dbg_uart2_error;    memcpy(&rpl[pos], &v, 4U); pos += 4U;
+                v = s_dbg_uart2_frames;   memcpy(&rpl[pos], &v, 4U); pos += 4U;
+                v = s_dbg_dma_init_rc;    memcpy(&rpl[pos], &v, 4U); pos += 4U;
+                v = s_dbg_uart2_sr;       memcpy(&rpl[pos], &v, 4U); pos += 4U;
+                v = s_dbg_dma_cr;         memcpy(&rpl[pos], &v, 4U); pos += 4U;
+                v = s_dbg_dma_ndtr;       memcpy(&rpl[pos], &v, 4U); pos += 4U;
+                Bridge_SendToCDC(BRIDGE_CH_WIFI_CTRL, rpl, pos);
+            } else if (m->len >= 2U && m->buf[0] == 0xF2U) {
+                /* GPIO connectivity test: toggle PA2 (USART2_TX) as GPIO */
+                uint8_t action = m->buf[1];
+                if (action == 0U) {
+                    /* Deinit USART2, set PA2 = OUTPUT LOW */
+                    HAL_UART_DMAStop(&huart2);
+                    HAL_UART_DeInit(&huart2);
+                    GPIO_InitTypeDef gi = {0};
+                    gi.Pin  = GPIO_PIN_2;
+                    gi.Mode = GPIO_MODE_OUTPUT_PP;
+                    gi.Pull = GPIO_NOPULL;
+                    gi.Speed = GPIO_SPEED_FREQ_LOW;
+                    HAL_GPIO_Init(GPIOA, &gi);
+                    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
+                    /* Also test PA3 as input */
+                    gi.Pin = GPIO_PIN_3;
+                    gi.Mode = GPIO_MODE_INPUT;
+                    gi.Pull = GPIO_NOPULL;
+                    HAL_GPIO_Init(GPIOA, &gi);
+                    uint8_t rr[3] = {0xF2U, 0x00U,
+                        (uint8_t)HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3)};
+                    Bridge_SendToCDC(BRIDGE_CH_WIFI_CTRL, rr, 3U);
+                } else if (action == 1U) {
+                    /* Set PA2 = HIGH */
+                    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
+                    uint8_t rr[3] = {0xF2U, 0x01U,
+                        (uint8_t)HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_3)};
+                    Bridge_SendToCDC(BRIDGE_CH_WIFI_CTRL, rr, 3U);
+                } else if (action == 2U) {
+                    /* Restore USART2 */
+                    GPIO_InitTypeDef gi = {0};
+                    gi.Pin  = GPIO_PIN_2 | GPIO_PIN_3;
+                    gi.Mode = GPIO_MODE_AF_PP;
+                    gi.Pull = GPIO_NOPULL;
+                    gi.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+                    gi.Alternate = GPIO_AF7_USART2;
+                    HAL_GPIO_Init(GPIOA, &gi);
+                    huart2.Init.BaudRate     = WIFI_UART_BAUDRATE;
+                    huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+                    HAL_UART_Init(&huart2);
+                    uint8_t *rxbuf = WiFi_Bridge_GetRxBuf();
+                    HAL_UARTEx_ReceiveToIdle_DMA(&huart2, rxbuf, WIFI_RX_BUF_SIZE);
+                    __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
+                    uint8_t rr[2] = {0xF2U, 0x02U};
+                    Bridge_SendToCDC(BRIDGE_CH_WIFI_CTRL, rr, 2U);
+                }
+            } else if (m->len >= 1U && m->buf[0] == 0xF3U) {
+                /* ---- Register dump + polling TX test ---- */
+                uint8_t rpl3[1 + 7*4];  /* subcmd + 7 x uint32 */
+                rpl3[0] = 0xF3U;
+                uint16_t pos3 = 1U;
+                uint32_t v3;
+
+                /* 1) USART2 register snapshot */
+                v3 = USART2->CR1;   memcpy(&rpl3[pos3], &v3, 4U); pos3 += 4U;
+                v3 = USART2->CR3;   memcpy(&rpl3[pos3], &v3, 4U); pos3 += 4U;
+                v3 = USART2->BRR;   memcpy(&rpl3[pos3], &v3, 4U); pos3 += 4U;
+                v3 = USART2->SR;    memcpy(&rpl3[pos3], &v3, 4U); pos3 += 4U;
+
+                /* 2) TX DMA stream snapshot (DMA1_Stream6) */
+                if (huart2.hdmatx && huart2.hdmatx->Instance) {
+                    DMA_Stream_TypeDef *dtx = (DMA_Stream_TypeDef *)huart2.hdmatx->Instance;
+                    v3 = dtx->CR;   memcpy(&rpl3[pos3], &v3, 4U); pos3 += 4U;
+                    v3 = dtx->NDTR; memcpy(&rpl3[pos3], &v3, 4U); pos3 += 4U;
+                } else {
+                    v3 = 0xDEADU;   memcpy(&rpl3[pos3], &v3, 4U); pos3 += 4U;
+                    v3 = 0xDEADU;   memcpy(&rpl3[pos3], &v3, 4U); pos3 += 4U;
+                }
+
+                /* 3) Polling TX test — bypass DMA entirely */
+                uint8_t test_msg[] = "HELLO_FROM_MCU\n";
+                HAL_StatusTypeDef txrc = HAL_UART_Transmit(
+                    &huart2, test_msg, sizeof(test_msg)-1, 500);
+                v3 = (uint32_t)txrc;
+                memcpy(&rpl3[pos3], &v3, 4U); pos3 += 4U;
+
+                Bridge_SendToCDC(BRIDGE_CH_WIFI_CTRL, rpl3, pos3);
             } else {
                 WiFi_Bridge_Send(BRIDGE_CH_WIFI_CTRL, m->buf, m->len);
             }
@@ -400,6 +537,9 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
     else if (huart->Instance == USART2)
     {
         /* WiFi bridge: copy raw data into ring buffer and re-arm DMA */
+        if (WiFi_Bridge_IsBootloader()) return;  /* USART2 deinitialized */
+        extern volatile uint32_t s_dbg_uart2_rx_event;
+        s_dbg_uart2_rx_event++;
         uint8_t *rxbuf = WiFi_Bridge_GetRxBuf();
         WiFi_Bridge_RxHandler(rxbuf, Size);
         HAL_UARTEx_ReceiveToIdle_DMA(&huart2, rxbuf, WIFI_RX_BUF_SIZE);
@@ -440,6 +580,9 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
     else if (huart->Instance == USART2)
     {
         /* WiFi bridge USART2 — re-arm DMA into the WiFi RX buffer */
+        if (WiFi_Bridge_IsBootloader()) return;  /* USART2 deinitialized */
+        extern volatile uint32_t s_dbg_uart2_error;
+        s_dbg_uart2_error++;
         __HAL_UART_CLEAR_OREFLAG(&huart2);
         __HAL_UART_CLEAR_NEFLAG(&huart2);
         __HAL_UART_CLEAR_FEFLAG(&huart2);

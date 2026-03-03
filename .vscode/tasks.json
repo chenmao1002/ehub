@@ -186,6 +186,125 @@
             "problemMatcher": [
                 "$gcc"
             ]
+        },
+        {
+            "label": "Flash WiFi DAP (OpenOCD TCP)",
+            "type": "shell",
+            "command": "F:/vscode/openstm32/xpack-openocd/xpack-openocd-0.12.0-4/bin/openocd.exe",
+            "args": [
+                "-s",
+                "F:/vscode/openstm32/xpack-openocd/xpack-openocd-0.12.0-4/openocd/scripts",
+                "-f",
+                "${workspaceFolder}/openocd_wifi_dap.cfg",
+                "-c",
+                "program ${workspaceFolder}/build/Debug/EHUB.hex verify reset exit"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "DAP TCP Test",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/tools/dap_tcp_test.py",
+                "--host",
+                "ehub.local",
+                "--port",
+                "6000"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Install elaphureLink to Keil",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/tools/elaphureLink/install_elaphurelink.ps1"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "ESP32 Download Mode",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/tools/esp32_download_mode.py",
+                "--port",
+                "COM19"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "ESP32 Build",
+            "type": "shell",
+            "command": "pio",
+            "args": [
+                "run"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/ESP32_wifi"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "ESP32 Upload",
+            "type": "shell",
+            "command": "pio",
+            "args": [
+                "run",
+                "-t",
+                "upload",
+                "--upload-port",
+                "COM18"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/ESP32_wifi"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": [],
+            "dependsOn": "ESP32 Download Mode"
+        },
+        {
+            "label": "ESP32 Flash + MCU Restore",
+            "dependsOn": [
+                "ESP32 Upload",
+                "Flash (OpenOCD)"
+            ],
+            "dependsOrder": "sequence",
+            "group": "build",
+            "problemMatcher": []
         }
     ]
 }

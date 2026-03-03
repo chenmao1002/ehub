@@ -27,6 +27,9 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 #define USBD_HID_REQ_PERIOD_UPDATE  0x02U
 #define USBD_HID_REQ_EP_INT         0x03U
 
+/* ---- USB HID uses fixed 64-byte reports regardless of DAP_PACKET_SIZE --- */
+#define DAP_USB_PACKET_SIZE  64U
+
 /* ---- HID 请求/响应环形缓冲区 -------------------------------------------- */
 static volatile uint16_t USB_RequestIndexI;
 static volatile uint16_t USB_RequestIndexO;
@@ -58,11 +61,11 @@ int32_t USBD_HID0_GetReport(uint8_t rtype, uint8_t req, uint8_t rid, uint8_t *bu
                     break;
                 case USBD_HID_REQ_EP_INT:
                     if (USB_ResponseCountI != USB_ResponseCountO) {
-                        memcpy(buf, USB_Response[USB_ResponseIndexO], DAP_PACKET_SIZE);
+                        memcpy(buf, USB_Response[USB_ResponseIndexO], DAP_USB_PACKET_SIZE);
                         USB_ResponseIndexO++;
                         if (USB_ResponseIndexO == DAP_PACKET_COUNT) { USB_ResponseIndexO = 0U; }
                         USB_ResponseCountO++;
-                        return (int32_t)DAP_PACKET_SIZE;
+                        return (int32_t)DAP_USB_PACKET_SIZE;
                     } else {
                         USB_ResponseIdle = 1U;
                     }
@@ -162,7 +165,7 @@ void StartDAPTask(void *argument)
                 USB_ResponseCountO++;
                 USB_ResponseIdle = 0U;
                 USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS,
-                                           USB_Response[n], DAP_PACKET_SIZE);
+                                           USB_Response[n], DAP_USB_PACKET_SIZE);
             }
         }
         osDelay(1); /* 无待处理命令时让出 CPU */

@@ -32,6 +32,18 @@ static volatile uint8_t  s_ring[WIFI_RING_SIZE];
 static volatile uint16_t s_ring_head = 0U;   /* written by ISR  */
 static volatile uint16_t s_ring_tail = 0U;   /* read by Task    */
 
+/* ---- Debug counters (exposed via BRIDGE_CH_WIFI_CTRL subcmd 0xF1) ------- */
+volatile uint32_t s_dbg_uart2_tx_ok    = 0U;  /* WiFi_Bridge_Send DMA TX OK   */
+volatile uint32_t s_dbg_uart2_tx_fail  = 0U;  /* WiFi_Bridge_Send DMA TX fail */
+volatile uint32_t s_dbg_uart2_rx_event = 0U;  /* USART2 RxEvent callback      */
+volatile uint32_t s_dbg_uart2_rx_bytes = 0U;  /* total bytes into ring buffer */
+volatile uint32_t s_dbg_uart2_error    = 0U;  /* USART2 ErrorCallback count   */
+volatile uint32_t s_dbg_uart2_frames   = 0U;  /* complete frames parsed        */
+volatile uint32_t s_dbg_dma_init_rc    = 0xFFU; /* return code of ReceiveToIdle_DMA */
+volatile uint32_t s_dbg_uart2_sr       = 0U;  /* USART2->SR snapshot          */
+volatile uint32_t s_dbg_dma_cr         = 0U;  /* DMA stream CR snapshot       */
+volatile uint32_t s_dbg_dma_ndtr       = 0U;  /* DMA stream NDTR snapshot     */
+
 static inline void ring_put(uint8_t b)
 {
     uint16_t next = (s_ring_head + 1U) % WIFI_RING_SIZE;
@@ -49,6 +61,9 @@ static inline int ring_get(uint8_t *b)
     s_ring_tail = (s_ring_tail + 1U) % WIFI_RING_SIZE;
     return 1;
 }
+
+/* ---- Bootloader mode flag: when set, USART2 is deinitialized ----------- */
+static volatile uint8_t s_esp_in_bootloader = 0U;
 
 /* ---- TX buffer & mutex (shared by multiple callers of Send) ------------- */
 static uint8_t  s_wifi_tx_buf[BRIDGE_MAX_DATA + 6U];
@@ -85,6 +100,8 @@ static void WiFi_HandleCtrlFromCDC(const BridgeMsg_t *m);
 
 void WiFi_Bridge_RxHandler(const uint8_t *data, uint16_t size)
 {
+    if (s_esp_in_bootloader) { return; }  /* USART2 deinitialized */
+    s_dbg_uart2_rx_bytes += size;
     for (uint16_t i = 0U; i < size; i++)
     {
         ring_put(data[i]);
@@ -97,6 +114,7 @@ void WiFi_Bridge_RxHandler(const uint8_t *data, uint16_t size)
 
 void WiFi_Bridge_Send(uint8_t ch, const uint8_t *data, uint16_t len)
 {
+    if (s_esp_in_bootloader) { return; }  /* USART2 deinitialized */
     if (len == 0U || len > BRIDGE_MAX_DATA) { return; }
 
     if (osMutexAcquire(s_wifi_tx_mutex, 60U) != osOK) { return; }
@@ -119,7 +137,9 @@ void WiFi_Bridge_Send(uint8_t ch, const uint8_t *data, uint16_t len)
         osDelay(1);
     }
 
-    HAL_UART_Transmit_DMA(&huart2, s_wifi_tx_buf, (uint16_t)(6U + len));
+    HAL_StatusTypeDef txrc = HAL_UART_Transmit_DMA(&huart2, s_wifi_tx_buf, (uint16_t)(6U + len));
+    if (txrc == HAL_OK) { s_dbg_uart2_tx_ok++; }
+    else                { s_dbg_uart2_tx_fail++; }
 
     osMutexRelease(s_wifi_tx_mutex);
 }
@@ -200,12 +220,13 @@ void WiFi_Bridge_Task(void *argument)
 
     for (;;)
     {
-        /* Drain ring buffer — process up to 256 bytes per iteration */
-        uint16_t budget = 256U;
+        /* Drain ring buffer — process up to 1024 bytes per iteration */
+        uint16_t budget = 1024U;
         while (budget-- > 0U && ring_get(&byte))
         {
             if (wifi_parse_byte(byte))
             {
+                s_dbg_uart2_frames++;
                 /* Complete frame available in w_msg */
                 if (w_msg.ch == BRIDGE_CH_WIFI_CTRL)
                 {
@@ -257,6 +278,23 @@ static void WiFi_HandleCtrlFromCDC(const BridgeMsg_t *m)
             Bridge_SendToCDC(BRIDGE_CH_WIFI_CTRL, m->buf, m->len);
             break;
 
+        case 0xF1U:
+        {
+            /* MCU-side UART2 diagnostic counters → send back to CDC */
+            uint8_t rpl[1 + 6*4];   /* subcmd + 6 x uint32 */
+            rpl[0] = 0xF1U;
+            uint32_t v;
+            uint16_t pos = 1U;
+            v = s_dbg_uart2_tx_ok;    memcpy(&rpl[pos], &v, 4U); pos += 4U;
+            v = s_dbg_uart2_tx_fail;  memcpy(&rpl[pos], &v, 4U); pos += 4U;
+            v = s_dbg_uart2_rx_event; memcpy(&rpl[pos], &v, 4U); pos += 4U;
+            v = s_dbg_uart2_rx_bytes; memcpy(&rpl[pos], &v, 4U); pos += 4U;
+            v = s_dbg_uart2_error;    memcpy(&rpl[pos], &v, 4U); pos += 4U;
+            v = s_dbg_uart2_frames;   memcpy(&rpl[pos], &v, 4U); pos += 4U;
+            Bridge_SendToCDC(BRIDGE_CH_WIFI_CTRL, rpl, pos);
+            break;
+        }
+
         default:
             /* STATUS / CONFIG / SCAN responses from ESP32 → forward to CDC */
             Bridge_SendToCDC(BRIDGE_CH_WIFI_CTRL, m->buf, m->len);
@@ -278,18 +316,37 @@ void WiFi_ESP_Reset(void)
 
 void WiFi_ESP_EnterBootloader(void)
 {
-    /* BOOT low  → ESP32 GPIO0 = 0  */
+    /* 0. Set flag FIRST — prevents other tasks from touching USART2 */
+    s_esp_in_bootloader = 1U;
+
+    /* 1. Stop USART2 DMA and deinitialise — release PA2/PA3 to high-Z */
+    HAL_UART_DMAStop(&huart2);
+    HAL_UART_DeInit(&huart2);
+
+    /* 2. Configure PA2/PA3 as Input (floating) so external programmer can use them */
+    GPIO_InitTypeDef gi = {0};
+    gi.Pin  = GPIO_PIN_2 | GPIO_PIN_3;
+    gi.Mode = GPIO_MODE_INPUT;
+    gi.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &gi);
+
+    /* 3. BOOT low  → ESP32 GPIO0 = 0  */
     HAL_GPIO_WritePin(ESP_BOOT_GPIO_Port, ESP_BOOT_Pin, GPIO_PIN_RESET);
     osDelay(50);
 
-    /* Pulse EN low to reset */
+    /* 4. Pulse EN low to reset into bootloader */
     HAL_GPIO_WritePin(ESP_EN_GPIO_Port, ESP_EN_Pin, GPIO_PIN_RESET);
     osDelay(100);
     HAL_GPIO_WritePin(ESP_EN_GPIO_Port, ESP_EN_Pin, GPIO_PIN_SET);
-    osDelay(50);
+    osDelay(100);
 
-    /* Release BOOT */
+    /* 5. Release BOOT (keep USART2 disabled — PC can now flash ESP32) */
     HAL_GPIO_WritePin(ESP_BOOT_GPIO_Port, ESP_BOOT_Pin, GPIO_PIN_SET);
+}
+
+uint8_t WiFi_Bridge_IsBootloader(void)
+{
+    return s_esp_in_bootloader;
 }
 
 /*===========================================================================
@@ -298,33 +355,51 @@ void WiFi_ESP_EnterBootloader(void)
 
 static const osThreadAttr_t wifi_task_attrs = {
     .name       = "wifiBridgeTask",
-    .stack_size = 512U * 4U,
+    .stack_size = 1024U * 4U,
     .priority   = (osPriority_t)osPriorityAboveNormal,
 };
 
 void WiFi_Bridge_Init(void)
 {
-    /* 1. Reconfigure USART2 to 921600 baud */
+    /* 1. Reconfigure USART2 to 1 Mbaud.
+     *    PCLK1 = 30 MHz  →  OVER16: USARTDIV = 30 MHz / (16 × 1 MHz) = 1.875
+     *                        BRR = 0x1E  →  mantissa 1, fraction 14  →  valid.
+     *    16 samples per bit gives better noise rejection than OVER8. */
     HAL_UART_DMAStop(&huart2);
     HAL_UART_DeInit(&huart2);
-    huart2.Init.BaudRate = WIFI_UART_BAUDRATE;  /* 921600 */
+    huart2.Init.BaudRate     = WIFI_UART_BAUDRATE;          /* 1000000 */
+    huart2.Init.OverSampling = UART_OVERSAMPLING_16;
     if (HAL_UART_Init(&huart2) != HAL_OK)
     {
         /* Fallback: try to reinit at original baud (should not happen) */
         huart2.Init.BaudRate = 115200U;
+        huart2.Init.OverSampling = UART_OVERSAMPLING_16;
         HAL_UART_Init(&huart2);
     }
 
     /* 2. Create TX mutex */
     s_wifi_tx_mutex = osMutexNew(&s_wifi_tx_mutex_attr);
 
-    /* 3. Start DMA+IDLE receive on USART2 */
-    HAL_UARTEx_ReceiveToIdle_DMA(&huart2, s_wifi_rx_buf, WIFI_RX_BUF_SIZE);
-    __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
-
-    /* 4. Reset ESP32 for a clean start */
+    /* 3. Reset ESP32 FIRST (before arming DMA!) — avoids boot-noise
+     *    at 74880 baud from corrupting the DMA receive state machine.  */
     WiFi_ESP_Reset();
 
-    /* 5. Create WiFi bridge task */
+    /* 4. Wait additional time for ESP32 to finish booting and call
+     *    Serial.begin(2000000).  ESP32 ROM bootloader + 2nd stage +
+     *    Arduino setup() typically takes ~800-1200 ms after EN release. */
+    osDelay(1500);
+
+    /* 5. Flush any residual UART errors, then start DMA+IDLE receive */
+    __HAL_UART_CLEAR_OREFLAG(&huart2);
+    __HAL_UART_CLEAR_NEFLAG(&huart2);
+    __HAL_UART_CLEAR_FEFLAG(&huart2);
+    /* Read DR to clear any stale data */
+    (void)huart2.Instance->DR;
+
+    HAL_StatusTypeDef dma_rc = HAL_UARTEx_ReceiveToIdle_DMA(&huart2, s_wifi_rx_buf, WIFI_RX_BUF_SIZE);
+    s_dbg_dma_init_rc = (uint32_t)dma_rc;
+    __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
+
+    /* 6. Create WiFi bridge task */
     osThreadNew(WiFi_Bridge_Task, NULL, &wifi_task_attrs);
 }
