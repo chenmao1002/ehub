@@ -103,7 +103,7 @@ void StartBatteryTask(void *argument)
             /* 电压上升 → 可能在充电 */
             rising_cnt++;
             falling_cnt = 0U;
-            if (rising_cnt >= 2U)   /* 连续 2 个周期上升才确认 */
+            if (rising_cnt >= 1U)   /* 连续 1 个周期上升即确认（提高灵敏度） */
             {
                 charging = 1U;
             }
@@ -141,6 +141,6 @@ void StartBatteryTask(void *argument)
         payload[1] = (uint8_t)(ema_mv & 0xFFU);
         payload[2] = pct;
         payload[3] = charging;
-        Bridge_SendToCDC(BRIDGE_CH_BATTERY, payload, 4U);
+        Bridge_SendToAll(BRIDGE_CH_BATTERY, payload, 4U);
     }
 }

@@ -17,6 +17,7 @@
  */
 
 #include "usb_app.h"
+#include "wifi_bridge.h"
 #include "usbd_cdc_if.h"
 #include "usbd_def.h"
 #include "usart.h"
@@ -83,7 +84,7 @@ static uint16_t     s_idx;
 static void Bridge_Config_Reply(uint8_t iface, uint8_t ok)
 {
     uint8_t rep[2] = { iface, ok ? 0x00U : 0xFFU };
-    Bridge_SendToCDC(BRIDGE_CH_CONFIG, rep, 2U);
+    Bridge_SendToAll(BRIDGE_CH_CONFIG, rep, 2U);
 }
 
 static void Bridge_HandleConfig(const BridgeMsg_t *m)
@@ -95,7 +96,7 @@ static void Bridge_HandleConfig(const BridgeMsg_t *m)
     if (iface == BRIDGE_CH_CONFIG)
     {
         uint8_t rep[6] = { BRIDGE_CH_CONFIG, 0x00U, 'E', 'H', 'U', 'B' };
-        Bridge_SendToCDC(BRIDGE_CH_CONFIG, rep, 6U);
+        Bridge_SendToAll(BRIDGE_CH_CONFIG, rep, 6U);
         return;
     }
 
@@ -159,6 +160,17 @@ static void Bridge_Dispatch(const BridgeMsg_t *m)
             break;
         case BRIDGE_CH_CONFIG:
             Bridge_HandleConfig(m);
+            break;
+        case BRIDGE_CH_WIFI_CTRL:
+            /* WiFi control frames from CDC: forward to ESP32 via USART2,
+               except ESP_RESET and ESP_BOOT which MCU handles locally. */
+            if (m->len >= 1U && m->buf[0] == WIFI_SUBCMD_ESP_RESET) {
+                WiFi_ESP_Reset();
+            } else if (m->len >= 1U && m->buf[0] == WIFI_SUBCMD_ESP_BOOT) {
+                WiFi_ESP_EnterBootloader();
+            } else {
+                WiFi_Bridge_Send(BRIDGE_CH_WIFI_CTRL, m->buf, m->len);
+            }
             break;
         default:
             break;
@@ -263,6 +275,16 @@ void Bridge_SendToCDC(uint8_t ch, const uint8_t *data, uint16_t len)
 }
 
 /*===========================================================================
+ *  Bridge_SendToAll: broadcast to both CDC and WiFi
+ *===========================================================================*/
+
+void Bridge_SendToAll(uint8_t ch, const uint8_t *data, uint16_t len)
+{
+    Bridge_SendToCDC(ch, data, len);
+    WiFi_Bridge_Send(ch, data, len);
+}
+
+/*===========================================================================
  *  Section 3 – Bridge_Task: command dispatch + bus-RX queue → PC
  *===========================================================================*/
 
@@ -285,7 +307,7 @@ void Bridge_Task(void *argument)
             if (osMessageQueueGet(bridge_rx_queue, &msg, NULL, 0U) != osOK) {
                 break;
             }
-            Bridge_SendToCDC(msg.ch, msg.buf, msg.len);
+            Bridge_SendToAll(msg.ch, msg.buf, msg.len);
         }
     }
 }
@@ -319,6 +341,9 @@ void Bridge_Init(void)
 
     /* Start bridge task */
     osThreadNew(Bridge_Task, NULL, &bridge_task_attrs);
+
+    /* Initialise WiFi bridge (USART2 → ESP32) */
+    WiFi_Bridge_Init();
 }
 
 /*===========================================================================
@@ -372,6 +397,14 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
         HAL_UARTEx_ReceiveToIdle_DMA(&huart4, uart4_rx_buf, UART_RX_BUF_SIZE);
         __HAL_DMA_DISABLE_IT(huart4.hdmarx, DMA_IT_HT);
     }
+    else if (huart->Instance == USART2)
+    {
+        /* WiFi bridge: copy raw data into ring buffer and re-arm DMA */
+        uint8_t *rxbuf = WiFi_Bridge_GetRxBuf();
+        WiFi_Bridge_RxHandler(rxbuf, Size);
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart2, rxbuf, WIFI_RX_BUF_SIZE);
+        __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
+    }
 }
 
 /* -------------------------------------------------------------------------
@@ -386,6 +419,53 @@ void Bridge_USART1_Config(uint8_t param, uint32_t value)
     HAL_UART_Init(&huart1);
     HAL_UARTEx_ReceiveToIdle_DMA(&huart1, usart1_rx_buf, UART_RX_BUF_SIZE);
     __HAL_DMA_DISABLE_IT(huart1.hdmarx, DMA_IT_HT);
+}
+
+/**
+ * Called when a UART error occurs (Overrun, Framing, Noise, Parity).
+ * The HAL automatically aborts DMA and sets state to READY.
+ * We MUST re-arm DMA-idle receive here, otherwise reception stops forever.
+ */
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART1)
+    {
+        /* Clear error flags then restart DMA-idle receive */
+        __HAL_UART_CLEAR_OREFLAG(&huart1);
+        __HAL_UART_CLEAR_NEFLAG(&huart1);
+        __HAL_UART_CLEAR_FEFLAG(&huart1);
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart1, usart1_rx_buf, UART_RX_BUF_SIZE);
+        __HAL_DMA_DISABLE_IT(huart1.hdmarx, DMA_IT_HT);
+    }
+    else if (huart->Instance == USART2)
+    {
+        /* WiFi bridge USART2 — re-arm DMA into the WiFi RX buffer */
+        __HAL_UART_CLEAR_OREFLAG(&huart2);
+        __HAL_UART_CLEAR_NEFLAG(&huart2);
+        __HAL_UART_CLEAR_FEFLAG(&huart2);
+        uint8_t *rxbuf = WiFi_Bridge_GetRxBuf();
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart2, rxbuf, WIFI_RX_BUF_SIZE);
+        __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
+    }
+    else if (huart->Instance == USART3)
+    {
+        /* RS485 — ensure DE pin is LOW (receive mode) then re-arm */
+        __HAL_UART_CLEAR_OREFLAG(&huart3);
+        __HAL_UART_CLEAR_NEFLAG(&huart3);
+        __HAL_UART_CLEAR_FEFLAG(&huart3);
+        HAL_GPIO_WritePin(RS485_TX_EN_GPIO_Port, RS485_TX_EN_Pin, GPIO_PIN_RESET);
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart3, usart3_rx_buf, UART_RX_BUF_SIZE);
+        __HAL_DMA_DISABLE_IT(huart3.hdmarx, DMA_IT_HT);
+    }
+    else if (huart->Instance == UART4)
+    {
+        /* RS422 */
+        __HAL_UART_CLEAR_OREFLAG(huart);
+        __HAL_UART_CLEAR_NEFLAG(huart);
+        __HAL_UART_CLEAR_FEFLAG(huart);
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart4, uart4_rx_buf, UART_RX_BUF_SIZE);
+        __HAL_DMA_DISABLE_IT(huart4.hdmarx, DMA_IT_HT);
+    }
 }
 
 /**
