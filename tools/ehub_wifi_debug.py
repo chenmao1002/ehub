@@ -36,6 +36,7 @@ CH = {
     "I2C_R":   0x06,
     "CAN":     0x07,
     "BATTERY": 0x08,
+    "DAP":     0xD0,
     "WIFI_CTRL": 0xE0,
     "CONFIG":  0xF0,
 }

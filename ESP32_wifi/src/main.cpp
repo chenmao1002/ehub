@@ -3,6 +3,7 @@
 #include "config.h"
 #include "wifi_manager.h"
 #include "tcp_server.h"
+#include "dap_tcp_server.h"
 #include "uart_bridge.h"
 #include "protocol.h"
 #include "web_config.h"
@@ -12,6 +13,7 @@
 // ═══════════════════════════════════════════════════════════════
 WiFiManager     wifiMgr;
 TCPBridgeServer tcpServer;
+DAPTCPServer    dapServer;         // CMSIS-DAP over TCP (port 6000)
 UARTBridge      uart;
 WebConfig       webCfg;
 FrameParser     tcpParser;      // 解析 TCP 来的帧
@@ -276,19 +278,25 @@ void setup() {
         MDNS.addService(MDNS_SERVICE, MDNS_PROTOCOL, TCP_PORT);
         MDNS.addServiceTxt(MDNS_SERVICE, MDNS_PROTOCOL, "version", FW_VERSION);
         MDNS.addServiceTxt(MDNS_SERVICE, MDNS_PROTOCOL, "device", "EHUB");
+        // Advertise DAP TCP service for cmsis-dap discovery
+        MDNS.addService("_dap", "_tcp", DAP_TCP_PORT);
+        MDNS.addServiceTxt("_dap", "_tcp", "version", FW_VERSION);
     }
 
     // 5. TCP 服务器
     tcpServer.begin(TCP_PORT);   // 5000
 
-    // 6. Web 配置
+    // 6. DAP TCP 服务器 (CMSIS-DAP over TCP)
+    dapServer.begin(DAP_TCP_PORT);  // 6000
+
+    // 7. Web 配置
     webCfg.begin(wifiMgr, tcpServer);
 
-    // 7. 初始化心跳时间
+    // 8. 初始化心跳时间
     lastHeartbeatSend = millis();
     lastHeartbeatRecv = millis();
 
-    // 8. LED 指示就绪
+    // 9. LED 指示就绪
     digitalWrite(LED_PIN, HIGH);
 }
 
@@ -325,7 +333,21 @@ void loop() {
         }
     }
 
-    // ── UART → TCP (MCU 回复发往 PC) ──
+    // ── DAP TCP → UART (OpenOCD/elaphureLink DAP 命令发往 MCU) ──
+    dapServer.loop();
+    if (dapServer.hasClient()) {
+        uint8_t dapCmd[DAP_TCP_MAX_PACKET];
+        uint16_t dapLen;
+        while (dapServer.readCommand(dapCmd, &dapLen)) {
+            // Wrap DAP command in Bridge frame (CH=0xD0) and send to MCU
+            uint8_t txBuf[BRIDGE_MAX_DATA + 6];
+            int txLen = buildFrame(txBuf, BRIDGE_SOF0_CMD, BRIDGE_CH_DAP,
+                                   dapCmd, dapLen);
+            uart.write(txBuf, txLen);
+        }
+    }
+
+    // ── UART → TCP / DAP TCP (MCU 回复) ──
     {
         uint8_t buf[256];
         int n = uart.read(buf, sizeof(buf));
@@ -336,7 +358,10 @@ void loop() {
                     // CRC 错误，丢弃该帧
                     continue;
                 }
-                if (frame.ch == BRIDGE_CH_WIFI_CTRL) {
+                if (frame.ch == BRIDGE_CH_DAP) {
+                    // DAP 响应 → 发送到 DAP TCP 客户端 (带 4 字节长度头)
+                    dapServer.sendResponse(frame.data, frame.len);
+                } else if (frame.ch == BRIDGE_CH_WIFI_CTRL) {
                     // MCU 发来的 WiFi 控制帧，ESP32 处理
                     handleWifiCtrlFromMCU(frame);
                 } else {

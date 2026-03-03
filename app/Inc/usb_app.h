@@ -48,6 +48,7 @@ extern "C" {
 #define BRIDGE_CH_I2C_R     0x06U   /* I2C1 master read  */
 #define BRIDGE_CH_CAN       0x07U   /* CAN1  */
 #define BRIDGE_CH_BATTERY   0x08U   /* Battery voltage & charging status */
+#define BRIDGE_CH_DAP       0xD0U   /* CMSIS-DAP over WiFi (TCP) */
 #define BRIDGE_CH_WIFI_CTRL 0xE0U   /* WiFi control channel (MCU + ESP32) */
 #define BRIDGE_CH_CONFIG    0xF0U   /* peripheral re-configuration */
 

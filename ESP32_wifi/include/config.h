@@ -14,6 +14,11 @@
 #define TCP_PORT            5000
 #define TCP_MAX_CLIENTS     1       // 仅允许 1 个客户端
 
+// ─── CMSIS-DAP over TCP (OpenOCD / elaphureLink) ───
+#define DAP_TCP_PORT        6000    // DAP TCP 端口 (标准 cmsis-dap tcp)
+#define DAP_TCP_MAX_PACKET  256     // DAP 最大包长度
+#define BRIDGE_CH_DAP       0xD0    // Bridge 协议 DAP 通道 ID
+
 // ─── WiFi 默认配置 ───
 #define DEFAULT_AP_SSID     "EHUB_WiFi"
 #define DEFAULT_AP_PASS     "12345678"

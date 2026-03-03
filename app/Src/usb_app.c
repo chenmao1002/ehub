@@ -23,6 +23,8 @@
 #include "usart.h"
 #include "main.h"
 #include "cmsis_os.h"
+#include "DAP.h"
+#include "DAP_config.h"
 #include <string.h>
 
 /* ---- External bus-send functions (implemented in their own .c files) ----- */
@@ -161,6 +163,25 @@ static void Bridge_Dispatch(const BridgeMsg_t *m)
         case BRIDGE_CH_CONFIG:
             Bridge_HandleConfig(m);
             break;
+        case BRIDGE_CH_DAP:
+        {
+            /* CMSIS-DAP commands from WiFi TCP — execute on MCU, reply to WiFi only */
+            static uint8_t dap_wifi_req[DAP_PACKET_SIZE];
+            static uint8_t dap_wifi_rsp[DAP_PACKET_SIZE];
+            uint16_t copy_len = (m->len > DAP_PACKET_SIZE) ? DAP_PACKET_SIZE : m->len;
+            memset(dap_wifi_req, 0, DAP_PACKET_SIZE);
+            memset(dap_wifi_rsp, 0, DAP_PACKET_SIZE);
+            memcpy(dap_wifi_req, m->buf, copy_len);
+
+            if (dap_wifi_req[0] == ID_DAP_TransferAbort) {
+                DAP_TransferAbort = 1U;
+                break;
+            }
+
+            DAP_ExecuteCommand(dap_wifi_req, dap_wifi_rsp);
+            WiFi_Bridge_Send(BRIDGE_CH_DAP, dap_wifi_rsp, DAP_PACKET_SIZE);
+            break;
+        }
         case BRIDGE_CH_WIFI_CTRL:
             /* WiFi control frames from CDC: forward to ESP32 via USART2,
                except ESP_RESET and ESP_BOOT which MCU handles locally. */

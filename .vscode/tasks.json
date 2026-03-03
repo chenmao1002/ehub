@@ -186,6 +186,60 @@
             "problemMatcher": [
                 "$gcc"
             ]
+        },
+        {
+            "label": "Flash WiFi DAP (OpenOCD TCP)",
+            "type": "shell",
+            "command": "F:/vscode/openstm32/xpack-openocd/xpack-openocd-0.12.0-4/bin/openocd.exe",
+            "args": [
+                "-s",
+                "F:/vscode/openstm32/xpack-openocd/xpack-openocd-0.12.0-4/openocd/scripts",
+                "-f",
+                "${workspaceFolder}/openocd_wifi_dap.cfg",
+                "-c",
+                "program ${workspaceFolder}/build/Debug/EHUB.hex verify reset exit"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "DAP TCP Test",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/tools/dap_tcp_test.py",
+                "--host",
+                "ehub.local",
+                "--port",
+                "6000"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Install elaphureLink to Keil",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/tools/elaphureLink/install_elaphurelink.ps1"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
         }
     ]
 }
