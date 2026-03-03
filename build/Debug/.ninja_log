@@ -78,3 +78,6 @@
 87	646	7942409783547363	CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj	8277c553e4b053d2
 12	518	7942433663743749	CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj	fb37ceee2b40bb22
 519	1175	7942433668808367	EHUB.elf	e0f7cd0deceba093
+22	484	7942457232201709	CMakeFiles/EHUB.dir/app/Src/wifi_bridge.c.obj	8277c553e4b053d2
+12	543	7942457232101618	CMakeFiles/EHUB.dir/app/Src/usb_app.c.obj	fb37ceee2b40bb22
+543	1213	7942457237407174	EHUB.elf	e0f7cd0deceba093

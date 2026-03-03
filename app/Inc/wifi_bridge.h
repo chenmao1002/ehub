@@ -95,8 +95,12 @@ void WiFi_Bridge_Task(void *argument);
 void WiFi_ESP_Reset(void);
 
 /**
- * @brief  Put ESP32 into bootloader mode:
- *         BOOT low → EN low 100 ms → EN high → delay → BOOT high
+ * @brief  Put ESP32 into bootloader mode AND release USART2 pins:
+ *         1. Stop USART2 DMA + HAL_UART_DeInit (PA2/PA3 → high-Z)
+ *         2. BOOT low → EN low 100 ms → EN high → BOOT high
+ *         After this call, an external programmer can flash ESP32 via
+ *         the shared USART2 lines (COM port).  MCU firmware re-flash
+ *         via OpenOCD will restore USART2 on next boot.
  */
 void WiFi_ESP_EnterBootloader(void);
 

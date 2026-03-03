@@ -4,7 +4,10 @@
  *
  * Two TCP servers:
  *   1. Port 6000 (DAP_TCP_PORT)     — OpenOCD cmsis-dap tcp protocol
- *      Send/Recv: [4-byte LE uint32 length][DAP data]
+ *      8-byte header: [4-byte signature "DAP\0" = 0x00504144 LE]
+ *                     [2-byte LE payload length]
+ *                     [1-byte type: 0x01=req, 0x02=rsp]
+ *                     [1-byte reserved = 0x00]
  *
  *   2. Port 3240 (ELAPHURELINK_PORT) — elaphureLink protocol
  *      Handshake: 12-byte packet starting with 0x8a 0x65 0x6c
@@ -68,12 +71,18 @@ private:
     // elaphureLink handshake state
     bool _elHandshakeDone;
 
-    // OpenOCD: state machine for 4-byte length prefix
-    enum ReadState { ST_LEN, ST_DATA };
+    // OpenOCD: state machine for 8-byte header
+    //   Header: [4B signature][2B LE length][1B type][1B reserved]
+    static constexpr uint32_t DAP_SIGNATURE = 0x00504144; // "DAP\0"
+    static constexpr uint8_t  DAP_TYPE_REQ  = 0x01;
+    static constexpr uint8_t  DAP_TYPE_RSP  = 0x02;
+    static constexpr uint8_t  HEADER_SIZE   = 8;
+
+    enum ReadState { ST_HDR, ST_DATA };
     ReadState _state;
-    uint8_t   _lenBuf[4];
-    uint8_t   _lenIdx;
-    uint32_t  _expectLen;
+    uint8_t   _hdrBuf[8];
+    uint8_t   _hdrIdx;
+    uint16_t  _expectLen;
     uint8_t   _cmdBuf[DAP_TCP_MAX_PACKET];
     uint16_t  _cmdIdx;
 

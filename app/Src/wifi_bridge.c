@@ -278,17 +278,28 @@ void WiFi_ESP_Reset(void)
 
 void WiFi_ESP_EnterBootloader(void)
 {
-    /* BOOT low  → ESP32 GPIO0 = 0  */
+    /* 1. Stop USART2 DMA and deinitialise — release PA2/PA3 to high-Z */
+    HAL_UART_DMAStop(&huart2);
+    HAL_UART_DeInit(&huart2);
+
+    /* 2. Configure PA2/PA3 as Input (floating) so external programmer can use them */
+    GPIO_InitTypeDef gi = {0};
+    gi.Pin  = GPIO_PIN_2 | GPIO_PIN_3;
+    gi.Mode = GPIO_MODE_INPUT;
+    gi.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &gi);
+
+    /* 3. BOOT low  → ESP32 GPIO0 = 0  */
     HAL_GPIO_WritePin(ESP_BOOT_GPIO_Port, ESP_BOOT_Pin, GPIO_PIN_RESET);
     osDelay(50);
 
-    /* Pulse EN low to reset */
+    /* 4. Pulse EN low to reset into bootloader */
     HAL_GPIO_WritePin(ESP_EN_GPIO_Port, ESP_EN_Pin, GPIO_PIN_RESET);
     osDelay(100);
     HAL_GPIO_WritePin(ESP_EN_GPIO_Port, ESP_EN_Pin, GPIO_PIN_SET);
-    osDelay(50);
+    osDelay(100);
 
-    /* Release BOOT */
+    /* 5. Release BOOT (keep USART2 disabled — PC can now flash ESP32) */
     HAL_GPIO_WritePin(ESP_BOOT_GPIO_Port, ESP_BOOT_Pin, GPIO_PIN_SET);
 }
 

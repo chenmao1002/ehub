@@ -240,6 +240,71 @@
                 "panel": "shared"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "ESP32 Download Mode",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/tools/esp32_download_mode.py",
+                "--port",
+                "COM19"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "ESP32 Build",
+            "type": "shell",
+            "command": "pio",
+            "args": [
+                "run"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/ESP32_wifi"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "ESP32 Upload",
+            "type": "shell",
+            "command": "pio",
+            "args": [
+                "run",
+                "-t",
+                "upload",
+                "--upload-port",
+                "COM18"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/ESP32_wifi"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": [],
+            "dependsOn": "ESP32 Download Mode"
+        },
+        {
+            "label": "ESP32 Flash + MCU Restore",
+            "dependsOn": [
+                "ESP32 Upload",
+                "Flash (OpenOCD)"
+            ],
+            "dependsOrder": "sequence",
+            "group": "build",
+            "problemMatcher": []
         }
     ]
 }

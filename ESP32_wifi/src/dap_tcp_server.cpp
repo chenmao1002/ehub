@@ -3,7 +3,8 @@
  * @brief   CMSIS-DAP over TCP — dual protocol server
  *
  * Two independent TCP servers:
- *   Port 6000: OpenOCD cmsis-dap tcp — [4-byte LE length][DAP data]
+ *   Port 6000: OpenOCD cmsis-dap tcp — 8-byte header protocol
+ *              [4B signature 0x00504144][2B LE length][1B type][1B reserved]
  *   Port 3240: elaphureLink — 12-byte handshake, then raw DAP data
  *
  * The ESP32 does NOT process DAP commands. It wraps them in Bridge protocol
@@ -19,16 +20,16 @@ DAPTCPServer::DAPTCPServer()
     , _protocol(DAP_PROTO_NONE)
     , _connected(false)
     , _elHandshakeDone(false)
-    , _state(ST_LEN)
-    , _lenIdx(0)
+    , _state(ST_HDR)
+    , _hdrIdx(0)
     , _expectLen(0)
     , _cmdIdx(0)
 {
 }
 
 void DAPTCPServer::resetParser() {
-    _state = ST_LEN;
-    _lenIdx = 0;
+    _state = ST_HDR;
+    _hdrIdx = 0;
     _expectLen = 0;
     _cmdIdx = 0;
     _elHandshakeDone = false;
@@ -108,22 +109,29 @@ IPAddress DAPTCPServer::clientIP() {
     return IPAddress(0, 0, 0, 0);
 }
 
-// ─── OpenOCD protocol: [4-byte LE length][data] ───
+// ─── OpenOCD protocol: 8-byte header [sig][len][type][rsv] + data ───
 bool DAPTCPServer::readOpenOCD(uint8_t* buf, uint16_t* len) {
     while (_client.available()) {
         uint8_t b = _client.read();
 
         switch (_state) {
-        case ST_LEN:
-            _lenBuf[_lenIdx++] = b;
-            if (_lenIdx >= 4) {
-                _expectLen = (uint32_t)_lenBuf[0]
-                           | ((uint32_t)_lenBuf[1] << 8)
-                           | ((uint32_t)_lenBuf[2] << 16)
-                           | ((uint32_t)_lenBuf[3] << 24);
+        case ST_HDR:
+            _hdrBuf[_hdrIdx++] = b;
+            if (_hdrIdx >= HEADER_SIZE) {
+                // Parse header
+                uint32_t sig = (uint32_t)_hdrBuf[0]
+                             | ((uint32_t)_hdrBuf[1] << 8)
+                             | ((uint32_t)_hdrBuf[2] << 16)
+                             | ((uint32_t)_hdrBuf[3] << 24);
+                _expectLen = (uint16_t)_hdrBuf[4]
+                           | ((uint16_t)_hdrBuf[5] << 8);
+                uint8_t pktType = _hdrBuf[6];
+                // _hdrBuf[7] = reserved
 
-                if (_expectLen == 0 || _expectLen > DAP_TCP_MAX_PACKET) {
-                    _lenIdx = 0;
+                if (sig != DAP_SIGNATURE || pktType != DAP_TYPE_REQ
+                    || _expectLen == 0 || _expectLen > DAP_TCP_MAX_PACKET) {
+                    // Invalid header — reset
+                    _hdrIdx = 0;
                     continue;
                 }
                 _cmdIdx = 0;
@@ -135,9 +143,9 @@ bool DAPTCPServer::readOpenOCD(uint8_t* buf, uint16_t* len) {
             _cmdBuf[_cmdIdx++] = b;
             if (_cmdIdx >= _expectLen) {
                 memcpy(buf, _cmdBuf, _expectLen);
-                *len = (uint16_t)_expectLen;
-                _state = ST_LEN;
-                _lenIdx = 0;
+                *len = _expectLen;
+                _state = ST_HDR;
+                _hdrIdx = 0;
                 return true;
             }
             break;
@@ -213,13 +221,18 @@ void DAPTCPServer::sendResponse(const uint8_t* buf, uint16_t len) {
     switch (_protocol) {
     case DAP_PROTO_OPENOCD:
     {
-        // OpenOCD: send 4-byte LE length header + data
-        uint8_t header[4];
-        header[0] = (uint8_t)(len & 0xFF);
-        header[1] = (uint8_t)((len >> 8) & 0xFF);
-        header[2] = 0;
-        header[3] = 0;
-        _client.write(header, 4);
+        // OpenOCD: send 8-byte header + data
+        // [4B signature][2B LE length][1B type=0x02][1B reserved=0x00]
+        uint8_t header[8];
+        header[0] = 0x44; // 'D'
+        header[1] = 0x41; // 'A'
+        header[2] = 0x50; // 'P'
+        header[3] = 0x00; // '\0'
+        header[4] = (uint8_t)(len & 0xFF);
+        header[5] = (uint8_t)((len >> 8) & 0xFF);
+        header[6] = DAP_TYPE_RSP; // 0x02
+        header[7] = 0x00;         // reserved
+        _client.write(header, 8);
         _client.write(buf, len);
         _client.flush();
         break;
