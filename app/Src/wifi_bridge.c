@@ -119,6 +119,23 @@ void WiFi_Bridge_Send(uint8_t ch, const uint8_t *data, uint16_t len)
 
     if (osMutexAcquire(s_wifi_tx_mutex, 60U) != osOK) { return; }
 
+    /* ── Wait for previous DMA transfer to finish BEFORE touching buffer ──
+     * Without this, a new caller can overwrite s_wifi_tx_buf while the
+     * DMA controller is still reading it, corrupting the on-wire frame
+     * and causing CRC failures on the ESP32 side.                        */
+    uint32_t t0 = HAL_GetTick();
+    while (HAL_UART_GetState(&huart2) & HAL_UART_STATE_BUSY_TX)
+    {
+        if ((HAL_GetTick() - t0) > 50U)
+        {
+            /* DMA stuck — abort it so we can proceed safely */
+            HAL_UART_AbortTransmit(&huart2);
+            break;
+        }
+        osDelay(1);
+    }
+
+    /* ── Now safe to fill the shared TX buffer ── */
     uint8_t crc = 0U;
     s_wifi_tx_buf[0] = BRIDGE_SOF0_RPY;            /* 0xBB */
     s_wifi_tx_buf[1] = BRIDGE_SOF1;                 /* 0x55 */
@@ -128,14 +145,6 @@ void WiFi_Bridge_Send(uint8_t ch, const uint8_t *data, uint16_t len)
     memcpy(&s_wifi_tx_buf[5], data, len);
     for (uint16_t i = 0U; i < len; i++) { crc ^= data[i]; }
     s_wifi_tx_buf[5U + len] = crc;
-
-    /* Wait for previous DMA transfer to finish (max 50 ms) */
-    uint32_t t0 = HAL_GetTick();
-    while (HAL_UART_GetState(&huart2) & HAL_UART_STATE_BUSY_TX)
-    {
-        if ((HAL_GetTick() - t0) > 50U) { break; }
-        osDelay(1);
-    }
 
     HAL_StatusTypeDef txrc = HAL_UART_Transmit_DMA(&huart2, s_wifi_tx_buf, (uint16_t)(6U + len));
     if (txrc == HAL_OK) { s_dbg_uart2_tx_ok++; }

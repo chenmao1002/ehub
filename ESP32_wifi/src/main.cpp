@@ -413,17 +413,20 @@ void loop() {
                 uint8_t uBuf[1024];
                 int n = uart.read(uBuf, sizeof(uBuf));
                 dbg_uartBytesRx += n;
+                // Process ALL bytes — never break early, to avoid leaving
+                // the frame parser in a partial state that causes subsequent
+                // frame loss.
                 for (int i = 0; i < n; i++) {
                     BridgeFrame frame;
                     if (uartParser.feed(uBuf[i], frame)) {
                         dbg_uartFramesRx++;
                         if (!frame.valid) continue;
-                        if (frame.ch == BRIDGE_CH_DAP) {
+                        if (frame.ch == BRIDGE_CH_DAP && !gotResponse) {
                             dbg_dapUartRx++;
                             dapServer.sendResponse(frame.data, frame.len);
                             dbg_dapTcpSend++;
                             gotResponse = true;
-                            break;
+                            // Do NOT break — keep parsing remaining bytes
                         } else if (frame.ch == BRIDGE_CH_WIFI_CTRL) {
                             handleWifiCtrlFromMCU(frame);
                         } else {
