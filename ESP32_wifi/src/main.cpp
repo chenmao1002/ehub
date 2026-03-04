@@ -141,11 +141,14 @@ void handleWifiCtrl(const BridgeFrame& frame) {
             // 16 bytes: lastBridgeTx
             memcpy(&reply[pos], dbg_lastBridgeTx, 16); pos += 16;
 
-            // GPIO state diagnostics (read raw pin levels)
-            // NOTE: avoid digitalRead on GPIO1/GPIO3 — they are UART0 pins
-            // and digitalRead might interfere with UART function on some ESP32 versions
-            reply[pos++] = 0xFF;  // GPIO1 placeholder (cannot safely read UART TX pin)
-            reply[pos++] = 0xFF;  // GPIO3 placeholder (cannot safely read UART RX pin)
+            // GPIO state diagnostics — read raw pin level via input register
+            // On ESP32, GPIO input register reflects actual pin level even in
+            // peripheral (UART) mode. Safe to read without disrupting UART.
+            {
+                uint32_t gpio_in = REG_READ(GPIO_IN_REG);
+                reply[pos++] = (gpio_in >> 1) & 1;  // GPIO1 (TX) actual level
+                reply[pos++] = (gpio_in >> 3) & 1;  // GPIO3 (RX) actual level
+            }
             // Serial.available() counter
             v = (uint32_t)Serial.available();
             memcpy(&reply[pos], &v, 4); pos += 4;
@@ -156,6 +159,43 @@ void handleWifiCtrl(const BridgeFrame& frame) {
             uint8_t txBuf[BRIDGE_MAX_DATA + 6];
             int txLen = buildFrame(txBuf, BRIDGE_SOF0_RPY, BRIDGE_CH_WIFI_CTRL,
                                    reply, pos);
+            tcpServer.write(txBuf, txLen);
+            break;
+        }
+        case 0xF4: { // GPIO3 PIN LEVEL TEST — stop UART, read pin, restart
+            // Temporarily release UART0 to read GPIO3 as plain digital input.
+            // This is the only reliable way since IO_MUX bypasses GPIO_IN_REG.
+            Serial.end();
+            delay(5);  // let UART hardware fully release
+
+            pinMode(3, INPUT);
+            delay(2);
+
+            // Read GPIO3 multiple times to get stable reading
+            uint8_t readings[10];
+            for (int i = 0; i < 10; i++) {
+                readings[i] = digitalRead(3);
+                delayMicroseconds(100);
+            }
+
+            // Also read GPIO1 (TX) for reference
+            // Don't change pinMode of GPIO1 - it's our debug output
+            uint8_t gpio1_level = digitalRead(1);
+
+            // Restart UART
+            Serial.setRxBufferSize(UART_RX_BUF_SIZE);
+            Serial.begin(UART_BAUDRATE);
+            delay(5);
+
+            // Build reply: [0xF4][gpio1][10 x gpio3_readings]
+            uint8_t reply[12];
+            reply[0] = 0xF4;
+            reply[1] = gpio1_level;
+            memcpy(&reply[2], readings, 10);
+
+            uint8_t txBuf[BRIDGE_MAX_DATA + 6];
+            int txLen = buildFrame(txBuf, BRIDGE_SOF0_RPY, BRIDGE_CH_WIFI_CTRL,
+                                   reply, 12);
             tcpServer.write(txBuf, txLen);
             break;
         }
@@ -400,16 +440,18 @@ void loop() {
             dbg_lastBridgeTxLen = txLen;
             memcpy(dbg_lastBridgeTx, txBuf, (txLen < 16) ? txLen : 16);
             
+            // --- Drain-then-retry strategy ---
+            // 1st attempt: send command, wait 500ms for response
+            // If timeout: drain UART 200ms (catch slow responses before retry)
+            // If still no response: resend (safe — no duplicate in flight)
+            // 2nd attempt: wait 2000ms
             uart.write(txBuf, txLen);
             dbg_dapUartTx++;
 
-            // Wait for and forward DAP response immediately (tight loop)
-            // This ensures the response is sent back to TCP before processing
-            // anything else, minimizing latency and preventing data loss.
-            unsigned long t0 = millis();
             bool gotResponse = false;
-            while (!gotResponse && (millis() - t0 < 2000)) {
-                // Read UART
+            // --- Phase 1: first attempt (500ms) ---
+            unsigned long t0 = millis();
+            while (!gotResponse && (millis() - t0 < 500)) {
                 uint8_t uBuf[1024];
                 int n = uart.read(uBuf, sizeof(uBuf));
                 dbg_uartBytesRx += n;
@@ -427,7 +469,6 @@ void loop() {
                         } else if (frame.ch == BRIDGE_CH_WIFI_CTRL) {
                             handleWifiCtrlFromMCU(frame);
                         } else {
-                            // Non-DAP response — forward to bridge TCP
                             uint8_t fwdBuf[BRIDGE_MAX_DATA + 6];
                             int fwdLen = buildFrame(fwdBuf, frame.sof0, frame.ch,
                                                     frame.data, frame.len);
@@ -435,12 +476,85 @@ void loop() {
                         }
                     }
                 }
-                if (!gotResponse) {
-                    yield(); // Let WiFi stack process
+                if (!gotResponse) delayMicroseconds(100);
+            }
+
+            // --- Phase 2: drain — catch slow response before retrying ---
+            if (!gotResponse) {
+                unsigned long drainEnd = millis() + 200;
+                while (!gotResponse && millis() < drainEnd) {
+                    uint8_t uBuf[512];
+                    int n = uart.read(uBuf, sizeof(uBuf));
+                    dbg_uartBytesRx += n;
+                    for (int i = 0; i < n; i++) {
+                        BridgeFrame frame;
+                        if (uartParser.feed(uBuf[i], frame)) {
+                            dbg_uartFramesRx++;
+                            if (!frame.valid) continue;
+                            if (frame.ch == BRIDGE_CH_DAP) {
+                                dbg_dapUartRx++;
+                                dapServer.sendResponse(frame.data, frame.len);
+                                dbg_dapTcpSend++;
+                                gotResponse = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!gotResponse) delayMicroseconds(500);
+                }
+            }
+
+            // --- Phase 3: retry — only if drain found nothing ---
+            if (!gotResponse) {
+                uart.write(txBuf, txLen);
+                dbg_dapUartTx++;
+
+                unsigned long t1 = millis();
+                while (!gotResponse && (millis() - t1 < 2000)) {
+                    uint8_t uBuf[1024];
+                    int n = uart.read(uBuf, sizeof(uBuf));
+                    dbg_uartBytesRx += n;
+                    for (int i = 0; i < n; i++) {
+                        BridgeFrame frame;
+                        if (uartParser.feed(uBuf[i], frame)) {
+                            dbg_uartFramesRx++;
+                            if (!frame.valid) continue;
+                            if (frame.ch == BRIDGE_CH_DAP) {
+                                dbg_dapUartRx++;
+                                dapServer.sendResponse(frame.data, frame.len);
+                                dbg_dapTcpSend++;
+                                gotResponse = true;
+                                break;
+                            } else if (frame.ch == BRIDGE_CH_WIFI_CTRL) {
+                                handleWifiCtrlFromMCU(frame);
+                            } else {
+                                uint8_t fwdBuf[BRIDGE_MAX_DATA + 6];
+                                int fwdLen = buildFrame(fwdBuf, frame.sof0, frame.ch,
+                                                        frame.data, frame.len);
+                                tcpServer.write(fwdBuf, fwdLen);
+                            }
+                        }
+                    }
+                    if (!gotResponse) delayMicroseconds(100);
                 }
             }
             if (!gotResponse) {
                 dbg_dapTimeout++;
+                // Send error response to keep TCP stream aligned
+                uint8_t errResp[4];
+                uint16_t errLen;
+                if (dapCmd[0] == 0x06) {
+                    errResp[0] = 0x06; errResp[1] = 0; errResp[2] = 0; errResp[3] = 0x07;
+                    errLen = 4;
+                } else if (dapCmd[0] == 0x05) {
+                    errResp[0] = 0x05; errResp[1] = 0; errResp[2] = 0x00;
+                    errLen = 3;
+                } else {
+                    errResp[0] = dapCmd[0]; errResp[1] = 0xFF;
+                    errLen = 2;
+                }
+                dapServer.sendResponse(errResp, errLen);
+                dbg_dapTcpSend++;
             }
         }
     }
@@ -477,8 +591,8 @@ void loop() {
             if (uartParser.feed(buf[i], frame)) {
                 if (!frame.valid) continue;
                 if (frame.ch == BRIDGE_CH_DAP) {
-                    // Stale DAP response (not matched above) — still forward it
-                    dapServer.sendResponse(frame.data, frame.len);
+                    // Stale DAP response — discard silently to avoid corrupting TCP stream
+                    // (can happen after retry sends duplicate command to MCU)
                 } else if (frame.ch == BRIDGE_CH_WIFI_CTRL) {
                     handleWifiCtrlFromMCU(frame);
                 } else {

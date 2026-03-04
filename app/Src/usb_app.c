@@ -19,6 +19,7 @@
 #include "usb_app.h"
 #include "wifi_bridge.h"
 #include "usbd_cdc_if.h"
+#include "usbd_customhid.h"
 #include "usbd_def.h"
 #include "usart.h"
 #include "main.h"
@@ -195,6 +196,17 @@ static void Bridge_Dispatch(const BridgeMsg_t *m)
                 WiFi_ESP_Reset();
             } else if (m->len >= 1U && m->buf[0] == WIFI_SUBCMD_ESP_BOOT) {
                 WiFi_ESP_EnterBootloader();
+            } else if (m->len >= 1U && m->buf[0] == WIFI_SUBCMD_ESP_PASSTHROUGH) {
+                /* Enter CDC↔USART2 transparent passthrough for flashing ESP32 */
+                uint8_t rpl[2] = {WIFI_SUBCMD_ESP_PASSTHROUGH, 0x00U};
+                Bridge_SendToCDC(BRIDGE_CH_WIFI_CTRL, rpl, 2U);
+                osDelay(50);  /* let CDC TX complete before switching mode */
+                /* Flush any stale bus-RX replies so they can't leak 0xBB later */
+                {
+                    BridgeMsg_t flush_msg;
+                    while (osMessageQueueGet(bridge_rx_queue, &flush_msg, NULL, 0U) == osOK) { /* discard */ }
+                }
+                WiFi_ESP_EnterPassthrough();
             } else if (m->len >= 1U && m->buf[0] == 0xF1U) {
                 /* MCU-side UART2 diagnostic — handle locally */
                 extern volatile uint32_t s_dbg_uart2_tx_ok;
@@ -320,6 +332,12 @@ static void Bridge_Dispatch(const BridgeMsg_t *m)
  */
 void CDC_Receive_FS(uint8_t *Buf, uint32_t Len)
 {
+    /* Passthrough mode: raw bytes → USART2 (no frame parsing) */
+    if (WiFi_Bridge_IsPassthrough()) {
+        WiFi_Passthrough_CDCRx(Buf, (uint16_t)Len);
+        return;
+    }
+
     for (uint32_t i = 0U; i < Len; i++)
     {
         uint8_t b = Buf[i];
@@ -386,6 +404,10 @@ void CDC_Receive_FS(uint8_t *Buf, uint32_t Len)
 
 void Bridge_SendToCDC(uint8_t ch, const uint8_t *data, uint16_t len)
 {
+    /* Block all CDC bridge frames during ESP32 passthrough —
+       any 0xBB-prefixed frame would corrupt the transparent stream. */
+    if (WiFi_Bridge_IsPassthrough()) { return; }
+
     /* Static TX buffer: SOF(2) + CH(1) + LEN(2) + DATA(≤128) + CRC(1) = 134 */
     static uint8_t tx_buf[BRIDGE_MAX_DATA + 6U];
 
@@ -432,6 +454,13 @@ void Bridge_Task(void *argument)
 
     for (;;)
     {
+        /* In passthrough mode, Bridge_Task idles — all CDC traffic
+           is handled by the transparent passthrough path. */
+        if (WiFi_Bridge_IsPassthrough()) {
+            osDelay(100);
+            continue;
+        }
+
         /* 1) Prefer one host command first, keeping command latency bounded */
         if (osMessageQueueGet(bridge_cmd_queue, &msg, NULL, 1U) == osOK)
         {
@@ -536,6 +565,14 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
     }
     else if (huart->Instance == USART2)
     {
+        /* Passthrough: forward raw UART data → CDC */
+        if (WiFi_Bridge_IsPassthrough()) {
+            uint8_t *rxbuf = WiFi_Bridge_GetRxBuf();
+            WiFi_Passthrough_UARTRx(rxbuf, Size);
+            HAL_UARTEx_ReceiveToIdle_DMA(&huart2, rxbuf, WIFI_RX_BUF_SIZE);
+            __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
+            return;
+        }
         /* WiFi bridge: copy raw data into ring buffer and re-arm DMA */
         if (WiFi_Bridge_IsBootloader()) return;  /* USART2 deinitialized */
         extern volatile uint32_t s_dbg_uart2_rx_event;
@@ -579,6 +616,16 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
     }
     else if (huart->Instance == USART2)
     {
+        /* Passthrough: clear errors and re-arm DMA */
+        if (WiFi_Bridge_IsPassthrough()) {
+            __HAL_UART_CLEAR_OREFLAG(&huart2);
+            __HAL_UART_CLEAR_NEFLAG(&huart2);
+            __HAL_UART_CLEAR_FEFLAG(&huart2);
+            uint8_t *rxbuf = WiFi_Bridge_GetRxBuf();
+            HAL_UARTEx_ReceiveToIdle_DMA(&huart2, rxbuf, WIFI_RX_BUF_SIZE);
+            __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
+            return;
+        }
         /* WiFi bridge USART2 — re-arm DMA into the WiFi RX buffer */
         if (WiFi_Bridge_IsBootloader()) return;  /* USART2 deinitialized */
         extern volatile uint32_t s_dbg_uart2_error;
@@ -628,5 +675,47 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
         /* Re-arm DMA idle receive */
         HAL_UARTEx_ReceiveToIdle_DMA(&huart3, usart3_rx_buf, UART_RX_BUF_SIZE);
         __HAL_DMA_DISABLE_IT(huart3.hdmarx, DMA_IT_HT);
+    }
+}
+
+/*===========================================================================
+ *  Section 6 – CDC control callbacks (called from USB ISR via
+ *              usbd_customhid.c SET_LINE_CODING / SET_CONTROL_LINE_STATE)
+ *===========================================================================*/
+
+/**
+ * Called when host sends SET_LINE_CODING (baud rate change).
+ * In passthrough mode, requests USART2 baud-rate update (deferred to task).
+ */
+void CDC_SetLineCoding_Callback(uint8_t *linecoding)
+{
+    uint32_t baud = (uint32_t)linecoding[0]
+                  | ((uint32_t)linecoding[1] <<  8U)
+                  | ((uint32_t)linecoding[2] << 16U)
+                  | ((uint32_t)linecoding[3] << 24U);
+    WiFi_Passthrough_SetBaud(baud);
+}
+
+/**
+ * Called when host sends SET_CONTROL_LINE_STATE (DTR/RTS).
+ * In passthrough mode, maps DTR→ESP32 BOOT, RTS→ESP32 EN.
+ */
+void CDC_SetControlLineState_Callback(uint16_t state)
+{
+    WiFi_Passthrough_SetLineState(state);
+}
+
+/**
+ * Re-arm CDC OUT endpoint after passthrough ring buffer has been drained.
+ * Called from WiFi_Passthrough_Process (task context).
+ */
+void WiFi_Passthrough_RearmCDC(void)
+{
+    extern USBD_HandleTypeDef hUsbDeviceFS;
+    USBD_CUSTOM_HID_ComposeHandleTypeDef *hhid =
+        (USBD_CUSTOM_HID_ComposeHandleTypeDef *)hUsbDeviceFS.pClassData;
+    if (hhid != NULL) {
+        USBD_LL_PrepareReceive(&hUsbDeviceFS, CDC_OUT_EP_ADDR,
+                               hhid->cdc_rx_buf, CDC_DATA_FS_MAX_PACKET_SIZE);
     }
 }

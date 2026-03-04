@@ -672,6 +672,8 @@ static uint8_t  USBD_CUSTOM_HID_Setup(USBD_HandleTypeDef *pdev,
 
         case 0x22: /* SET_CONTROL_LINE_STATE */
           hhid->control_line_state = (uint16_t)(req->wValue);
+          { extern void CDC_SetControlLineState_Callback(uint16_t state);
+            CDC_SetControlLineState_Callback(hhid->control_line_state); }
           break;
 
         default:
@@ -864,9 +866,19 @@ static uint8_t  USBD_CUSTOM_HID_DataOut(USBD_HandleTypeDef *pdev,
     extern void CDC_Receive_FS(uint8_t* Buf, uint32_t Len);
     CDC_Receive_FS(hhid->cdc_rx_buf, len);
 
-    /* Prepare to receive next packet */
-    USBD_LL_PrepareReceive(pdev, CDC_OUT_EP_ADDR, hhid->cdc_rx_buf,
-                           CDC_DATA_FS_MAX_PACKET_SIZE);
+    /* Passthrough flow control: if ring is nearly full, DON'T re-arm
+     * the OUT endpoint.  The task loop will re-arm when ring drains. */
+    extern uint8_t WiFi_Bridge_IsPassthrough(void);
+    extern uint8_t WiFi_Passthrough_C2URingNearlyFull(void);
+    extern void    WiFi_Passthrough_SetCDCPaused(void);
+    if (WiFi_Bridge_IsPassthrough() && WiFi_Passthrough_C2URingNearlyFull()) {
+        WiFi_Passthrough_SetCDCPaused();
+        /* Don't call PrepareReceive — endpoint will NAK host */
+    } else {
+        /* Prepare to receive next packet */
+        USBD_LL_PrepareReceive(pdev, CDC_OUT_EP_ADDR, hhid->cdc_rx_buf,
+                               CDC_DATA_FS_MAX_PACKET_SIZE);
+    }
   }
   else
   {
@@ -900,7 +912,8 @@ static uint8_t USBD_CUSTOM_HID_EP0_RxReady(USBD_HandleTypeDef *pdev)
   /* Handle SET_LINE_CODING reception */
   if (hhid->is_linecoding_set == 1U)
   {
-    /* application may apply new line coding now (not implemented) */
+    extern void CDC_SetLineCoding_Callback(uint8_t *linecoding);
+    CDC_SetLineCoding_Callback(hhid->linecoding);
     hhid->is_linecoding_set = 0U;
   }
 

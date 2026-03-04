@@ -1,97 +1,92 @@
-"""Wireshark-like TCP stream monitor — run this alongside OpenOCD to see what's happening"""
-import socket, select, struct, time, sys, threading
+"""TCP proxy: capture OpenOCD ←→ ESP32 DAP TCP traffic."""
+import socket, select, struct, sys
 
-HOST = "ehub.local"
-PORT = 6000
-SIGNATURE = 0x00504144
+LOCAL_PORT = 6001
+REMOTE_HOST = "192.168.227.100"
+REMOTE_PORT = 6000
+DAP_SIG = b'\x44\x41\x50\x00'
+
+CMD_NAMES = {
+    0x00:'Info', 0x01:'HostStatus', 0x02:'Connect', 0x03:'Disconnect',
+    0x04:'WriteAbort', 0x05:'Transfer', 0x06:'TransferBlock',
+    0x08:'TransferCfg', 0x10:'SWJ_Pins', 0x11:'SWJ_Clock',
+    0x12:'SWJ_Seq', 0x13:'SWD_Cfg',
+}
+
+def log_pkt(num, direction, data):
+    """Parse and log one TCP chunk."""
+    pos = 0
+    while pos + 8 <= len(data):
+        sig = data[pos:pos+4]
+        if sig != DAP_SIG:
+            print(f"  [{num}] {direction} BAD_SIG @ offset {pos}: {data[pos:pos+16].hex()}")
+            return
+        plen = struct.unpack_from('<H', data, pos+4)[0]
+        ptype = data[pos+6]
+        if pos + 8 + plen > len(data):
+            print(f"  [{num}] {direction} INCOMPLETE plen={plen} avail={len(data)-pos-8}")
+            return
+        payload = data[pos+8:pos+8+plen]
+        cmd = payload[0] if payload else 0xFF
+        name = CMD_NAMES.get(cmd, f'0x{cmd:02X}')
+        tstr = 'REQ' if ptype == 1 else 'RSP'
+
+        extra = ''
+        if cmd == 0x06:
+            if ptype == 1 and plen >= 5:
+                cnt = struct.unpack_from('<H', payload, 2)[0]
+                extra = f" count={cnt}"
+            elif ptype == 2 and plen >= 4:
+                cnt = struct.unpack_from('<H', payload, 1)[0]
+                st = payload[3]
+                extra = f" count={cnt} st=0x{st:02X} datalen={plen-4}"
+        elif cmd == 0x05:
+            if ptype == 1 and plen >= 3:
+                cnt = payload[2]
+                extra = f" count={cnt}"
+            elif ptype == 2 and plen >= 3:
+                cnt = payload[1]; st = payload[2]
+                extra = f" count={cnt} st=0x{st:02X}"
+
+        print(f"  [{num}] {direction} {tstr} {name:16s} len={plen}{extra}")
+        pos += 8 + plen
+        num += 1
+    return num
 
 def main():
-    # Create a proxy: PC connects to local:6001, we relay to ESP32:6000
-    # This lets us see all traffic in both directions
-    
-    proxy = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    proxy.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    proxy.bind(('0.0.0.0', 6001))
-    proxy.listen(1)
-    print(f"Proxy listening on port 6001. Configure OpenOCD to connect to localhost:6001")
-    print(f"Waiting for connection...")
-    
-    client, addr = proxy.accept()
-    print(f"Client connected from {addr}")
-    
-    # Connect to ESP32
-    remote = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    remote.settimeout(10)
-    remote.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-    print(f"Connecting to {HOST}:{PORT}...")
-    remote.connect((HOST, PORT))
-    print(f"Connected to ESP32!")
-    
-    client.setblocking(False)
-    remote.setblocking(False)
-    
-    cmd_count = 0
-    
-    while True:
-        readable, _, _ = select.select([client, remote], [], [], 1.0)
-        
-        for sock in readable:
-            if sock is client:
-                # Data from OpenOCD → ESP32
-                try:
-                    data = client.recv(4096)
-                    if not data:
-                        print("Client disconnected")
-                        return
-                    cmd_count += 1
-                    t = time.time()
-                    
-                    # Parse header
-                    if len(data) >= 8:
-                        sig, length, ptype = struct.unpack_from('<IHB', data)
-                        if sig == SIGNATURE:
-                            payload = data[8:8+length] if len(data) >= 8+length else data[8:]
-                            cmd_byte = payload[0] if payload else 0xFF
-                            cmd_name = {0x00: "DAP_Info", 0x02: "DAP_Connect", 0x03: "DAP_Disconnect",
-                                       0x04: "DAP_Write_ABORT", 0x05: "DAP_Transfer", 
-                                       0x06: "DAP_TransferBlock", 0x08: "DAP_TransferConfigure",
-                                       0x11: "DAP_SWJ_Clock", 0x12: "DAP_SWJ_Sequence",
-                                       0x13: "DAP_SWD_Configure", 0x17: "DAP_SWJ_Pins"}.get(cmd_byte, f"0x{cmd_byte:02X}")
-                            info_id = ""
-                            if cmd_byte == 0x00 and len(payload) >= 2:
-                                info_id = f"({payload[1]:02X})"
-                            print(f"[{t:.3f}] OCD→ESP #{cmd_count}: {cmd_name}{info_id} ({len(data)}B) payload={payload[:8].hex()}")
-                        else:
-                            print(f"[{t:.3f}] OCD→ESP #{cmd_count}: raw ({len(data)}B) {data[:20].hex()}")
-                    
-                    remote.sendall(data)
-                except ConnectionError:
-                    print("Client error")
-                    return
-                    
-            if sock is remote:
-                # Data from ESP32 → OpenOCD
-                try:
-                    data = remote.recv(4096)
-                    if not data:
-                        print("Remote disconnected")
-                        return
-                    t = time.time()
-                    
-                    if len(data) >= 8:
-                        sig, length, ptype = struct.unpack_from('<IHB', data)
-                        if sig == SIGNATURE:
-                            payload = data[8:8+length] if len(data) >= 8+length else data[8:]
-                            print(f"[{t:.3f}] ESP→OCD: rsp ({len(data)}B, payload={length}B) first_bytes={payload[:8].hex()}")
-                        else:
-                            print(f"[{t:.3f}] ESP→OCD: raw ({len(data)}B) {data[:20].hex()}")
-                    else:
-                        print(f"[{t:.3f}] ESP→OCD: partial ({len(data)}B) {data.hex()}")
-                    
-                    client.sendall(data)
-                except ConnectionError:
-                    print("Remote error")
-                    return
+    srv = socket.socket(); srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    srv.bind(('0.0.0.0', LOCAL_PORT)); srv.listen(1)
+    print(f"Proxy: :{LOCAL_PORT} → {REMOTE_HOST}:{REMOTE_PORT}")
+    cli, addr = srv.accept()
+    cli.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    print(f"Client: {addr}")
+    rem = socket.socket()
+    rem.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    rem.connect((REMOTE_HOST, REMOTE_PORT))
+    print("Connected to ESP32\n")
+    n = 0
+    try:
+        while True:
+            r, _, _ = select.select([cli, rem], [], [], 60)
+            if not r:
+                print("Timeout"); break
+            for s in r:
+                d = s.recv(8192)
+                if not d: raise SystemExit
+                if s is cli:
+                    nn = log_pkt(n, '>>>', d)
+                    if nn: n = nn
+                    else: n += 1
+                    rem.sendall(d)
+                else:
+                    nn = log_pkt(n, '<<<', d)
+                    if nn: n = nn
+                    else: n += 1
+                    cli.sendall(d)
+    except (KeyboardInterrupt, SystemExit):
+        pass
+    cli.close(); rem.close(); srv.close()
+    print(f"\nDone. {n} events.")
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

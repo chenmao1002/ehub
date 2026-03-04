@@ -428,7 +428,7 @@ COLOR_TS      = "#888888"
 MONO_FONT     = ("Consolas", 11)
 LABEL_FONT    = ("微软雅黑", 11)
 TITLE_FONT    = ("微软雅黑", 12, "bold")
-PROTO_LABELS  = ["USART", "RS485", "RS422", "SPI", "I2C", "CAN"]
+PROTO_LABELS  = ["USART", "RS485", "RS422", "SPI", "I2C", "CAN", "TCP", "UDP"]
 
 # ─── 主应用 ───────────────────────────────────────────────────────────────────
 class EHUBApp(ctk.CTk):
@@ -447,6 +447,12 @@ class EHUBApp(ctk.CTk):
         self._wifi_tick = 0
         self._wifi_scan_results: list[tuple[str, int]] = []
         self._last_ping_ok = 0.0
+        self._auto_send_enabled = False
+        self._auto_send_job = None
+        self._pc_tcp_sock: socket.socket | None = None
+        self._pc_tcp_peer: tuple[str, int] | None = None
+        self._extra_tx_count = 0
+        self._extra_rx_count = 0
         self._build_ui()
         self._refresh_ports()
         self._poll_log()
@@ -697,6 +703,15 @@ class EHUBApp(ctk.CTk):
                       fg_color=("#2563eb","#1d4ed8")).pack(side="left", padx=(0,6))
         ctk.CTkButton(btn_left, text="清除", width=72, fg_color=("gray70","#374151"),
                       command=lambda: self._send_entry.delete(0, "end")).pack(side="left")
+        self._auto_send_var = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(btn_left, text="自动发送", variable=self._auto_send_var,
+                        command=self._on_auto_send_toggle,
+                        font=LABEL_FONT, width=80).pack(side="left", padx=(10, 4))
+        ctk.CTkLabel(btn_left, text="周期(ms)：", font=LABEL_FONT).pack(side="left", padx=(2, 2))
+        self._auto_interval_var = ctk.StringVar(value="1000")
+        self._auto_interval_entry = ctk.CTkEntry(
+            btn_left, textvariable=self._auto_interval_var, width=70, font=MONO_FONT)
+        self._auto_interval_entry.pack(side="left", padx=(0, 0))
         self._append_newline = ctk.BooleanVar(value=False)
         ctk.CTkCheckBox(card, text="追加换行", variable=self._append_newline,
                         font=LABEL_FONT, width=40
@@ -745,6 +760,8 @@ class EHUBApp(ctk.CTk):
 
     # ── CONFIG 面板渲染 ────────────────────────────────────────────────────────
     def _select_proto(self, name: str):
+        if name != "TCP":
+            self._close_pc_tcp_socket()
         self._cur_proto = name
         for n, btn in self._proto_btns.items():
             btn.configure(
@@ -770,6 +787,8 @@ class EHUBApp(ctk.CTk):
             self._cfg_i2c()
         elif name == "CAN":
             self._cfg_can()
+        elif name in ("TCP", "UDP"):
+            self._cfg_tcp_udp(name)
 
         ctk.CTkButton(self._cfg_frame, text="应用配置", width=110,
                       fg_color=("#d97706","#b45309"),
@@ -860,6 +879,27 @@ class EHUBApp(ctk.CTk):
                   ctk.CTkEntry(self._cfg_frame, textvariable=id_var, width=110, font=MONO_FONT))
         self._cfg_widgets.update(can_baud=baud_var, can_ide=ide_var, can_id=id_var)
 
+    def _cfg_tcp_udp(self, name: str):
+        host_var = ctk.StringVar(value="127.0.0.1")
+        port_var = ctk.StringVar(value="9000" if name == "TCP" else "9001")
+        local_port_var = ctk.StringVar(value="0")
+        timeout_var = ctk.StringVar(value="0.2")
+
+        self._row("目标地址：", 1,
+                  ctk.CTkEntry(self._cfg_frame, textvariable=host_var, width=220, font=MONO_FONT))
+        self._row("目标端口：", 2,
+                  ctk.CTkEntry(self._cfg_frame, textvariable=port_var, width=120, font=MONO_FONT))
+        if name == "UDP":
+            self._row("本地端口(0随机)：", 3,
+                      ctk.CTkEntry(self._cfg_frame, textvariable=local_port_var, width=120, font=MONO_FONT))
+        self._row("接收超时(秒)：", 4,
+                  ctk.CTkEntry(self._cfg_frame, textvariable=timeout_var, width=120, font=MONO_FONT))
+
+        self._cfg_widgets["net_host"] = host_var
+        self._cfg_widgets["net_port"] = port_var
+        self._cfg_widgets["net_local_port"] = local_port_var
+        self._cfg_widgets["net_timeout"] = timeout_var
+
     # ── Apply Config ──────────────────────────────────────────────────────────
     def _apply_config(self):
         if not self._serial.connected:
@@ -903,15 +943,43 @@ class EHUBApp(ctk.CTk):
         self._update_stats()
 
     # ── Send ──────────────────────────────────────────────────────────────────
-    def _do_send(self):
-        if not self._serial.connected:
-            self._log_append("⚠ 设备未连接", "err"); return
+    def _do_send(self, silent: bool = False) -> bool:
+        name = self._cur_proto
+        if name not in ("TCP", "UDP") and not self._serial.connected:
+            if not silent:
+                self._log_append("⚠ 设备未连接", "err")
+            return False
 
         raw = self._send_entry.get()
-        if not raw.strip(): return
+        if not raw.strip():
+            return False
 
         mode = self._send_mode.get()
-        name = self._cur_proto
+
+        if name in ("TCP", "UDP"):
+            try:
+                payload = self._parse_input(raw, mode)
+                if self._append_newline.get() and mode == "text":
+                    payload += b"\r\n"
+                recv_data = self._send_pc_socket(name, payload)
+                hex_str = " ".join(f"{b:02X}" for b in payload)
+                self._log_append(f"→ [{name}]  {hex_str}", "send")
+                if recv_data:
+                    recv_hex = " ".join(f"{b:02X}" for b in recv_data)
+                    try:
+                        recv_txt = recv_data.decode("utf-8", errors="replace").replace("\r", "").replace("\n", "↵")
+                    except Exception:
+                        recv_txt = ""
+                    line = f"← [{name}]  {recv_hex}"
+                    if recv_txt and recv_txt.isprintable():
+                        line += '    “' + recv_txt + '”'
+                    self._log_append(line, "recv")
+            except Exception as e:
+                if not silent:
+                    self._log_append(f"⚠ {name} 发送失败: {e}", "err")
+                return False
+            self._update_stats()
+            return True
 
         try:
             # build payload
@@ -925,7 +993,9 @@ class EHUBApp(ctk.CTk):
                     payload += b"\r\n"
                 ch_key  = name    # USART / RS485 / RS422 / SPI
         except Exception as e:
-            self._log_append(f"⚠ Input error: {e}", "err"); return
+            if not silent:
+                self._log_append(f"⚠ Input error: {e}", "err")
+            return False
 
         if name not in ("CAN", "I2C"):
             ch_key = name
@@ -941,6 +1011,118 @@ class EHUBApp(ctk.CTk):
         hex_str = " ".join(f"{b:02X}" for b in (frame[5:-1] if len(frame) > 6 else frame))
         self._log_append(f"→ [{ch_key}]  {hex_str}", "send")
         self._update_stats()
+        return True
+
+    def _send_pc_socket(self, proto: str, payload: bytes) -> bytes:
+        host = self._cfg_widgets.get("net_host", ctk.StringVar(value="127.0.0.1")).get().strip() or "127.0.0.1"
+        port_s = self._cfg_widgets.get("net_port", ctk.StringVar(value="9000")).get().strip()
+        timeout_s = self._cfg_widgets.get("net_timeout", ctk.StringVar(value="0.2")).get().strip() or "0.2"
+        local_port_s = self._cfg_widgets.get("net_local_port", ctk.StringVar(value="0")).get().strip() or "0"
+
+        port = int(port_s)
+        if port <= 0 or port > 65535:
+            raise ValueError("端口范围应为 1~65535")
+        timeout = max(0.05, float(timeout_s))
+
+        if proto == "TCP":
+            sock = self._ensure_pc_tcp_socket(host, port, timeout)
+            sock.sendall(payload)
+            self._extra_tx_count += len(payload)
+            sock.settimeout(timeout)
+            try:
+                data = sock.recv(2048)
+            except socket.timeout:
+                data = b""
+            self._extra_rx_count += len(data)
+            return data
+
+        # UDP
+        local_port = int(local_port_s)
+        if local_port < 0 or local_port > 65535:
+            raise ValueError("本地端口范围应为 0~65535")
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.settimeout(timeout)
+            if local_port > 0:
+                sock.bind(("0.0.0.0", local_port))
+            sock.sendto(payload, (host, port))
+            self._extra_tx_count += len(payload)
+            try:
+                data, _ = sock.recvfrom(2048)
+            except socket.timeout:
+                data = b""
+            self._extra_rx_count += len(data)
+            return data
+
+    def _ensure_pc_tcp_socket(self, host: str, port: int, timeout: float) -> socket.socket:
+        peer = (host, port)
+        if self._pc_tcp_sock is not None and self._pc_tcp_peer == peer:
+            return self._pc_tcp_sock
+        self._close_pc_tcp_socket()
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(timeout)
+        sock.connect(peer)
+        self._pc_tcp_sock = sock
+        self._pc_tcp_peer = peer
+        return sock
+
+    def _close_pc_tcp_socket(self):
+        if self._pc_tcp_sock is not None:
+            try:
+                self._pc_tcp_sock.close()
+            except Exception:
+                pass
+        self._pc_tcp_sock = None
+        self._pc_tcp_peer = None
+
+    def _on_auto_send_toggle(self):
+        if not self._auto_send_var.get():
+            self._stop_auto_send("ℹ 自动发送已停止")
+            return
+        try:
+            interval_ms = int(self._auto_interval_var.get().strip())
+            if interval_ms < 20:
+                raise ValueError
+        except Exception:
+            self._log_append("⚠ 自动发送周期无效（最小 20ms）", "err")
+            self._auto_send_var.set(False)
+            return
+        if not self._send_entry.get().strip():
+            self._log_append("⚠ 请先输入发送内容", "err")
+            self._auto_send_var.set(False)
+            return
+        self._auto_send_enabled = True
+        self._log_append(f"ℹ 自动发送已启动，周期 {interval_ms} ms", "config")
+        self._schedule_auto_send()
+
+    def _schedule_auto_send(self):
+        if not self._auto_send_enabled:
+            return
+        try:
+            interval_ms = max(20, int(self._auto_interval_var.get().strip()))
+        except Exception:
+            interval_ms = 1000
+        self._auto_send_job = self.after(interval_ms, self._auto_send_tick)
+
+    def _auto_send_tick(self):
+        if not self._auto_send_enabled:
+            return
+        ok = self._do_send(silent=True)
+        if not ok and self._cur_proto not in ("TCP", "UDP"):
+            self._stop_auto_send("⚠ 自动发送已停止：设备未连接或参数错误")
+            return
+        self._schedule_auto_send()
+
+    def _stop_auto_send(self, log_text: str | None = None):
+        self._auto_send_enabled = False
+        if self._auto_send_job is not None:
+            try:
+                self.after_cancel(self._auto_send_job)
+            except Exception:
+                pass
+        self._auto_send_job = None
+        self._auto_send_var.set(False)
+        if log_text:
+            self._log_append(log_text, "config")
 
     def _parse_input(self, raw: str, mode: str) -> bytes:
         if mode == "hex":
@@ -1177,6 +1359,7 @@ class EHUBApp(ctk.CTk):
         if self._serial.connected:
             self._auto_connect = False   # 手动断开 → 禁止自动重连
             self._serial.disconnect()
+            self._close_pc_tcp_socket()
             self._conn_btn.configure(text="  连接",
                                       fg_color=("#16a34a","#15803d"),
                                       hover_color=("#15803d","#166534"))
@@ -1333,8 +1516,10 @@ class EHUBApp(ctk.CTk):
             self._stat_tip.configure(text="未找到 EHUB 设备  |  可手动选择串口后点击连接")
 
     def _update_stats(self):
-        self._stat_tx.configure(text=f"发送:  {self._serial.tx_count} B")
-        self._stat_rx.configure(text=f"接收:  {self._serial.rx_count} B")
+        tx_total = self._serial.tx_count + self._extra_tx_count
+        rx_total = self._serial.rx_count + self._extra_rx_count
+        self._stat_tx.configure(text=f"发送:  {tx_total} B")
+        self._stat_rx.configure(text=f"接收:  {rx_total} B")
         self._stat_err.configure(text=f"错误: {self._errors}")
 
     def _hotplug_watch(self):

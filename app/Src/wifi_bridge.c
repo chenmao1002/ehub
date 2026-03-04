@@ -17,6 +17,8 @@
 
 #include "wifi_bridge.h"
 #include "usb_app.h"
+#include "usbd_cdc_if.h"
+#include "usbd_def.h"
 #include "usart.h"
 #include "main.h"
 #include "cmsis_os.h"
@@ -64,6 +66,19 @@ static inline int ring_get(uint8_t *b)
 
 /* ---- Bootloader mode flag: when set, USART2 is deinitialized ----------- */
 static volatile uint8_t s_esp_in_bootloader = 0U;
+
+/* ---- Passthrough mode (CDC ↔ USART2 transparent for ESP32 flashing) ---- */
+static volatile uint8_t  s_passthrough_mode = 0U;
+static volatile uint32_t s_pt_new_baud = 0U;   /* deferred baud rate change */
+
+#define PT_RING_SIZE  2048U
+static volatile uint8_t  pt_c2u_ring[PT_RING_SIZE]; /* CDC → UART */
+static volatile uint16_t pt_c2u_head = 0U;
+static volatile uint16_t pt_c2u_tail = 0U;
+static volatile uint8_t  pt_u2c_ring[PT_RING_SIZE]; /* UART → CDC */
+static volatile uint16_t pt_u2c_head = 0U;
+static volatile uint16_t pt_u2c_tail = 0U;
+static volatile uint8_t  pt_cdc_rx_paused = 0U; /* USB CDC OUT endpoint paused */
 
 /* ---- TX buffer & mutex (shared by multiple callers of Send) ------------- */
 static uint8_t  s_wifi_tx_buf[BRIDGE_MAX_DATA + 6U];
@@ -117,7 +132,7 @@ void WiFi_Bridge_Send(uint8_t ch, const uint8_t *data, uint16_t len)
     if (s_esp_in_bootloader) { return; }  /* USART2 deinitialized */
     if (len == 0U || len > BRIDGE_MAX_DATA) { return; }
 
-    if (osMutexAcquire(s_wifi_tx_mutex, 60U) != osOK) { return; }
+    if (osMutexAcquire(s_wifi_tx_mutex, 200U) != osOK) { return; }
 
     uint8_t crc = 0U;
     s_wifi_tx_buf[0] = BRIDGE_SOF0_RPY;            /* 0xBB */
@@ -129,11 +144,12 @@ void WiFi_Bridge_Send(uint8_t ch, const uint8_t *data, uint16_t len)
     for (uint16_t i = 0U; i < len; i++) { crc ^= data[i]; }
     s_wifi_tx_buf[5U + len] = crc;
 
-    /* Wait for previous DMA transfer to finish (max 50 ms) */
+    /* Wait for previous DMA transfer to finish (max 100 ms — 512-byte
+     * frames at 2 Mbaud take ~2.6 ms, but contention can add delay) */
     uint32_t t0 = HAL_GetTick();
     while (HAL_UART_GetState(&huart2) & HAL_UART_STATE_BUSY_TX)
     {
-        if ((HAL_GetTick() - t0) > 50U) { break; }
+        if ((HAL_GetTick() - t0) > 100U) { break; }
         osDelay(1);
     }
 
@@ -213,6 +229,133 @@ static int wifi_parse_byte(uint8_t b)
     return 0;
 }
 
+/*===========================================================================
+ *  Passthrough — CDC ↔ USART2 transparent bridge for ESP32 flashing
+ *===========================================================================*/
+
+void WiFi_Passthrough_CDCRx(const uint8_t *data, uint16_t len)
+{
+    for (uint16_t i = 0U; i < len; i++) {
+        uint16_t next = (pt_c2u_head + 1U) % PT_RING_SIZE;
+        if (next == pt_c2u_tail) {
+            /* Ring full — drop remaining bytes.
+             * USB endpoint is already paused by DataOut handler.
+             * Data loss shouldn't happen if flow control works. */
+            break;
+        }
+        pt_c2u_ring[pt_c2u_head] = data[i];
+        pt_c2u_head = next;
+    }
+}
+
+void WiFi_Passthrough_UARTRx(const uint8_t *data, uint16_t len)
+{
+    for (uint16_t i = 0U; i < len; i++) {
+        uint16_t next = (pt_u2c_head + 1U) % PT_RING_SIZE;
+        if (next != pt_u2c_tail) {
+            pt_u2c_ring[pt_u2c_head] = data[i];
+            pt_u2c_head = next;
+        }
+    }
+}
+
+void WiFi_Passthrough_SetBaud(uint32_t baud)
+{
+    if (!s_passthrough_mode || baud == 0U) { return; }
+    s_pt_new_baud = baud;   /* picked up in passthrough task loop */
+}
+
+void WiFi_Passthrough_SetLineState(uint16_t state)
+{
+    if (!s_passthrough_mode) { return; }
+    /* NodeMCU auto-reset mapping (inverted by transistors on dev boards):
+     * DTR asserted (1) → BOOT/GPIO0 LOW (bootloader)
+     * RTS asserted (1) → EN LOW (reset)                */
+    uint8_t dtr = (state & 0x01U) ? 1U : 0U;
+    uint8_t rts = (state & 0x02U) ? 1U : 0U;
+    HAL_GPIO_WritePin(ESP_BOOT_GPIO_Port, ESP_BOOT_Pin,
+                      dtr ? GPIO_PIN_RESET : GPIO_PIN_SET);
+    HAL_GPIO_WritePin(ESP_EN_GPIO_Port, ESP_EN_Pin,
+                      rts ? GPIO_PIN_RESET : GPIO_PIN_SET);
+}
+
+uint8_t WiFi_Passthrough_C2URingNearlyFull(void)
+{
+    uint16_t used = (pt_c2u_head >= pt_c2u_tail)
+        ? (pt_c2u_head - pt_c2u_tail)
+        : (PT_RING_SIZE - pt_c2u_tail + pt_c2u_head);
+    return (used > (PT_RING_SIZE * 3U / 4U)) ? 1U : 0U;
+}
+
+void WiFi_Passthrough_SetCDCPaused(void)
+{
+    pt_cdc_rx_paused = 1U;
+}
+
+/** Process one iteration of the passthrough loop (called from task). */
+static void WiFi_Passthrough_Process(void)
+{
+    /* ---- Deferred baud-rate change (requested from USB ISR) ---- */
+    if (s_pt_new_baud) {
+        uint32_t nb = s_pt_new_baud;
+        s_pt_new_baud = 0U;
+        HAL_UART_DMAStop(&huart2);
+        HAL_UART_DeInit(&huart2);
+        huart2.Init.BaudRate     = nb;
+        huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+        HAL_UART_Init(&huart2);
+        __HAL_UART_CLEAR_OREFLAG(&huart2);
+        (void)huart2.Instance->DR;
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart2, s_wifi_rx_buf, WIFI_RX_BUF_SIZE);
+        __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
+    }
+
+    /* ---- CDC → UART: drain ring, blocking TX ---- */
+    uint8_t tx_chunk[64];
+    uint16_t tn = 0U;
+    while (tn < sizeof(tx_chunk) && pt_c2u_head != pt_c2u_tail) {
+        tx_chunk[tn++] = pt_c2u_ring[pt_c2u_tail];
+        pt_c2u_tail = (pt_c2u_tail + 1U) % PT_RING_SIZE;
+    }
+    if (tn > 0U) {
+        HAL_UART_Transmit(&huart2, tx_chunk, tn, 100U);
+    }
+
+    /* ---- If CDC OUT endpoint was paused (ring was full), re-arm it ---- */
+    if (pt_cdc_rx_paused) {
+        uint16_t used = (pt_c2u_head >= pt_c2u_tail)
+            ? (pt_c2u_head - pt_c2u_tail)
+            : (PT_RING_SIZE - pt_c2u_tail + pt_c2u_head);
+        if (used < PT_RING_SIZE / 2) {
+            /* Enough space now — re-arm USB CDC OUT endpoint */
+            extern void WiFi_Passthrough_RearmCDC(void);
+            WiFi_Passthrough_RearmCDC();
+            pt_cdc_rx_paused = 0U;
+        }
+    }
+
+    /* ---- UART → CDC: drain ring, send via USB ---- */
+    static uint8_t  cdc_chunk[64];
+    static uint16_t cdc_pending = 0U;
+    if (cdc_pending > 0U) {
+        /* Retry previous unsent chunk */
+        if (CDC_Transmit_FS(cdc_chunk, cdc_pending) != USBD_BUSY) {
+            cdc_pending = 0U;
+        }
+    } else {
+        uint16_t cn = 0U;
+        while (cn < sizeof(cdc_chunk) && pt_u2c_head != pt_u2c_tail) {
+            cdc_chunk[cn++] = pt_u2c_ring[pt_u2c_tail];
+            pt_u2c_tail = (pt_u2c_tail + 1U) % PT_RING_SIZE;
+        }
+        if (cn > 0U) {
+            if (CDC_Transmit_FS(cdc_chunk, cn) == USBD_BUSY) {
+                cdc_pending = cn;
+            }
+        }
+    }
+}
+
 void WiFi_Bridge_Task(void *argument)
 {
     (void)argument;
@@ -220,6 +363,13 @@ void WiFi_Bridge_Task(void *argument)
 
     for (;;)
     {
+        /* ---- Passthrough mode: bypass frame parser ---- */
+        if (s_passthrough_mode) {
+            WiFi_Passthrough_Process();
+            osDelay(1);
+            continue;
+        }
+
         /* Drain ring buffer — process up to 1024 bytes per iteration */
         uint16_t budget = 1024U;
         while (budget-- > 0U && ring_get(&byte))
@@ -349,6 +499,55 @@ uint8_t WiFi_Bridge_IsBootloader(void)
     return s_esp_in_bootloader;
 }
 
+uint8_t WiFi_Bridge_IsPassthrough(void)
+{
+    return s_passthrough_mode;
+}
+
+void WiFi_ESP_EnterPassthrough(void)
+{
+    /* 1. Block normal bridge operations immediately */
+    s_esp_in_bootloader = 1U;
+
+    /* 2. Stop USART2 */
+    HAL_UART_DMAStop(&huart2);
+    HAL_UART_DeInit(&huart2);
+
+    /* 3. ESP32 bootloader entry: BOOT=LOW → EN pulse → release BOOT */
+    HAL_GPIO_WritePin(ESP_BOOT_GPIO_Port, ESP_BOOT_Pin, GPIO_PIN_RESET);
+    osDelay(50);
+    HAL_GPIO_WritePin(ESP_EN_GPIO_Port, ESP_EN_Pin, GPIO_PIN_RESET);
+    osDelay(100);
+    HAL_GPIO_WritePin(ESP_EN_GPIO_Port, ESP_EN_Pin, GPIO_PIN_SET);
+    osDelay(50);
+    HAL_GPIO_WritePin(ESP_BOOT_GPIO_Port, ESP_BOOT_Pin, GPIO_PIN_SET);
+    osDelay(50);
+
+    /* 4. Reinit USART2 at 115200 baud (esptool default sync speed) */
+    huart2.Init.BaudRate     = 115200U;
+    huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+    HAL_UART_Init(&huart2);
+
+    /* 5. Clear errors and stale data */
+    __HAL_UART_CLEAR_OREFLAG(&huart2);
+    __HAL_UART_CLEAR_NEFLAG(&huart2);
+    __HAL_UART_CLEAR_FEFLAG(&huart2);
+    (void)huart2.Instance->DR;
+
+    /* 6. Start DMA+IDLE receive */
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart2, s_wifi_rx_buf, WIFI_RX_BUF_SIZE);
+    __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
+
+    /* 7. Reset passthrough ring buffers */
+    pt_c2u_head = pt_c2u_tail = 0U;
+    pt_u2c_head = pt_u2c_tail = 0U;
+    s_pt_new_baud = 0U;
+    pt_cdc_rx_paused = 0U;
+
+    /* 8. Enable passthrough (LAST — task loop will pick this up) */
+    s_passthrough_mode = 1U;
+}
+
 /*===========================================================================
  *  Section 6 — Initialisation
  *===========================================================================*/
@@ -362,9 +561,9 @@ static const osThreadAttr_t wifi_task_attrs = {
 void WiFi_Bridge_Init(void)
 {
     /* 1. Reconfigure USART2 to 1 Mbaud.
-     *    PCLK1 = 30 MHz  →  OVER16: USARTDIV = 30 MHz / (16 × 1 MHz) = 1.875
-     *                        BRR = 0x1E  →  mantissa 1, fraction 14  →  valid.
-     *    16 samples per bit gives better noise rejection than OVER8. */
+     *    PCLK1 = 30 MHz  \u2192  OVER16: USARTDIV = 30 MHz / (16 \u00d7 1 MHz) = 1.875
+     *                        BRR = 0x1E  \u2192  mantissa 1, fraction 14 \u2192 valid.
+     *    1 Mbaud with OVER16 gives better noise margin than 2 Mbaud OVER8. */
     HAL_UART_DMAStop(&huart2);
     HAL_UART_DeInit(&huart2);
     huart2.Init.BaudRate     = WIFI_UART_BAUDRATE;          /* 1000000 */
