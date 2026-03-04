@@ -42,9 +42,32 @@ static volatile uint16_t USB_ResponseCountI;
 static volatile uint16_t USB_ResponseCountO;
 
 static volatile uint8_t  USB_ResponseIdle;
+static osMutexId_t       s_dapExecMutex;
+static const osMutexAttr_t s_dapExecMutexAttr = {
+    .name = "dapExecMutex"
+};
 
 static uint8_t USB_Request [DAP_PACKET_COUNT][DAP_PACKET_SIZE];
 static uint8_t USB_Response[DAP_PACKET_COUNT][DAP_PACKET_SIZE];
+
+uint32_t DAP_ExecuteCommandLocked(const uint8_t *request, uint8_t *response, uint16_t packet_size_report)
+{
+    if (s_dapExecMutex == NULL) {
+        s_dapExecMutex = osMutexNew(&s_dapExecMutexAttr);
+    }
+
+    if (s_dapExecMutex != NULL) {
+        osMutexAcquire(s_dapExecMutex, osWaitForever);
+    }
+
+    DAP_SetPacketSizeReport(packet_size_report);
+    uint32_t ret = DAP_ExecuteCommand(request, response);
+
+    if (s_dapExecMutex != NULL) {
+        osMutexRelease(s_dapExecMutex);
+    }
+    return ret;
+}
 
 /*===========================================================================
  * USB HID 回调 — 由 USB 中断上下文调用
@@ -107,6 +130,9 @@ void USBD_HID0_Initialize(void)
     USB_ResponseIndexI = 0U;  USB_ResponseIndexO = 0U;
     USB_ResponseCountI = 0U;  USB_ResponseCountO = 0U;
     USB_ResponseIdle   = 1U;
+    if (s_dapExecMutex == NULL) {
+        s_dapExecMutex = osMutexNew(&s_dapExecMutexAttr);
+    }
 }
 
 void USBD_InEvent(void)
@@ -148,8 +174,9 @@ void StartDAPTask(void *argument)
                 if (n == USB_RequestIndexI) { break; }
             }
 
-            DAP_ExecuteCommand(USB_Request[USB_RequestIndexO],
-                               USB_Response[USB_ResponseIndexI]);
+            DAP_ExecuteCommandLocked(USB_Request[USB_RequestIndexO],
+                                     USB_Response[USB_ResponseIndexI],
+                                     DAP_USB_PACKET_SIZE);
 
             USB_RequestIndexO++;
             if (USB_RequestIndexO == DAP_PACKET_COUNT) { USB_RequestIndexO = 0U; }

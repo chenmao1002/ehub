@@ -110,13 +110,16 @@
             "label": "Flash (OpenOCD)",
             "type": "shell",
             "command": "F:/vscode/openstm32/xpack-openocd/xpack-openocd-0.12.0-4/bin/openocd.exe",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "args": [
                 "-s",
                 "F:/vscode/openstm32/xpack-openocd/xpack-openocd-0.12.0-4/openocd/scripts",
                 "-f",
                 "${workspaceFolder}/openocd.cfg",
                 "-c",
-                "program ${workspaceFolder}/build/Debug/EHUB.hex verify reset exit"
+                "program build/Debug/EHUB.hex verify reset exit"
             ],
             "group": "build",
             "presentation": {
@@ -191,13 +194,16 @@
             "label": "Flash WiFi DAP (OpenOCD TCP)",
             "type": "shell",
             "command": "F:/vscode/openstm32/xpack-openocd/xpack-openocd-0.12.0-4/bin/openocd.exe",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "args": [
                 "-s",
                 "F:/vscode/openstm32/xpack-openocd/xpack-openocd-0.12.0-4/openocd/scripts",
                 "-f",
                 "${workspaceFolder}/openocd_wifi_dap.cfg",
                 "-c",
-                "program ${workspaceFolder}/build/Debug/EHUB.hex verify reset exit"
+                "program build/Debug/EHUB.hex verify reset exit"
             ],
             "group": "build",
             "presentation": {

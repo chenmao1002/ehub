@@ -26,6 +26,7 @@
 #include "cmsis_os.h"
 #include "DAP.h"
 #include "DAP_config.h"
+#include "dap_app.h"
 #include <string.h>
 
 /* ---- External bus-send functions (implemented in their own .c files) ----- */
@@ -179,7 +180,7 @@ static void Bridge_Dispatch(const BridgeMsg_t *m)
                 break;
             }
 
-            uint32_t rsp_len = DAP_ExecuteCommand(dap_wifi_req, dap_wifi_rsp);
+            uint32_t rsp_len = DAP_ExecuteCommandLocked(dap_wifi_req, dap_wifi_rsp, DAP_PACKET_SIZE);
             /* DAP_ExecuteCommand returns (request_count << 16) | response_size.
              * Extract lower 16 bits for the actual response length. */
             uint16_t send_len = (uint16_t)(rsp_len & 0xFFFFU);

@@ -55,6 +55,16 @@
 
          DAP_Data_t DAP_Data;           // DAP Data
 volatile uint8_t    DAP_TransferAbort;  // Transfer Abort Flag
+static uint16_t     DAP_PacketSizeReport = DAP_PACKET_SIZE;
+
+void DAP_SetPacketSizeReport(uint16_t packet_size) {
+  if (packet_size < 64U) {
+    packet_size = 64U;
+  } else if (packet_size > DAP_PACKET_SIZE) {
+    packet_size = DAP_PACKET_SIZE;
+  }
+  DAP_PacketSizeReport = packet_size;
+}
 
 
 static const char DAP_FW_Ver [] = DAP_FW_VER;
@@ -127,8 +137,8 @@ static uint8_t DAP_Info(uint8_t id, uint8_t *info) {
 #endif
       break;
     case DAP_ID_PACKET_SIZE:
-      info[0] = (uint8_t)(DAP_PACKET_SIZE >> 0);
-      info[1] = (uint8_t)(DAP_PACKET_SIZE >> 8);
+      info[0] = (uint8_t)(DAP_PacketSizeReport >> 0);
+      info[1] = (uint8_t)(DAP_PacketSizeReport >> 8);
       length = 2U;
       break;
     case DAP_ID_PACKET_COUNT:

@@ -272,6 +272,7 @@ extern uint32_t Manchester_SWO_GetCount (void);
 extern uint32_t DAP_ProcessVendorCommand (const uint8_t *request, uint8_t *response);
 extern uint32_t DAP_ProcessCommand       (const uint8_t *request, uint8_t *response);
 extern uint32_t DAP_ExecuteCommand       (const uint8_t *request, uint8_t *response);
+extern void     DAP_SetPacketSizeReport  (uint16_t packet_size);
 
 extern void     DAP_Setup (void);
 

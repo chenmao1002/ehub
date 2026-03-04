@@ -440,18 +440,14 @@ void loop() {
             dbg_lastBridgeTxLen = txLen;
             memcpy(dbg_lastBridgeTx, txBuf, (txLen < 16) ? txLen : 16);
             
-            // --- Drain-then-retry strategy ---
-            // 1st attempt: send command, wait 500ms for response
-            // If timeout: drain UART 200ms (catch slow responses before retry)
-            // If still no response: resend (safe — no duplicate in flight)
-            // 2nd attempt: wait 2000ms
+            // 单次发送 + 等待响应（不重发）
+            // DAP 命令在目标侧是有状态的，重发可能打乱 Flash 算法流程。
             uart.write(txBuf, txLen);
             dbg_dapUartTx++;
 
             bool gotResponse = false;
-            // --- Phase 1: first attempt (500ms) ---
             unsigned long t0 = millis();
-            while (!gotResponse && (millis() - t0 < 500)) {
+            while (!gotResponse && (millis() - t0 < 2500)) {
                 uint8_t uBuf[1024];
                 int n = uart.read(uBuf, sizeof(uBuf));
                 dbg_uartBytesRx += n;
@@ -477,66 +473,6 @@ void loop() {
                     }
                 }
                 if (!gotResponse) delayMicroseconds(100);
-            }
-
-            // --- Phase 2: drain — catch slow response before retrying ---
-            if (!gotResponse) {
-                unsigned long drainEnd = millis() + 200;
-                while (!gotResponse && millis() < drainEnd) {
-                    uint8_t uBuf[512];
-                    int n = uart.read(uBuf, sizeof(uBuf));
-                    dbg_uartBytesRx += n;
-                    for (int i = 0; i < n; i++) {
-                        BridgeFrame frame;
-                        if (uartParser.feed(uBuf[i], frame)) {
-                            dbg_uartFramesRx++;
-                            if (!frame.valid) continue;
-                            if (frame.ch == BRIDGE_CH_DAP) {
-                                dbg_dapUartRx++;
-                                dapServer.sendResponse(frame.data, frame.len);
-                                dbg_dapTcpSend++;
-                                gotResponse = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!gotResponse) delayMicroseconds(500);
-                }
-            }
-
-            // --- Phase 3: retry — only if drain found nothing ---
-            if (!gotResponse) {
-                uart.write(txBuf, txLen);
-                dbg_dapUartTx++;
-
-                unsigned long t1 = millis();
-                while (!gotResponse && (millis() - t1 < 2000)) {
-                    uint8_t uBuf[1024];
-                    int n = uart.read(uBuf, sizeof(uBuf));
-                    dbg_uartBytesRx += n;
-                    for (int i = 0; i < n; i++) {
-                        BridgeFrame frame;
-                        if (uartParser.feed(uBuf[i], frame)) {
-                            dbg_uartFramesRx++;
-                            if (!frame.valid) continue;
-                            if (frame.ch == BRIDGE_CH_DAP) {
-                                dbg_dapUartRx++;
-                                dapServer.sendResponse(frame.data, frame.len);
-                                dbg_dapTcpSend++;
-                                gotResponse = true;
-                                break;
-                            } else if (frame.ch == BRIDGE_CH_WIFI_CTRL) {
-                                handleWifiCtrlFromMCU(frame);
-                            } else {
-                                uint8_t fwdBuf[BRIDGE_MAX_DATA + 6];
-                                int fwdLen = buildFrame(fwdBuf, frame.sof0, frame.ch,
-                                                        frame.data, frame.len);
-                                tcpServer.write(fwdBuf, fwdLen);
-                            }
-                        }
-                    }
-                    if (!gotResponse) delayMicroseconds(100);
-                }
             }
             if (!gotResponse) {
                 dbg_dapTimeout++;
@@ -573,6 +509,12 @@ void loop() {
                 if (frame.ch == BRIDGE_CH_WIFI_CTRL) {
                     handleWifiCtrl(frame);
                 } else {
+#if DAP_EXCLUSIVE_MODE
+                    if (dapSessionActive) {
+                        /* DAP 会话独占期间，丢弃非 WIFI_CTRL 通道命令 */
+                        continue;
+                    }
+#endif
                     uint8_t txBuf[BRIDGE_MAX_DATA + 6];
                     int txLen = buildFrame(txBuf, frame.sof0, frame.ch,
                                            frame.data, frame.len);
@@ -596,6 +538,12 @@ void loop() {
                 } else if (frame.ch == BRIDGE_CH_WIFI_CTRL) {
                     handleWifiCtrlFromMCU(frame);
                 } else {
+#if DAP_EXCLUSIVE_MODE
+                    if (dapSessionActive) {
+                        /* DAP 会话独占期间，不转发非 WIFI_CTRL 返回到扩展坞 TCP */
+                        continue;
+                    }
+#endif
                     uint8_t txBuf[BRIDGE_MAX_DATA + 6];
                     int txLen = buildFrame(txBuf, frame.sof0, frame.ch,
                                            frame.data, frame.len);
