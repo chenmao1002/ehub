@@ -33,12 +33,20 @@ static volatile uint32_t dbg_dapUartTx     = 0;   // Bridge frames sent to UART
 static volatile uint32_t dbg_dapUartRx     = 0;   // DAP responses received from UART
 static volatile uint32_t dbg_dapTcpSend    = 0;   // DAP responses sent to TCP
 static volatile uint32_t dbg_dapTimeout    = 0;   // DAP response timeouts
+static volatile uint32_t dbg_dapMismatchDrop = 0; // DAP responses dropped due to cmd-id mismatch
+static volatile uint32_t dbg_dapTxnStart   = 0;   // DAP transaction start count
+static volatile uint32_t dbg_dapTxnDone    = 0;   // DAP transaction completed count
 static volatile uint32_t dbg_uartBytesRx   = 0;   // Total UART bytes received
 static volatile uint32_t dbg_uartFramesRx  = 0;   // Total UART frames parsed
 static uint8_t dbg_lastDapCmd[8] = {0};           // First 8 bytes of last DAP command
 static uint16_t dbg_lastDapCmdLen = 0;
 static uint8_t dbg_lastBridgeTx[16] = {0};       // First 16 bytes of last bridge frame TX
 static uint16_t dbg_lastBridgeTxLen = 0;
+static uint8_t dbg_lastDapRsp[8] = {0};           // First 8 bytes of last DAP response from MCU
+static uint16_t dbg_lastDapRspLen = 0;
+static uint8_t dbg_lastDapCmdId = 0;
+static uint8_t dbg_lastDapRspId = 0;
+static uint8_t dbg_lastTimeoutCmdId = 0;
 
 // ═══════════════════════════════════════════════════════════════
 // WiFi 控制帧处理（来自 TCP/PC）
@@ -118,7 +126,7 @@ void handleWifiCtrl(const BridgeFrame& frame) {
             break;
         }
         case 0xF0: { // DEBUG_DIAG — return DAP debug counters + GPIO diag
-            uint8_t reply[80];
+            uint8_t reply[112];
             int pos = 0;
             reply[pos++] = 0xF0;  // subcmd echo
             // Copy volatile counters to local vars first
@@ -128,6 +136,9 @@ void handleWifiCtrl(const BridgeFrame& frame) {
             v = dbg_dapUartRx;   memcpy(&reply[pos], &v, 4); pos += 4;
             v = dbg_dapTcpSend;  memcpy(&reply[pos], &v, 4); pos += 4;
             v = dbg_dapTimeout;  memcpy(&reply[pos], &v, 4); pos += 4;
+            v = dbg_dapMismatchDrop; memcpy(&reply[pos], &v, 4); pos += 4;
+            v = dbg_dapTxnStart; memcpy(&reply[pos], &v, 4); pos += 4;
+            v = dbg_dapTxnDone;  memcpy(&reply[pos], &v, 4); pos += 4;
             v = dbg_uartBytesRx; memcpy(&reply[pos], &v, 4); pos += 4;
             v = dbg_uartFramesRx;memcpy(&reply[pos], &v, 4); pos += 4;
             // 2 bytes: lastDapCmdLen
@@ -140,6 +151,18 @@ void handleWifiCtrl(const BridgeFrame& frame) {
             memcpy(&reply[pos], &v16, 2); pos += 2;
             // 16 bytes: lastBridgeTx
             memcpy(&reply[pos], dbg_lastBridgeTx, 16); pos += 16;
+
+            // 1 byte: last DAP command ID
+            reply[pos++] = dbg_lastDapCmdId;
+            // 1 byte: last DAP response ID
+            reply[pos++] = dbg_lastDapRspId;
+            // 2 bytes: last DAP response len
+            v16 = dbg_lastDapRspLen;
+            memcpy(&reply[pos], &v16, 2); pos += 2;
+            // 8 bytes: first bytes of last DAP response
+            memcpy(&reply[pos], dbg_lastDapRsp, 8); pos += 8;
+            // 1 byte: last timeout command ID
+            reply[pos++] = dbg_lastTimeoutCmdId;
 
             // GPIO state diagnostics — read raw pin level via input register
             // On ESP32, GPIO input register reflects actual pin level even in
@@ -417,38 +440,74 @@ void loop() {
         dapSessionActive = true;
         // Set UART timeout to minimum for fast DAP response reads
         Serial.setTimeout(10);
+        // ── 新连接时清空 UART 残留数据和解析器状态 ──
+        uartParser.reset();
+        {
+            uint8_t flushBuf[512];
+            int fn;
+            while ((fn = uart.read(flushBuf, sizeof(flushBuf))) > 0) {
+                dbg_uartBytesRx += fn;
+            }
+        }
     } else if (!dapConnected && dapSessionActive) {
         dapSessionActive = false;
         Serial.setTimeout(1000);
+        // ── 断开时清空 UART 残留数据 ──
+        uartParser.reset();
+        {
+            uint8_t flushBuf[512];
+            int fn;
+            while ((fn = uart.read(flushBuf, sizeof(flushBuf))) > 0) {
+                dbg_uartBytesRx += fn;
+            }
+        }
     }
 
     if (dapConnected) {
         uint8_t dapCmd[DAP_TCP_MAX_PACKET];
         uint16_t dapLen;
         while (dapServer.readCommand(dapCmd, &dapLen)) {
+            dbg_dapTxnStart++;
             dbg_dapTcpRead++;
             // Save debug info
             dbg_lastDapCmdLen = dapLen;
+            dbg_lastDapCmdId = dapCmd[0];
             memcpy(dbg_lastDapCmd, dapCmd, (dapLen < 8) ? dapLen : 8);
+
+            // ── 非阻塞 drain：吞掉 UART 中残留的字节（不等待） ──
+            {
+                uint8_t dBuf[512];
+                int dn;
+                while ((dn = uart.read(dBuf, sizeof(dBuf))) > 0) {
+                    dbg_uartBytesRx += dn;
+                    // 不解析，直接丢弃——我们马上要 reset parser
+                }
+            }
 
             // Wrap DAP command in Bridge frame (CH=0xD0) and send to MCU
             uint8_t txBuf[BRIDGE_MAX_DATA + 6];
             int txLen = buildFrame(txBuf, BRIDGE_SOF0_CMD, BRIDGE_CH_DAP,
                                    dapCmd, dapLen);
-            
+
             // Save bridge TX debug info
             dbg_lastBridgeTxLen = txLen;
             memcpy(dbg_lastBridgeTx, txBuf, (txLen < 16) ? txLen : 16);
-            
-            // 单次发送 + 等待响应（不重发）
-            // DAP 命令在目标侧是有状态的，重发可能打乱 Flash 算法流程。
+
+            // 单次发送——DAP 命令在目标侧是有状态的，不可重发。
             uart.write(txBuf, txLen);
+
+            // ── 发送完成后重置解析器，确保从干净状态开始读取响应 ──
+            uartParser.reset();
             dbg_dapUartTx++;
 
             bool gotResponse = false;
+            bool abortTxn = false;
+            uint8_t mismatchInTxn = 0;
+            const unsigned long waitWindowMs = (dapCmd[0] == 0x05 || dapCmd[0] == 0x06)
+                ? DAP_WAIT_TRANSFER_MS : DAP_WAIT_DEFAULT_MS;
             unsigned long t0 = millis();
-            while (!gotResponse && (millis() - t0 < 2500)) {
-                uint8_t uBuf[1024];
+            while (!gotResponse && (millis() - t0 < waitWindowMs)) {
+                uint8_t uBuf[512];
                 int n = uart.read(uBuf, sizeof(uBuf));
                 dbg_uartBytesRx += n;
                 for (int i = 0; i < n; i++) {
@@ -458,10 +517,29 @@ void loop() {
                         if (!frame.valid) continue;
                         if (frame.ch == BRIDGE_CH_DAP) {
                             dbg_dapUartRx++;
-                            dapServer.sendResponse(frame.data, frame.len);
-                            dbg_dapTcpSend++;
-                            gotResponse = true;
-                            break;
+                            if (frame.len > 0 && frame.data[0] == dapCmd[0]) {
+                                dbg_lastDapRspLen = frame.len;
+                                dbg_lastDapRspId = frame.data[0];
+                                memset(dbg_lastDapRsp, 0, sizeof(dbg_lastDapRsp));
+                                memcpy(dbg_lastDapRsp, frame.data,
+                                       (frame.len < sizeof(dbg_lastDapRsp)) ? frame.len : sizeof(dbg_lastDapRsp));
+                                dapServer.sendResponse(frame.data, frame.len);
+                                dbg_dapTcpSend++;
+                                dbg_dapTxnDone++;
+                                gotResponse = true;
+                                break;
+                            }
+                            // DAP 命令应答 ID 必须与请求 ID 一致。
+                            // 不一致说明是滞留帧（常见于上一条 0x05 Transfer 的晚到应答），丢弃继续等待。
+                            dbg_dapMismatchDrop++;
+                            if (mismatchInTxn < 0xFF) mismatchInTxn++;
+                            if (mismatchInTxn >= 12) {
+                                // 单事务错位过多，触发局部软重同步并提前结束本事务。
+                                uartParser.reset();
+                                abortTxn = true;
+                                break;
+                            }
+                            continue;
                         } else if (frame.ch == BRIDGE_CH_WIFI_CTRL) {
                             handleWifiCtrlFromMCU(frame);
                         } else {
@@ -472,24 +550,44 @@ void loop() {
                         }
                     }
                 }
-                if (!gotResponse) delayMicroseconds(100);
+                if (abortTxn) break;
+                if (!gotResponse) delayMicroseconds(DAP_RX_POLL_US);
             }
             if (!gotResponse) {
                 dbg_dapTimeout++;
-                // Send error response to keep TCP stream aligned
-                uint8_t errResp[4];
-                uint16_t errLen;
-                if (dapCmd[0] == 0x06) {
-                    errResp[0] = 0x06; errResp[1] = 0; errResp[2] = 0; errResp[3] = 0x07;
-                    errLen = 4;
-                } else if (dapCmd[0] == 0x05) {
-                    errResp[0] = 0x05; errResp[1] = 0; errResp[2] = 0x00;
-                    errLen = 3;
-                } else {
-                    errResp[0] = dapCmd[0]; errResp[1] = 0xFF;
-                    errLen = 2;
+                dbg_lastTimeoutCmdId = dapCmd[0];
+                // 超时后清空解析器和 UART 残留
+                uartParser.reset();
+                {
+                    uint8_t pBuf[256];
+                    int pn;
+                    while ((pn = uart.read(pBuf, sizeof(pBuf))) > 0) {
+                        dbg_uartBytesRx += pn;
+                    }
                 }
-                dapServer.sendResponse(errResp, errLen);
+                // 统一回复最小错误响应
+                if (dapCmd[0] == 0x05) {
+                    uint8_t errResp[3] = {0x05, 0x00, 0x00};
+                    dbg_lastDapRspLen = 3;
+                    dbg_lastDapRspId = 0x05;
+                    memset(dbg_lastDapRsp, 0, sizeof(dbg_lastDapRsp));
+                    memcpy(dbg_lastDapRsp, errResp, 3);
+                    dapServer.sendResponse(errResp, 3);
+                } else if (dapCmd[0] == 0x06) {
+                    uint8_t errResp[4] = {0x06, 0x00, 0x00, 0x00};
+                    dbg_lastDapRspLen = 4;
+                    dbg_lastDapRspId = 0x06;
+                    memset(dbg_lastDapRsp, 0, sizeof(dbg_lastDapRsp));
+                    memcpy(dbg_lastDapRsp, errResp, 4);
+                    dapServer.sendResponse(errResp, 4);
+                } else {
+                    uint8_t errResp[2] = {dapCmd[0], 0xFF};
+                    dbg_lastDapRspLen = 2;
+                    dbg_lastDapRspId = dapCmd[0];
+                    memset(dbg_lastDapRsp, 0, sizeof(dbg_lastDapRsp));
+                    memcpy(dbg_lastDapRsp, errResp, 2);
+                    dapServer.sendResponse(errResp, 2);
+                }
                 dbg_dapTcpSend++;
             }
         }
@@ -497,6 +595,11 @@ void loop() {
 
     // ── TCP → UART (PC 命令发往 MCU) ──
     tcpServer.loop();
+#if DAP_EXCLUSIVE_MODE
+    if (dapSessionActive) {
+        /* DAP 独占期间跳过 5000 端口桥接解析，减少并发干扰 */
+    } else
+#endif
     if (tcpServer.hasClient()) {
         uint8_t buf[1024];
         int n = tcpServer.read(buf, sizeof(buf));

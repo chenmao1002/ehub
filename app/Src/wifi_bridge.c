@@ -144,18 +144,32 @@ void WiFi_Bridge_Send(uint8_t ch, const uint8_t *data, uint16_t len)
     for (uint16_t i = 0U; i < len; i++) { crc ^= data[i]; }
     s_wifi_tx_buf[5U + len] = crc;
 
-    /* Wait for previous DMA transfer to finish (max 100 ms — 512-byte
-     * frames at 2 Mbaud take ~2.6 ms, but contention can add delay) */
-    uint32_t t0 = HAL_GetTick();
-    while (HAL_UART_GetState(&huart2) & HAL_UART_STATE_BUSY_TX)
+    /* ---- Transmit: use polling for small frames (< 128 B), DMA for large ---- */
+    uint16_t total = (uint16_t)(6U + len);
+    if (total <= 128U)
     {
-        if ((HAL_GetTick() - t0) > 100U) { break; }
-        osDelay(1);
+        /* Polling TX: deterministic, no DMA-interrupt dependency.
+         * At 1 Mbaud 128 bytes takes ~1.3 ms — acceptable. */
+        HAL_StatusTypeDef txrc = HAL_UART_Transmit(&huart2, s_wifi_tx_buf, total, 20U);
+        if (txrc == HAL_OK) { s_dbg_uart2_tx_ok++; }
+        else                { s_dbg_uart2_tx_fail++; }
     }
-
-    HAL_StatusTypeDef txrc = HAL_UART_Transmit_DMA(&huart2, s_wifi_tx_buf, (uint16_t)(6U + len));
-    if (txrc == HAL_OK) { s_dbg_uart2_tx_ok++; }
-    else                { s_dbg_uart2_tx_fail++; }
+    else
+    {
+        /* Large frame: use DMA.  Wait for previous DMA to finish first. */
+        uint32_t t0 = HAL_GetTick();
+        while (HAL_UART_GetState(&huart2) & HAL_UART_STATE_BUSY_TX)
+        {
+            if ((HAL_GetTick() - t0) > 20U) {
+                HAL_UART_AbortTransmit(&huart2);   /* Abort stuck DMA */
+                break;
+            }
+            osDelay(1);
+        }
+        HAL_StatusTypeDef txrc = HAL_UART_Transmit_DMA(&huart2, s_wifi_tx_buf, total);
+        if (txrc == HAL_OK) { s_dbg_uart2_tx_ok++; }
+        else                { s_dbg_uart2_tx_fail++; }
+    }
 
     osMutexRelease(s_wifi_tx_mutex);
 }

@@ -29,15 +29,15 @@
 
 /// Default communication speed on the Debug Access Port for SWD and JTAG mode.
 /// 1MHz 是安全默认值，若需更快可调整（需匹配硬件）
-#define DAP_DEFAULT_SWJ_CLOCK   100000U        ///< Default SWD/JTAG clock frequency in Hz.
+#define DAP_DEFAULT_SWJ_CLOCK   1000000U        ///< Default SWD/JTAG clock frequency in Hz.
 
 /// Maximum Package Size for Command and Response data.
 /// Keep this value large for WiFi DAP throughput (OpenOCD/elaphureLink path).
 /// USB HID path reports 64-byte packet size at runtime for CMSIS-DAP v1 compatibility.
-#define DAP_PACKET_SIZE         512U            ///< Specifies Packet Size in bytes.
+#define DAP_PACKET_SIZE         1024U           ///< Specifies Packet Size in bytes.
 
 /// Maximum Package Buffers for Command and Response data.
-#define DAP_PACKET_COUNT        8U              ///< Specifies number of packets buffered.
+#define DAP_PACKET_COUNT        18U             ///< Specifies number of packets buffered.
 
 /// Indicate that UART Serial Wire Output (SWO) trace is available.
 /// STM32F4 支持 SWO UART 模式，若需要启用可改为 1（需硬件配合）
@@ -61,7 +61,7 @@
 #define TIMESTAMP_CLOCK         120000000U      ///< Timestamp clock in Hz (0 = timestamps not supported).
 
 /// Debug Unit is connected to fixed Target Device.
-#define TARGET_DEVICE_FIXED     0               ///< Target Device: 1 = known, 0 = unknown;
+#define TARGET_DEVICE_FIXED     1               ///< Target Device: 1 = known, 0 = unknown;
 
 #if TARGET_DEVICE_FIXED
 #define TARGET_DEVICE_VENDOR    "STMicroelectronics"  ///< STM32 厂商名称

@@ -184,7 +184,12 @@ static void Bridge_Dispatch(const BridgeMsg_t *m)
             /* DAP_ExecuteCommand returns (request_count << 16) | response_size.
              * Extract lower 16 bits for the actual response length. */
             uint16_t send_len = (uint16_t)(rsp_len & 0xFFFFU);
-            if (send_len == 0U || send_len > DAP_PACKET_SIZE) {
+            if (send_len == 0U) {
+                /* Should not happen with valid commands. */
+                /* Send minimal error: [ID_DAP_Invalid] */
+                dap_wifi_rsp[0] = 0xFFU;  /* ID_DAP_Invalid */
+                send_len = 1U;
+            } else if (send_len > DAP_PACKET_SIZE) {
                 send_len = DAP_PACKET_SIZE;
             }
             WiFi_Bridge_Send(BRIDGE_CH_DAP, dap_wifi_rsp, send_len);
