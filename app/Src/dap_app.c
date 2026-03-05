@@ -47,8 +47,8 @@ static const osMutexAttr_t s_dapExecMutexAttr = {
     .name = "dapExecMutex"
 };
 
-static uint8_t USB_Request [DAP_PACKET_COUNT][DAP_PACKET_SIZE];
-static uint8_t USB_Response[DAP_PACKET_COUNT][DAP_PACKET_SIZE];
+static uint8_t USB_Request [DAP_PACKET_COUNT][DAP_USB_PACKET_SIZE];
+static uint8_t USB_Response[DAP_PACKET_COUNT][DAP_USB_PACKET_SIZE];
 
 uint32_t DAP_ExecuteCommandLocked(const uint8_t *request, uint8_t *response, uint16_t packet_size_report)
 {

@@ -497,8 +497,8 @@ static const osThreadAttr_t bridge_task_attrs = {
 void Bridge_Init(void)
 {
     /* Create the inter-task queues */
-    bridge_cmd_queue = osMessageQueueNew(8U, sizeof(BridgeMsg_t), NULL); /* PC→Bus  */
-    bridge_rx_queue  = osMessageQueueNew(8U, sizeof(BridgeMsg_t), NULL); /* Bus→PC  */
+    bridge_cmd_queue = osMessageQueueNew(4U, sizeof(BridgeMsg_t), NULL); /* PC→Bus  */
+    bridge_rx_queue  = osMessageQueueNew(4U, sizeof(BridgeMsg_t), NULL); /* Bus→PC  */
 
     /* Initialise hardware bridges */
     Bridge_RS485_Init();

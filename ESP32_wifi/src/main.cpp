@@ -601,7 +601,7 @@ void loop() {
     } else
 #endif
     if (tcpServer.hasClient()) {
-        uint8_t buf[1024];
+        uint8_t buf[2048];
         int n = tcpServer.read(buf, sizeof(buf));
         for (int i = 0; i < n; i++) {
             BridgeFrame frame;
@@ -629,7 +629,7 @@ void loop() {
 
     // ── UART → TCP / DAP TCP (MCU 回复 — 非 DAP 活跃时处理) ──
     {
-        uint8_t buf[1024];
+        uint8_t buf[2048];
         int n = uart.read(buf, sizeof(buf));
         for (int i = 0; i < n; i++) {
             BridgeFrame frame;

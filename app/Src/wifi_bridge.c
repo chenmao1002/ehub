@@ -385,7 +385,7 @@ void WiFi_Bridge_Task(void *argument)
         }
 
         /* Drain ring buffer — process up to 1024 bytes per iteration */
-        uint16_t budget = 1024U;
+        uint16_t budget = 2048U;
         while (budget-- > 0U && ring_get(&byte))
         {
             if (wifi_parse_byte(byte))

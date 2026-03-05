@@ -1723,8 +1723,11 @@ uint32_t DAP_ProcessCommand(const uint8_t *request, uint8_t *response) {
 #endif
 
     default:
-      *(response-1) = ID_DAP_Invalid;
-      return ((1U << 16) | 1U);
+      /* Keep cmd_id echo already written at response[-1], append 0xFF status.
+       * This lets the ESP32 UART bridge match on data[0]==cmd_id immediately
+       * instead of waiting 500 ms for a timeout (which corrupts the TCP stream). */
+      *response = ID_DAP_Invalid;
+      return ((1U << 16) | 2U);
   }
 
   return ((1U << 16) + 1U + num);

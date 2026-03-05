@@ -34,10 +34,10 @@
 /// Maximum Package Size for Command and Response data.
 /// Keep this value large for WiFi DAP throughput (OpenOCD/elaphureLink path).
 /// USB HID path reports 64-byte packet size at runtime for CMSIS-DAP v1 compatibility.
-#define DAP_PACKET_SIZE         1024U           ///< Specifies Packet Size in bytes.
+#define DAP_PACKET_SIZE         1048U           ///< Specifies Packet Size in bytes.
 
 /// Maximum Package Buffers for Command and Response data.
-#define DAP_PACKET_COUNT        18U             ///< Specifies number of packets buffered.
+#define DAP_PACKET_COUNT        8U             ///< Specifies number of packets buffered.
 
 /// Indicate that UART Serial Wire Output (SWO) trace is available.
 /// STM32F4 支持 SWO UART 模式，若需要启用可改为 1（需硬件配合）

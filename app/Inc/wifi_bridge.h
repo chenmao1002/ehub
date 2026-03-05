@@ -40,8 +40,8 @@ extern "C" {
 /* ---- MCU ↔ ESP32 UART fixed baud rate ---------------------------------- */
 #define WIFI_UART_BAUDRATE       1000000U
 
-/* ---- DMA receive buffer size (> max frame ≈ 528 bytes) ----------------- */
-#define WIFI_RX_BUF_SIZE         1024U
+/* ---- DMA receive buffer size (> max frame ≈ 1054 bytes) ---------------- */
+#define WIFI_RX_BUF_SIZE         2048U
 
 /* ---- Ring buffer between ISR and Task ----------------------------------- */
 #define WIFI_RING_SIZE           4096U
