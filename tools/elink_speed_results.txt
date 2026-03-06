@@ -1,0 +1,10 @@
+Handshake: OK
+DPIDR: 0x1BA01477
+ERROR: timed out
+Traceback (most recent call last):
+  File "C:\Users\MC\Desktop\VSProject\EHUB4_3\EHUB\tools\elink_speed_v3.py", line 51, in <module>
+    cnt,ack,d = xfer(s, [(0,1,1,0)])
+  File "C:\Users\MC\Desktop\VSProject\EHUB4_3\EHUB\tools\elink_speed_v3.py", line 21, in xfer
+    r = s.recv(4096)
+TimeoutError: timed out
+

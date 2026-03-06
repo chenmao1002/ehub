@@ -29,15 +29,15 @@
 
 /// Default communication speed on the Debug Access Port for SWD and JTAG mode.
 /// 1MHz 是安全默认值，若需更快可调整（需匹配硬件）
-#define DAP_DEFAULT_SWJ_CLOCK   100000U        ///< Default SWD/JTAG clock frequency in Hz.
+#define DAP_DEFAULT_SWJ_CLOCK   1000000U        ///< Default SWD/JTAG clock frequency in Hz.
 
 /// Maximum Package Size for Command and Response data.
-/// 512 bytes for WiFi TCP path (reduces round-trips ~8x vs 64).
-/// USB HID endpoint is still 64 bytes — dap_app.c uses DAP_USB_PACKET_SIZE.
-#define DAP_PACKET_SIZE         512U            ///< Specifies Packet Size in bytes.
+/// Keep this value large for WiFi DAP throughput (OpenOCD/elaphureLink path).
+/// USB HID path reports 64-byte packet size at runtime for CMSIS-DAP v1 compatibility.
+#define DAP_PACKET_SIZE         1048U           ///< Specifies Packet Size in bytes.
 
 /// Maximum Package Buffers for Command and Response data.
-#define DAP_PACKET_COUNT        8U              ///< Specifies number of packets buffered.
+#define DAP_PACKET_COUNT        8U             ///< Specifies number of packets buffered.
 
 /// Indicate that UART Serial Wire Output (SWO) trace is available.
 /// STM32F4 支持 SWO UART 模式，若需要启用可改为 1（需硬件配合）
@@ -61,7 +61,7 @@
 #define TIMESTAMP_CLOCK         120000000U      ///< Timestamp clock in Hz (0 = timestamps not supported).
 
 /// Debug Unit is connected to fixed Target Device.
-#define TARGET_DEVICE_FIXED     0               ///< Target Device: 1 = known, 0 = unknown;
+#define TARGET_DEVICE_FIXED     1               ///< Target Device: 1 = known, 0 = unknown;
 
 #if TARGET_DEVICE_FIXED
 #define TARGET_DEVICE_VENDOR    "STMicroelectronics"  ///< STM32 厂商名称
@@ -184,15 +184,22 @@ __STATIC_INLINE void PORT_JTAG_SETUP (void) {
 //  HAL_GPIO_WritePin(JTAG_nRESET_GPIO_Port, JTAG_nRESET_Pin, GPIO_PIN_SET);
 //  GPIOB->BSRR = JTAG_TCK_Pin|JTAG_TMS_Pin|JTAG_TDI_Pin|JTAG_nTRST_Pin|JTAG_nRESET_Pin;
 //	
-	GPIOC->BSRR = JTAG_TCK_Pin|JTAG_TMS_Pin|JTAG_TDO_Pin;
+	GPIOC->BSRR = JTAG_TCK_Pin|JTAG_TMS_Pin;
 	GPIOD->BSRR = JTAG_nTRST_Pin|JTAG_nRESET_Pin|JTAG_TDI_Pin;
 	
-  /*Configure GPIO pins : JTAG_TCK_Pin JTAG_TMS_Pin JTAG_TDI_Pin */
-  GPIO_InitStruct.Pin = JTAG_TCK_Pin|JTAG_TMS_Pin|JTAG_TDO_Pin;
+  /*Configure GPIO pins : JTAG_TCK_Pin JTAG_TMS_Pin */
+  GPIO_InitStruct.Pin = JTAG_TCK_Pin|JTAG_TMS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : JTAG_TDI_Pin */
+  GPIO_InitStruct.Pin = JTAG_TDI_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pins : JTAG_nRESET_Pin JTAG_nTRST_Pin */
   GPIO_InitStruct.Pin = JTAG_nRESET_Pin|JTAG_nTRST_Pin;
@@ -202,11 +209,11 @@ __STATIC_INLINE void PORT_JTAG_SETUP (void) {
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pin : JTAG_TDO_Pin */
-  GPIO_InitStruct.Pin = JTAG_TDI_Pin;
+  GPIO_InitStruct.Pin = JTAG_TDO_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
 
 /** Setup SWD I/O pins: SWCLK, SWDIO, and nRESET.
@@ -276,7 +283,7 @@ __STATIC_INLINE void PORT_OFF (void) {
 \return Current status of the SWCLK/TCK DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE uint32_t PIN_SWCLK_TCK_IN  (void) {
-  return (uint32_t)(JTAG_TCK_GPIO_Port->ODR & JTAG_TCK_Pin ? 1:0);
+  return (uint32_t)(JTAG_TCK_GPIO_Port->IDR & JTAG_TCK_Pin ? 1:0);
 }
 
 /** SWCLK/TCK I/O pin: Set Output to High.
@@ -300,7 +307,7 @@ __STATIC_FORCEINLINE void     PIN_SWCLK_TCK_CLR (void) {
 \return Current status of the SWDIO/TMS DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE uint32_t PIN_SWDIO_TMS_IN  (void) {
-  return (uint32_t)(JTAG_TMS_GPIO_Port->ODR & JTAG_TMS_Pin ? 1:0);
+  return (uint32_t)(JTAG_TMS_GPIO_Port->IDR & JTAG_TMS_Pin ? 1:0);
 }
 
 /** SWDIO/TMS I/O pin: Set Output to High.
@@ -375,7 +382,7 @@ __STATIC_FORCEINLINE void     PIN_SWDIO_OUT_DISABLE (void) {
 \return Current status of the TDI DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE uint32_t PIN_TDI_IN  (void) {
-  return (uint32_t)(JTAG_TDI_GPIO_Port->ODR & JTAG_TDI_Pin ? 1:0);
+  return (uint32_t)(JTAG_TDI_GPIO_Port->IDR & JTAG_TDI_Pin ? 1:0);
 }
 
 /** TDI I/O pin: Set Output.
@@ -385,7 +392,7 @@ __STATIC_FORCEINLINE void     PIN_TDI_OUT (uint32_t bit) {
   if ((bit & 1U) == 1) {
     JTAG_TDI_GPIO_Port->BSRR = JTAG_TDI_Pin;
   } else {
-    JTAG_TDI_GPIO_Port->BSRR   = (uint32_t)JTAG_TMS_Pin << 16U;  // 高 16 位写 1 → 复位
+    JTAG_TDI_GPIO_Port->BSRR   = (uint32_t)JTAG_TDI_Pin << 16U;  // 高 16 位写 1 → 复位
   }
 }
 
@@ -425,7 +432,7 @@ __STATIC_FORCEINLINE void     PIN_nTRST_OUT  (uint32_t bit) {
 \return Current status of the nRESET DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE uint32_t PIN_nRESET_IN  (void) {
-  return (uint32_t)(JTAG_nRESET_GPIO_Port->ODR & JTAG_nRESET_Pin ? 1:0);
+  return (uint32_t)(JTAG_nRESET_GPIO_Port->IDR & JTAG_nRESET_Pin ? 1:0);
 }
 
 /** nRESET I/O pin: Set Output.
@@ -536,7 +543,8 @@ Status LEDs. In detail the operation of Hardware I/O and LED pins are enabled an
  - LED output pins are enabled and LEDs are turned off.
 */
 __STATIC_INLINE void DAP_SETUP (void) {
-  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
   PORT_JTAG_SETUP();
 }
 

@@ -249,14 +249,16 @@ void DAPTCPServer::sendResponse(const uint8_t* buf, uint16_t len) {
         pkt[7] = 0x00;         // reserved
         memcpy(pkt + 8, buf, len);
         _client.write(pkt, 8 + len);
-        _client.flush();
+        // NOTE: do NOT call _client.flush() here!
+        // ESP32 Arduino WiFiClient::flush() clears the RX buffer,
+        // which would discard any pending command data from OpenOCD.
         break;
     }
     case DAP_PROTO_ELAPHURELINK:
     {
         // elaphureLink: raw DAP response, no framing, no padding
         _client.write(buf, len);
-        _client.flush();
+        // No flush — see OpenOCD path comment.
         break;
     }
     default:

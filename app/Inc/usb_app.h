@@ -63,7 +63,7 @@ extern "C" {
 #define BRIDGE_CFG_I2C_OWN  0x08U   /* I2C own 7-bit address (0x08~0x77) */
 
 /* ---- Payload limits ------------------------------------------------------ */
-#define BRIDGE_MAX_DATA     520U    /* max bytes in one bridge frame payload (≥ DAP 512) */
+#define BRIDGE_MAX_DATA     1048U   /* max bytes in one bridge frame payload (≥ DAP 1048 for elaphureLink) */
 
 /* ---- Message type passed through the FreeRTOS queue --------------------- */
 typedef struct {

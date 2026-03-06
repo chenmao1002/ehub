@@ -3,7 +3,7 @@
  * @brief   WiFi ↔ Bus bridge via ESP32 — USART2 transport layer
  *
  * The ESP32-N8 module is connected to MCU via USART2 (PA2 TX / PA3 RX)
- * at 921600 baud.  It acts as a transparent WiFi ↔ UART bridge so that
+ * at 1 Mbaud.  It acts as a transparent WiFi ↔ UART bridge so that
  * a PC on the same LAN can send / receive the same Bridge protocol
  * frames that currently travel over USB CDC.
  *
@@ -34,13 +34,14 @@ extern "C" {
 #define WIFI_SUBCMD_ESP_RESET    0x03U  /* MCU hard-resets ESP32       */
 #define WIFI_SUBCMD_ESP_BOOT     0x04U  /* MCU puts ESP32 in download  */
 #define WIFI_SUBCMD_SCAN         0x05U  /* scan WiFi networks          */
+#define WIFI_SUBCMD_ESP_PASSTHROUGH 0x06U /* CDC↔USART2 transparent passthrough */
 #define WIFI_SUBCMD_HEARTBEAT    0x10U  /* heartbeat ping/pong         */
 
 /* ---- MCU ↔ ESP32 UART fixed baud rate ---------------------------------- */
 #define WIFI_UART_BAUDRATE       1000000U
 
-/* ---- DMA receive buffer size (> max frame ≈ 528 bytes) ----------------- */
-#define WIFI_RX_BUF_SIZE         1024U
+/* ---- DMA receive buffer size (> max frame ≈ 1054 bytes) ---------------- */
+#define WIFI_RX_BUF_SIZE         2048U
 
 /* ---- Ring buffer between ISR and Task ----------------------------------- */
 #define WIFI_RING_SIZE           4096U
@@ -109,6 +110,37 @@ void WiFi_ESP_EnterBootloader(void);
  *         (USART2 deinitialized, PA2/PA3 floating).
  */
 uint8_t WiFi_Bridge_IsBootloader(void);
+
+/**
+ * @brief  Enter CDC↔USART2 transparent passthrough mode for flashing ESP32.
+ *         1. Put ESP32 into bootloader (BOOT/EN sequence)
+ *         2. Reinit USART2 at 115200 (esptool default sync speed)
+ *         3. Enter passthrough: raw CDC bytes ↔ USART2
+ *         DTR/RTS → EN/BOOT, SET_LINE_CODING → USART2 baud rate.
+ *         Exit: reset MCU.
+ */
+void WiFi_ESP_EnterPassthrough(void);
+
+/** @brief  Returns non-zero if CDC↔USART2 passthrough is active. */
+uint8_t WiFi_Bridge_IsPassthrough(void);
+
+/** @brief  Passthrough: feed raw CDC data into CDC→UART ring (ISR-safe). */
+void WiFi_Passthrough_CDCRx(const uint8_t *data, uint16_t len);
+
+/** @brief  Passthrough: feed raw USART2 data into UART→CDC ring (ISR-safe). */
+void WiFi_Passthrough_UARTRx(const uint8_t *data, uint16_t len);
+
+/** @brief  Passthrough: request USART2 baud rate change (ISR-safe, deferred). */
+void WiFi_Passthrough_SetBaud(uint32_t baud);
+
+/** @brief  Passthrough: map CDC DTR/RTS to ESP32 EN/BOOT (ISR-safe). */
+void WiFi_Passthrough_SetLineState(uint16_t state);
+
+/** @brief  Passthrough: check if CDC→UART ring is nearly full (ISR-safe). */
+uint8_t WiFi_Passthrough_C2URingNearlyFull(void);
+
+/** @brief  Passthrough: mark CDC OUT endpoint as paused (called from USB ISR). */
+void WiFi_Passthrough_SetCDCPaused(void);
 
 #ifdef __cplusplus
 }

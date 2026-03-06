@@ -11,7 +11,9 @@
             "configFiles": [
                 "${workspaceFolder}/openocd.cfg"
             ],
-            "searchDir": ["F:/vscode/openstm32/xpack-openocd/xpack-openocd-0.12.0-4/openocd/scripts"],
+            "searchDir": [
+                "F:/vscode/openstm32/xpack-openocd/xpack-openocd-0.12.0-4/openocd/scripts"
+            ],
             "openOCDLaunchCommands": [],
             "runToEntryPoint": "main",
             "preLaunchTask": "Build Debug",
@@ -27,11 +29,41 @@
             "configFiles": [
                 "${workspaceFolder}/openocd.cfg"
             ],
-            "searchDir": ["F:/vscode/openstm32/xpack-openocd/xpack-openocd-0.12.0-4/openocd/scripts"],
+            "searchDir": [
+                "F:/vscode/openstm32/xpack-openocd/xpack-openocd-0.12.0-4/openocd/scripts"
+            ],
             "openOCDLaunchCommands": [
                 "program ${workspaceFolder}/build/Debug/EHUB.hex verify reset exit"
             ],
             "preLaunchTask": "Build Debug"
+        },
+        {
+            "showDevDebugOutput": "parsed",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/debug/projectName.elf",
+            "name": "Debug STM32",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "preLaunchTask": "Build STM",
+            "device": "",
+            "configFiles": [
+                "openocd.cfg"
+            ]
+        },
+        {
+            "showDevDebugOutput": "parsed",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/debug/projectName.elf",
+            "name": "Attach STM32",
+            "request": "attach",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "preLaunchTask": "Build STM",
+            "device": "",
+            "configFiles": [
+                "openocd.cfg"
+            ]
         }
     ]
 }

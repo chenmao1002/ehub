@@ -1,0 +1,9 @@
+Handshake OK
+ERROR: timed out
+Traceback (most recent call last):
+  File "C:\Users\MC\Desktop\VSProject\EHUB4_3\EHUB\tools\elink_tight.py", line 47, in <module>
+    sr(s, bytes([0x11])+struct.pack('<I',1000000)); time.sleep(0.2)
+  File "C:\Users\MC\Desktop\VSProject\EHUB4_3\EHUB\tools\elink_tight.py", line 15, in sr
+    s.settimeout(30); s.sendall(d); return s.recv(4096)
+TimeoutError: timed out
+

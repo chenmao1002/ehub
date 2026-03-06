@@ -30,6 +30,15 @@ void USBD_InEvent(void);
  */
 void USBD_OutEvent(void);
 
+/**
+ * @brief  线程安全执行 DAP 命令，并按当前链路设置上报包长。
+ * @param  request   DAP 请求缓冲区
+ * @param  response  DAP 响应缓冲区
+ * @param  packet_size_report  对主机上报的 DAP 包长（HID=64，WiFi=512）
+ * @retval DAP_ExecuteCommand 返回值
+ */
+uint32_t DAP_ExecuteCommandLocked(const uint8_t *request, uint8_t *response, uint16_t packet_size_report);
+
 #ifdef __cplusplus
 }
 #endif

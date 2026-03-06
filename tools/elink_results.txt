@@ -1,0 +1,12 @@
+=== elaphureLink Speed Test ===
+Host: 192.168.227.100:3240
+Time: 2026-03-04 21:41:48
+Handshake: OK (8a656c700000000000020000)
+ERROR: timed out
+Traceback (most recent call last):
+  File "C:\Users\MC\Desktop\VSProject\EHUB4_3\EHUB\tools\elink_final_test.py", line 68, in <module>
+    sr(s, bytes(seq))
+  File "C:\Users\MC\Desktop\VSProject\EHUB4_3\EHUB\tools\elink_final_test.py", line 21, in sr
+    return s.recv(4096)
+TimeoutError: timed out
+

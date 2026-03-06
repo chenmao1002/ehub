@@ -1,0 +1,23 @@
+=== elaphureLink Speed Test (combined TAR+DRW) ===
+Handshake: OK
+DPIDR: 0x1BA01477
+CTRL/STAT: 0xF0000040
+SWD Init: OK
+Verify: [0x20000670, 0x08000189, 0x080008AF, 0x0800086D]
+Verify2: [0x080008AD, 0x0800028B, 0x08000919, 0x00000000]
+Verify3: [0x00000000, 0x00000000, 0x00000000, 0x080008B3]
+
+=== READ SPEED (SWD 1MHz) ===
+
+ERROR: timed out
+Traceback (most recent call last):
+  File "C:\Users\MC\Desktop\VSProject\EHUB4_3\EHUB\tools\elink_combined.py", line 97, in <module>
+    data = read_words(s, addr, wpb)
+  File "C:\Users\MC\Desktop\VSProject\EHUB4_3\EHUB\tools\elink_combined.py", line 33, in read_words
+    cnt, ack, data = xfer(s, transfers)
+  File "C:\Users\MC\Desktop\VSProject\EHUB4_3\EHUB\tools\elink_combined.py", line 22, in xfer
+    r = sr(s, bytes(buf))
+  File "C:\Users\MC\Desktop\VSProject\EHUB4_3\EHUB\tools\elink_combined.py", line 15, in sr
+    s.settimeout(20); s.sendall(d); return s.recv(4096)
+TimeoutError: timed out
+

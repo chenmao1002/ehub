@@ -17,8 +17,14 @@
 // ─── CMSIS-DAP over TCP (OpenOCD / elaphureLink) ───
 #define DAP_TCP_PORT        6000    // OpenOCD cmsis-dap tcp 端口
 #define ELAPHURELINK_PORT   3240    // elaphureLink 专用端口
-#define DAP_TCP_MAX_PACKET  512     // DAP 最大包长度 (matches MCU DAP_PACKET_SIZE)
+#define DAP_TCP_MAX_PACKET  1048    // DAP 最大包长度 (matches MCU DAP_PACKET_SIZE)
 #define BRIDGE_CH_DAP       0xD0    // Bridge 协议 DAP 通道 ID
+/* DAP 会话活跃时，是否独占 UART2（仅保留 WIFI_CTRL 通道） */
+#define DAP_EXCLUSIVE_MODE  1
+/* DAP 等待窗口: 默认命令/Transfer(0x05) 命令 */
+#define DAP_WAIT_DEFAULT_MS  500
+#define DAP_WAIT_TRANSFER_MS 5000
+#define DAP_RX_POLL_US       100
 
 // ─── WiFi 默认配置 ───
 #define DEFAULT_AP_SSID     "EHUB_WiFi"
@@ -43,7 +49,7 @@
 #define BRIDGE_SOF1         0x55
 #define BRIDGE_SOF0_RPY     0xBB
 #define BRIDGE_CH_WIFI_CTRL 0xE0
-#define BRIDGE_MAX_DATA     520
+#define BRIDGE_MAX_DATA     1048
 
 // ─── 心跳 ───
 #define HEARTBEAT_INTERVAL_MS  3000   // 每 3 秒发送一次心跳到 MCU
