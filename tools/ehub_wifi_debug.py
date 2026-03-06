@@ -12,6 +12,9 @@ import struct
 import time
 import queue
 import socket
+import os
+import shutil
+import subprocess
 from abc import ABC, abstractmethod
 from datetime import datetime
 
@@ -419,6 +422,64 @@ class ConnectionManager:
 
 SerialManager = ConnectionManager
 
+# ─── EHUBLink 安装辅助 ────────────────────────────────────────────────────────
+def _find_keil_path() -> str:
+    """尝试自动找到 Keil MDK 安装根目录（含 UV4/UV4.exe）"""
+    # 1. 读取注册表
+    try:
+        import winreg
+        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                             r"SOFTWARE\WOW6432Node\Keil\Products\MDK")
+        path_val, _ = winreg.QueryValueEx(key, "Path")
+        winreg.CloseKey(key)
+        # Path 一般指向 ARM\ 子目录，取其父目录即 Keil 根
+        candidate = os.path.dirname(path_val.rstrip("\\/"))
+        if os.path.exists(os.path.join(candidate, "UV4", "UV4.exe")):
+            return candidate
+    except Exception:
+        pass
+    # 2. 尝试常见盘符/目录名
+    for drive in ("C", "D", "E", "F"):
+        for name in ("Keil_v5", "Keil", "keil_v5", "keil"):
+            p = f"{drive}:\\{name}"
+            if os.path.exists(os.path.join(p, "UV4", "UV4.exe")):
+                return p
+    return ""
+
+
+def _do_install_ehublink(keil_path: str, dll_src: str,
+                         dap_host: str, dap_port: int):
+    """将 EHUBLink.dll 安装为 elaphureRddi.dll 并写入调试配置。
+    返回 (success: bool, message: str)。
+    """
+    uv4_dir = os.path.join(keil_path, "UV4")
+    if not os.path.exists(os.path.join(uv4_dir, "UV4.exe")):
+        return False, f"✗ 无效的 Keil 路径，{uv4_dir} 中未找到 UV4.exe"
+    if not os.path.exists(dll_src):
+        return False, f"✗ 未找到 EHUBLink.dll：{dll_src}"
+
+    target = os.path.join(uv4_dir, "elaphureRddi.dll")
+
+    # 备份旧 DLL
+    if os.path.exists(target):
+        stamp = time.strftime("%Y%m%d_%H%M%S")
+        backup_dir = os.path.join(uv4_dir, "EHUBLink_backup")
+        os.makedirs(backup_dir, exist_ok=True)
+        shutil.copy2(target, os.path.join(backup_dir, f"elaphureRddi_{stamp}.dll"))
+
+    # 复制 DLL
+    shutil.copy2(dll_src, target)
+
+    # 写入 ehublink.cfg（調试器地址）
+    cfg_path = os.path.join(uv4_dir, "ehublink.cfg")
+    with open(cfg_path, "w", encoding="utf-8") as f:
+        f.write(f"# EHUBLink configuration\nhost={dap_host}\nport={dap_port}\n")
+
+    return True, (f"✓ 安装成功！\n"
+                  f"  DLL → {target}\n"
+                  f"  调试地址: {dap_host}:{dap_port}")
+
+
 # ─── 颜色 & 字体常量 ──────────────────────────────────────────────────────────
 COLOR_SEND    = "#63a3f5"
 COLOR_RECV    = "#5cd85c"
@@ -429,6 +490,36 @@ MONO_FONT     = ("Consolas", 11)
 LABEL_FONT    = ("微软雅黑", 11)
 TITLE_FONT    = ("微软雅黑", 12, "bold")
 PROTO_LABELS  = ["USART", "RS485", "RS422", "SPI", "I2C", "CAN", "TCP", "UDP"]
+
+# ─── OpenOCD 运行时路径 ────────────────────────────────────────────────────────
+_OPENOCD_DIR     = os.path.join(os.path.dirname(os.path.abspath(__file__)), "openocd")
+_OPENOCD_EXE     = os.path.join(_OPENOCD_DIR, "openocd.exe")
+_OPENOCD_SCRIPTS = os.path.join(_OPENOCD_DIR, "scripts")
+
+OCD_TARGET_MAP = {
+    "STM32F1x  (F103/F1xx)": "stm32f1x",
+    "STM32F2x  (F205/F2xx)": "stm32f2x",
+    "STM32F3x  (F303/F3xx)": "stm32f3x",
+    "STM32F4x  (F407/F4xx)": "stm32f4x",
+    "STM32F7x  (F746/F7xx)": "stm32f7x",
+    "STM32H7x  (H743/H7xx)": "stm32h7x",
+    "STM32F0x  (F030/F0xx)": "stm32f0x",
+    "STM32L4x  (L476/L4xx)": "stm32l4x",
+    "STM32G0x  (G071/G0xx)": "stm32g0x",
+    "STM32G4x  (G431/G4xx)": "stm32g4x",
+    "STM32L0x  (L031/L0xx)": "stm32l0",
+    "STM32L1x  (L151/L1xx)": "stm32l1",
+    "STM32L5x  (L552/L5xx)": "stm32l5x",
+    "STM32U0x  (U031/U0xx)": "stm32u0x",
+    "STM32U5x  (U585/U5xx)": "stm32u5x",
+    "STM32WBx  (WB55/WBxx)": "stm32wbx",
+    "STM32WLx  (WL55/WLxx)": "stm32wlx",
+}
+OCD_TRANSPORT_MAP = {
+    "SWD": "swd",
+    "JTAG": "jtag",
+}
+OCD_SPEED_LABELS = ["100", "500", "1000", "2000", "4000", "8000"]
 
 # ─── 主应用 ───────────────────────────────────────────────────────────────────
 class EHUBApp(ctk.CTk):
@@ -453,7 +544,21 @@ class EHUBApp(ctk.CTk):
         self._pc_tcp_peer: tuple[str, int] | None = None
         self._extra_tx_count = 0
         self._extra_rx_count = 0
+        # ── OpenOCD 相关状态 ─────────────────────────────────────────────
+        self._openocd_proc: subprocess.Popen | None = None
+        self._ocd_start_btn: ctk.CTkButton | None = None
+        self._ocd_stop_btn:  ctk.CTkButton | None = None
+        self._ocd_pid_lbl:   ctk.CTkLabel  | None = None
+        self._dbg_keil_status_lbl: ctk.CTkLabel | None = None
+        # 持久化变量（调试器面板重建后保留值）
+        self._ocd_host_var   = ctk.StringVar(value="ehub.local")
+        self._ocd_port_var   = ctk.StringVar(value="6000")
+        self._ocd_target_var = ctk.StringVar(value=list(OCD_TARGET_MAP.keys())[0])
+        self._ocd_transport_var = ctk.StringVar(value="SWD")
+        self._ocd_speed_var  = ctk.StringVar(value="1000")
+        self._dbg_keil_path_var = ctk.StringVar(value="")
         self._build_ui()
+        self.protocol("WM_DELETE_WINDOW", self._on_close)
         self._refresh_ports()
         self._poll_log()
         # 启动时自动检测，之后每秒热插拔监测
@@ -634,6 +739,20 @@ class EHUBApp(ctk.CTk):
             btn.pack(pady=3, padx=12)
             self._proto_btns[name] = btn
 
+        # ── 分隔线 + 调试器安装快捷按钮 ──────────────────────────────
+        ctk.CTkFrame(sb, height=1, fg_color=("gray60", "gray30")
+                     ).pack(fill="x", padx=12, pady=(12, 4))
+        ctk.CTkLabel(sb, text="调试器", font=("微软雅黑", 11, "bold"),
+                     text_color=("#475569", "#94a3b8")).pack(pady=(0, 4))
+        self._dbg_btn = ctk.CTkButton(sb, text="🔧 配置调试器", width=130, height=36,
+                      anchor="w", font=TITLE_FONT,
+                      fg_color="transparent",
+                      text_color=("#1e293b", "#e2e8f0"),
+                      hover_color=("#c7d0eb", "#1e2a45"),
+                      command=self._select_debugger,
+                      corner_radius=8)
+        self._dbg_btn.pack(pady=3, padx=12)
+
         sb_bot = ctk.CTkFrame(sb, fg_color="transparent")
         sb_bot.pack(side="bottom", pady=14, padx=10)
         self._stat_tx  = ctk.CTkLabel(sb_bot, text="发送:  0 B", font=MONO_FONT,
@@ -775,7 +894,8 @@ class EHUBApp(ctk.CTk):
             w.destroy()
         self._cfg_widgets.clear()
 
-        ctk.CTkLabel(self._cfg_frame, text=f"⚙  {name} 参数配置",
+        _title = "🔧  配置调试器" if name == "DEBUGGER" else f"⚙  {name} 参数配置"
+        ctk.CTkLabel(self._cfg_frame, text=_title,
                      font=TITLE_FONT, text_color=COLOR_CONFIG
                      ).grid(row=0, column=0, columnspan=6, sticky="w", padx=12, pady=(8,6))
 
@@ -789,6 +909,9 @@ class EHUBApp(ctk.CTk):
             self._cfg_can()
         elif name in ("TCP", "UDP"):
             self._cfg_tcp_udp(name)
+        elif name == "DEBUGGER":
+            self._cfg_debugger()
+            return   # 调试器面板自带按钮，无需"应用配置"
 
         ctk.CTkButton(self._cfg_frame, text="应用配置", width=110,
                       fg_color=("#d97706","#b45309"),
@@ -1185,6 +1308,9 @@ class EHUBApp(ctk.CTk):
                     else:
                         self._log_append(f"\u26a0 \u4e32\u53e3\u9519\u8bef\uff1a{text}", "err")
                     self._update_stats()
+                elif ch == -2:
+                    text = data.decode(errors="replace")
+                    self._log_append(f"[OpenOCD] {text}", "config")
                 else:
                     self._handle_frame(ch, data)
                     self._update_stats()
@@ -1642,6 +1768,314 @@ class EHUBApp(ctk.CTk):
         new  = "light" if mode == "Dark" else "dark"
         ctk.set_appearance_mode(new)
         self._theme_var.set("☀" if new == "light" else "🌙")
+
+    def _on_close(self):
+        """窗口关闭时自动停止 OpenOCD"""
+        if self._openocd_proc and self._openocd_proc.poll() is None:
+            self._openocd_proc.terminate()
+            try:
+                self._openocd_proc.wait(timeout=2)
+            except Exception:
+                pass
+        self.destroy()
+
+    # ── 调试器选择（内联面板） ─────────────────────────────────────────────────
+    def _select_debugger(self):
+        for btn in self._proto_btns.values():
+            btn.configure(fg_color="transparent",
+                          text_color=("#1e293b", "#e2e8f0"))
+        self._dbg_btn.configure(fg_color=("#b6c1e0", "#1e3a5f"),
+                                text_color=("#1e293b", "#ffffff"))
+        self._cur_proto = "DEBUGGER"
+        self._render_config("DEBUGGER")
+
+    # ── 配置调试器 内联面板 ────────────────────────────────────────────────────
+    def _cfg_debugger(self):
+        """在 _cfg_frame 内构建双列调试器配置面板（Keil安装 + OpenOCD启停）"""
+        fr = self._cfg_frame
+
+        # 容器框，跨满 cfg_frame 全部列
+        wrap = ctk.CTkFrame(fr, fg_color="transparent")
+        wrap.grid(row=1, column=0, columnspan=6, sticky="ew", padx=0, pady=(0, 6))
+        wrap.columnconfigure(0, weight=1)
+        wrap.columnconfigure(1, weight=1)
+
+        # ══════════════════ 左列: Keil 调试器安装 ══════════════════
+        keil_card = ctk.CTkFrame(wrap, corner_radius=8,
+                                  fg_color=("#d4d9ee", "#141d30"))
+        keil_card.grid(row=0, column=0, sticky="nsew", padx=(4, 3))
+        keil_card.columnconfigure(1, weight=1)
+
+        ctk.CTkLabel(keil_card, text="🔑 Keil 调试器安装", font=TITLE_FONT,
+                     text_color=COLOR_CONFIG
+                     ).grid(row=0, column=0, columnspan=3, sticky="w",
+                            padx=10, pady=(8, 4))
+
+        ctk.CTkLabel(keil_card, text="Keil 路径：", font=LABEL_FONT
+                     ).grid(row=1, column=0, sticky="w", padx=10, pady=3)
+        ctk.CTkEntry(keil_card, textvariable=self._dbg_keil_path_var,
+                     font=MONO_FONT
+                     ).grid(row=1, column=1, sticky="ew", padx=(0, 3), pady=3)
+
+        def _browse():
+            from tkinter import filedialog
+            p = filedialog.askdirectory(title="选择 Keil MDK 安装目录（含 UV4 文件夹）")
+            if p:
+                self._dbg_keil_path_var.set(p.replace("/", "\\"))
+
+        ctk.CTkButton(keil_card, text="浏览", width=52, command=_browse,
+                      font=LABEL_FONT
+                      ).grid(row=1, column=2, padx=(0, 10), pady=3)
+
+        def _auto_keil():
+            p = _find_keil_path()
+            if p:
+                self._dbg_keil_path_var.set(p)
+                if self._dbg_keil_status_lbl:
+                    self._dbg_keil_status_lbl.configure(
+                        text=f"✓ 自动检测到：{p}", text_color="#22c55e")
+            else:
+                if self._dbg_keil_status_lbl:
+                    self._dbg_keil_status_lbl.configure(
+                        text="✗ 未检测到 Keil MDK，请手动选择", text_color=COLOR_ERR)
+
+        ctk.CTkButton(keil_card, text="🔍 自动检测 Keil 路径", height=30,
+                      command=_auto_keil,
+                      fg_color=("#7c3aed", "#6d28d9"),
+                      hover_color=("#6d28d9", "#5b21b6"),
+                      font=LABEL_FONT
+                      ).grid(row=2, column=0, columnspan=3, padx=10,
+                             pady=(0, 4), sticky="ew")
+
+        # DLL 来源信息
+        _script_dir  = os.path.dirname(os.path.abspath(__file__))
+        _project_dir = os.path.dirname(_script_dir)
+        _dll_candidates = [
+            os.path.join(_project_dir, "EHUBLink", "EHUBLink", "bin", "Release", "EHUBLink.dll"),
+            os.path.join(_project_dir, "EHUBLink", "bin", "Release", "EHUBLink.dll"),
+        ]
+        _dll_src = next((p for p in _dll_candidates if os.path.exists(p)), "")
+        ctk.CTkLabel(keil_card,
+                     text=(f"DLL: {os.path.basename(_dll_src)}  ({os.path.dirname(_dll_src)})"
+                           if _dll_src else "✗ 未找到 EHUBLink.dll（请先编译项目）"),
+                     font=("微软雅黑", 10),
+                     text_color=("gray40" if _dll_src else COLOR_ERR),
+                     anchor="w", wraplength=260
+                     ).grid(row=3, column=0, columnspan=3, sticky="w",
+                            padx=10, pady=(0, 4))
+
+        def _do_install():
+            kp = self._dbg_keil_path_var.get().strip()
+            if not kp:
+                if self._dbg_keil_status_lbl:
+                    self._dbg_keil_status_lbl.configure(
+                        text="✗ 请先指定 Keil 安装路径", text_color=COLOR_ERR)
+                return
+            if not _dll_src:
+                if self._dbg_keil_status_lbl:
+                    self._dbg_keil_status_lbl.configure(
+                        text="✗ 未找到 EHUBLink.dll", text_color=COLOR_ERR)
+                return
+            _install_btn.configure(state="disabled", text="安装中…")
+            def _run():
+                try:
+                    ok, msg = _do_install_ehublink(
+                        kp, _dll_src,
+                        self._ocd_host_var.get().strip() or "ehub.local",
+                        int(self._ocd_port_var.get().strip() or "6000"))
+                    if self._dbg_keil_status_lbl:
+                        self.after(0, lambda m=msg, s=ok: self._dbg_keil_status_lbl.configure(
+                            text=m[:80], text_color="#22c55e" if s else COLOR_ERR))
+                    if ok:
+                        self.after(0, lambda: self._log_append(
+                            f"[调试器] EHUBLink 已安装到 Keil：{kp}", "config"))
+                except Exception as e:
+                    if self._dbg_keil_status_lbl:
+                        self.after(0, lambda ex=e: self._dbg_keil_status_lbl.configure(
+                            text=f"✗ 安装失败：{ex}", text_color=COLOR_ERR))
+                finally:
+                    self.after(0, lambda: _install_btn.configure(
+                        state="normal", text="⚡ 一键安装 EHUBLink"))
+            threading.Thread(target=_run, daemon=True).start()
+
+        _install_btn = ctk.CTkButton(
+            keil_card, text="⚡ 一键安装 EHUBLink", height=34,
+            fg_color=("#2563eb", "#1d4ed8"),
+            hover_color=("#1d4ed8", "#1e40af"),
+            font=("微软雅黑", 12, "bold"),
+            command=_do_install)
+        _install_btn.grid(row=4, column=0, columnspan=3, sticky="ew",
+                          padx=10, pady=(0, 4))
+
+        self._dbg_keil_status_lbl = ctk.CTkLabel(
+            keil_card, text="", font=("微软雅黑", 10),
+            text_color="#22c55e", anchor="w", wraplength=260)
+        self._dbg_keil_status_lbl.grid(row=5, column=0, columnspan=3,
+                                        sticky="w", padx=10, pady=(0, 10))
+
+        # 首次显示时自动检测 Keil 路径
+        if not self._dbg_keil_path_var.get():
+            _auto_keil()
+
+        # ══════════════════ 右列: OpenOCD DAP TCP 服务 ══════════════════
+        ocd_card = ctk.CTkFrame(wrap, corner_radius=8,
+                                 fg_color=("#d4d9ee", "#141d30"))
+        ocd_card.grid(row=0, column=1, sticky="nsew", padx=(3, 4))
+        ocd_card.columnconfigure(1, weight=1)
+
+        ctk.CTkLabel(ocd_card, text="▶ OpenOCD DAP TCP 服务", font=TITLE_FONT,
+                     text_color=COLOR_CONFIG
+                     ).grid(row=0, column=0, columnspan=4, sticky="w",
+                            padx=10, pady=(8, 4))
+
+        ctk.CTkLabel(ocd_card, text="EHUB 主机：", font=LABEL_FONT
+                     ).grid(row=1, column=0, sticky="w", padx=10, pady=3)
+        ctk.CTkEntry(ocd_card, textvariable=self._ocd_host_var,
+                     width=130, font=MONO_FONT
+                     ).grid(row=1, column=1, sticky="ew", padx=(0, 6), pady=3)
+        ctk.CTkLabel(ocd_card, text="端口：", font=LABEL_FONT
+                     ).grid(row=1, column=2, sticky="w", padx=(4, 2), pady=3)
+        ctk.CTkEntry(ocd_card, textvariable=self._ocd_port_var,
+                     width=68, font=MONO_FONT
+                     ).grid(row=1, column=3, sticky="w", padx=(0, 10), pady=3)
+
+        ctk.CTkLabel(ocd_card, text="目标芯片：", font=LABEL_FONT
+                     ).grid(row=2, column=0, sticky="w", padx=10, pady=3)
+        ctk.CTkComboBox(ocd_card, variable=self._ocd_target_var,
+                        values=list(OCD_TARGET_MAP.keys()),
+                        width=220, font=MONO_FONT
+                        ).grid(row=2, column=1, columnspan=3, sticky="w",
+                               padx=(0, 10), pady=3)
+
+        ctk.CTkLabel(ocd_card, text="调试方式：", font=LABEL_FONT
+                 ).grid(row=3, column=0, sticky="w", padx=10, pady=3)
+        ctk.CTkComboBox(ocd_card, variable=self._ocd_transport_var,
+                values=list(OCD_TRANSPORT_MAP.keys()), width=90, font=MONO_FONT
+                ).grid(row=3, column=1, sticky="w", padx=(0, 6), pady=3)
+
+        ctk.CTkLabel(ocd_card, text="适配器速率(kHz)：", font=LABEL_FONT
+                 ).grid(row=4, column=0, sticky="w", padx=10, pady=3)
+        ctk.CTkComboBox(ocd_card, variable=self._ocd_speed_var,
+                        values=OCD_SPEED_LABELS, width=90, font=MONO_FONT
+                ).grid(row=4, column=1, sticky="w", padx=(0, 6), pady=3)
+
+        ocd_avail = os.path.exists(_OPENOCD_EXE)
+        if not ocd_avail:
+            ctk.CTkLabel(ocd_card, text=f"⚠ 未找到 openocd.exe：{_OPENOCD_EXE}",
+                         font=("微软雅黑", 10), text_color=COLOR_ERR, anchor="w"
+                         ).grid(row=4, column=0, columnspan=4, sticky="w",
+                                padx=10, pady=(0, 4))
+
+        btn_row = ctk.CTkFrame(ocd_card, fg_color="transparent")
+        btn_row.grid(row=5, column=0, columnspan=4, sticky="w", padx=10, pady=(4, 4))
+
+        _already_running = (self._openocd_proc is not None and
+                            self._openocd_proc.poll() is None)
+        self._ocd_start_btn = ctk.CTkButton(
+            btn_row, text="▶ 启动 OpenOCD", width=130, height=34,
+            fg_color=("#16a34a", "#15803d"),
+            hover_color=("#15803d", "#166534"),
+            font=TITLE_FONT,
+            state="disabled" if (_already_running or not ocd_avail) else "normal",
+            command=self._start_openocd)
+        self._ocd_start_btn.pack(side="left", padx=(0, 6))
+
+        self._ocd_stop_btn = ctk.CTkButton(
+            btn_row, text="■ 停止", width=72, height=34,
+            fg_color=("#dc2626", "#b91c1c"),
+            hover_color=("#b91c1c", "#991b1b"),
+            font=TITLE_FONT,
+            state="normal" if _already_running else "disabled",
+            command=self._stop_openocd)
+        self._ocd_stop_btn.pack(side="left", padx=(0, 10))
+
+        _pid_text = f"PID: {self._openocd_proc.pid}" if _already_running else "PID: --"
+        self._ocd_pid_lbl = ctk.CTkLabel(
+            btn_row, text=_pid_text, font=MONO_FONT, text_color="#94a3b8")
+        self._ocd_pid_lbl.pack(side="left")
+
+        _status_text  = "▶ OpenOCD 运行中" if _already_running else "■ OpenOCD 未运行"
+        _status_color = "#22c55e" if _already_running else "#94a3b8"
+        ctk.CTkLabel(ocd_card, text=_status_text, font=("微软雅黑", 11),
+                     text_color=_status_color, anchor="w"
+                     ).grid(row=6, column=0, columnspan=4, sticky="w",
+                            padx=10, pady=(0, 10))
+
+    # ── OpenOCD 启动 / 停止 ───────────────────────────────────────────────────
+    def _start_openocd(self):
+        if self._openocd_proc and self._openocd_proc.poll() is None:
+            self._log_append("⚠ OpenOCD 已在运行中", "err")
+            return
+        if not os.path.exists(_OPENOCD_EXE):
+            self._log_append(f"✗ 未找到 OpenOCD：{_OPENOCD_EXE}", "err")
+            return
+        host   = self._ocd_host_var.get().strip()  or "ehub.local"
+        port   = self._ocd_port_var.get().strip()  or "6000"
+        speed  = self._ocd_speed_var.get().strip() or "1000"
+        target = OCD_TARGET_MAP.get(self._ocd_target_var.get(), "stm32f1x")
+        transport = OCD_TRANSPORT_MAP.get(self._ocd_transport_var.get(), "swd")
+        cmd = [
+            _OPENOCD_EXE, "-s", _OPENOCD_SCRIPTS,
+            "-c", "adapter driver cmsis-dap",
+            "-c", "cmsis-dap backend tcp",
+            "-c", f"cmsis-dap tcp host {host}",
+            "-c", f"cmsis-dap tcp port {port}",
+            "-c", f"transport select {transport}",
+            "-c", f"source [find target/{target}.cfg]",
+            "-c", f"adapter speed {speed}",
+            "-c", "reset_config none",
+            "-c", "cortex_m reset_config sysresetreq",
+        ]
+        try:
+            self._openocd_proc = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                text=True, encoding="utf-8", errors="replace",
+                cwd=_OPENOCD_DIR,
+                creationflags=subprocess.CREATE_NO_WINDOW,
+            )
+            pid = self._openocd_proc.pid
+            self._log_append(
+                f"▶ OpenOCD 已启动  PID={pid}  目标={target}  方式={transport.upper()}  {host}:{port}", "config")
+            if self._ocd_pid_lbl:   self._ocd_pid_lbl.configure(text=f"PID: {pid}")
+            if self._ocd_start_btn: self._ocd_start_btn.configure(state="disabled")
+            if self._ocd_stop_btn:  self._ocd_stop_btn.configure(state="normal")
+            threading.Thread(target=self._read_openocd_output, daemon=True).start()
+        except Exception as e:
+            self._log_append(f"✗ OpenOCD 启动失败: {e}", "err")
+
+    def _stop_openocd(self):
+        if self._openocd_proc and self._openocd_proc.poll() is None:
+            self._openocd_proc.terminate()
+            self._log_append("■ OpenOCD 停止命令已发送", "config")
+        else:
+            self._log_append("ℹ OpenOCD 未在运行", "config")
+            self._openocd_proc = None
+
+    def _read_openocd_output(self):
+        proc = self._openocd_proc
+        if not proc or not proc.stdout:
+            return
+        try:
+            for line in proc.stdout:
+                line = line.rstrip("\r\n")
+                if line:
+                    self._log_q.put((-2, line.encode("utf-8", errors="replace")))
+        except Exception:
+            pass
+        finally:
+            self.after(0, self._on_openocd_exit)
+
+    def _on_openocd_exit(self):
+        ret = self._openocd_proc.returncode if self._openocd_proc else None
+        self._log_append(f"■ OpenOCD 已退出 (ret={ret})", "config")
+        self._openocd_proc = None
+        try:
+            if self._ocd_pid_lbl:   self._ocd_pid_lbl.configure(text="PID: --")
+            if self._ocd_start_btn: self._ocd_start_btn.configure(state="normal")
+            if self._ocd_stop_btn:  self._ocd_stop_btn.configure(state="disabled")
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
