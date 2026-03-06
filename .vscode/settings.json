@@ -7,8 +7,8 @@
         }
     ],
     "cortex-debug.armToolchainPath": "F:\\vscode\\openstm32\\Arm GNU Toolchain arm-none-eabi\\14.3 rel1\\bin",
-    "cortex-debug.openocdPath": "F:\\vscode\\openstm32\\openocd-20250710\\OpenOCD-20250710-0.12.0\\bin\\openocd.EXE",
-    "stm32-for-vscode.makePath": false,
+    "cortex-debug.openocdPath": "F:\\vscode\\openstm32\\openocd-20250710\\OpenOCD-20250710-0.12.0\\bin\\openocd.exe",
+    "stm32-for-vscode.makePath": "c:\\Users\\MC\\AppData\\Roaming\\Code\\User\\globalStorage\\bmd.stm32-for-vscode\\@xpack-dev-tools\\windows-build-tools\\4.4.1-3.1\\.content\\bin\\make.EXE",
     "python-envs.defaultEnvManager": "ms-python.python:system",
     "stm32-for-vscode.armToolchainPath": "F:\\vscode\\openstm32\\Arm GNU Toolchain arm-none-eabi\\14.3 rel1\\bin",
     "stm32-for-vscode.makeConcurrentJobs": 8,
