@@ -15,7 +15,8 @@
 					"source" : ".",
 					"targetIndexes" : 
 					[
-						0
+						0,
+						1
 					]
 				}
 			],
@@ -30,7 +31,8 @@
 					"name" : "EHUB",
 					"targetIndexes" : 
 					[
-						0
+						0,
+						1
 					]
 				}
 			],
@@ -39,8 +41,15 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "EHUB::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-EHUB-Debug-d2fb7f98c0bce8a24fe2.json",
+					"jsonFile" : "target-EHUB-Debug-bbecc446c76fd3833119.json",
 					"name" : "EHUB",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "EHUB_bootloader::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-EHUB_bootloader-Debug-e97531c90ed06e31b9fa.json",
+					"name" : "EHUB_bootloader",
 					"projectIndex" : 0
 				}
 			]

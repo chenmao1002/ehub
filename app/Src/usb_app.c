@@ -17,6 +17,7 @@
  */
 
 #include "usb_app.h"
+#include "boot_update.h"
 #include "wifi_bridge.h"
 #include "usbd_cdc_if.h"
 #include "usbd_customhid.h"
@@ -164,6 +165,12 @@ static void Bridge_Dispatch(const BridgeMsg_t *m)
             break;
         case BRIDGE_CH_CONFIG:
             Bridge_HandleConfig(m);
+            break;
+        case BRIDGE_CH_BOOT:
+            if (!Boot_Update_HandleFrame(m)) {
+                uint8_t rep[2] = { 0xFFU, BOOT_STATUS_BAD_ARG };
+                Bridge_SendToCDC(BRIDGE_CH_BOOT, rep, 2U);
+            }
             break;
         case BRIDGE_CH_DAP:
         {
@@ -513,6 +520,8 @@ void Bridge_Init(void)
 
     /* Start bridge task */
     osThreadNew(Bridge_Task, NULL, &bridge_task_attrs);
+
+    Boot_Update_Init();
 
     /* Initialise WiFi bridge (USART2 → ESP32) */
     WiFi_Bridge_Init();

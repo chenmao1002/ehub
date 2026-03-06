@@ -35,6 +35,7 @@ set(COMPILE_DEFINITIONS
 # ============================================================
 set(INCLUDE_DIRS
     ${CMAKE_SOURCE_DIR}/Core/Inc
+    ${CMAKE_SOURCE_DIR}/boot/Inc
     ${CMAKE_SOURCE_DIR}/DAP/inc
     ${CMAKE_SOURCE_DIR}/USB_DEVICE/App
     ${CMAKE_SOURCE_DIR}/USB_DEVICE/Target
@@ -154,6 +155,7 @@ set(DAP_SOURCES
 set(ALL_SOURCES
     ${STARTUP_FILE}
     ${APP_SOURCES}
+    ${CMAKE_SOURCE_DIR}/boot/Src/ehub_boot.c
     ${CORE_SOURCES}
     ${HAL_SOURCES}
     ${FREERTOS_SOURCES}
@@ -165,7 +167,7 @@ set(ALL_SOURCES
 # ============================================================
 # 链接脚本
 # ============================================================
-set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F407VETx_FLASH.ld)
+set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F407VETx_APP.ld)
 
 # ============================================================
 # 可执行目标
@@ -224,4 +226,61 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_NAME}.bin
     COMMAND ${CMAKE_SIZE} --format=berkeley $<TARGET_FILE:${PROJECT_NAME}>
     COMMENT "生成 HEX/BIN 文件并显示大小信息"
+)
+
+set(BOOTLOADER_NAME EHUB_bootloader)
+set(BOOTLOADER_SOURCES
+    ${STARTUP_FILE}
+    ${CMAKE_SOURCE_DIR}/bootloader/Src/main.c
+    ${CMAKE_SOURCE_DIR}/boot/Src/ehub_boot.c
+    ${CMAKE_SOURCE_DIR}/Core/Src/system_stm32f4xx.c
+    ${CMAKE_SOURCE_DIR}/Core/Src/stm32f4xx_hal_msp.c
+    ${CMAKE_SOURCE_DIR}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c
+    ${CMAKE_SOURCE_DIR}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c
+    ${CMAKE_SOURCE_DIR}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c
+    ${CMAKE_SOURCE_DIR}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c
+    ${CMAKE_SOURCE_DIR}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c
+    ${CMAKE_SOURCE_DIR}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c
+    ${CMAKE_SOURCE_DIR}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c
+    ${CMAKE_SOURCE_DIR}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c
+    ${CMAKE_SOURCE_DIR}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c
+    ${CMAKE_SOURCE_DIR}/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c
+)
+
+set(BOOTLOADER_LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/bootloader/STM32F407VETx_BOOT.ld)
+
+add_executable(${BOOTLOADER_NAME} ${BOOTLOADER_SOURCES})
+target_compile_definitions(${BOOTLOADER_NAME} PRIVATE ${COMPILE_DEFINITIONS})
+target_include_directories(${BOOTLOADER_NAME} PRIVATE ${INCLUDE_DIRS})
+target_compile_options(${BOOTLOADER_NAME} PRIVATE
+    ${MCU_FLAGS}
+    -Wall
+    -Wextra
+    -fdata-sections
+    -ffunction-sections
+    $<$<CONFIG:Debug>:-Og -g3 -gdwarf-2>
+    $<$<CONFIG:Release>:-Os>
+    -Wno-unused-parameter
+    -Wno-sign-compare
+)
+target_compile_options(${BOOTLOADER_NAME} PRIVATE
+    $<$<COMPILE_LANGUAGE:ASM>:${MCU_FLAGS} -x assembler-with-cpp>
+)
+target_link_options(${BOOTLOADER_NAME} PRIVATE
+    ${MCU_FLAGS}
+    -T${BOOTLOADER_LINKER_SCRIPT}
+    -specs=nano.specs
+    -lc -lm -lnosys
+    -Wl,-Map=${BOOTLOADER_NAME}.map,--cref
+    -Wl,--gc-sections
+    -Wl,--print-memory-usage
+)
+set_target_properties(${BOOTLOADER_NAME} PROPERTIES
+    LINK_DEPENDS ${BOOTLOADER_LINKER_SCRIPT}
+)
+add_custom_command(TARGET ${BOOTLOADER_NAME} POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O ihex   $<TARGET_FILE:${BOOTLOADER_NAME}> ${BOOTLOADER_NAME}.hex
+    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${BOOTLOADER_NAME}> ${BOOTLOADER_NAME}.bin
+    COMMAND ${CMAKE_SIZE} --format=berkeley $<TARGET_FILE:${BOOTLOADER_NAME}>
+    COMMENT "生成 bootloader HEX/BIN 文件并显示大小信息"
 )

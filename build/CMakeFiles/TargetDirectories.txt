@@ -1,3 +1,4 @@
 C:/Users/MC/Desktop/VSProject/EHUB4_3/EHUB/build/CMakeFiles/EHUB.dir
+C:/Users/MC/Desktop/VSProject/EHUB4_3/EHUB/build/CMakeFiles/EHUB_bootloader.dir
 C:/Users/MC/Desktop/VSProject/EHUB4_3/EHUB/build/CMakeFiles/edit_cache.dir
 C:/Users/MC/Desktop/VSProject/EHUB4_3/EHUB/build/CMakeFiles/rebuild_cache.dir

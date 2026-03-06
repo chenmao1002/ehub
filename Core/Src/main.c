@@ -37,6 +37,7 @@
 # include "dap_config.h"
 # include "dap_app.h"
 # include "printf_app.h"
+# include "ehub_boot.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -178,6 +179,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  SCB->VTOR = EHUB_APP_START_ADDR;
   HAL_Init();
 
   /* USER CODE BEGIN Init */
